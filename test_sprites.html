@@ -1,0 +1,79 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test 32 sprites in a cycle animation</title>
+<style>
+    .sprite {
+        overflow:hidden;
+        position:absolute;
+    }
+
+    .sprite img{
+        position:relative;
+    }
+</style>
+</head>
+<body>
+
+<p>32 animated sprites: <span id="result"></span></p>
+
+</body>
+<script src="sprite.js"></script>
+<script>
+
+function g(id){return document.getElementById(id)}
+
+window.onload = function() {
+
+    var sprites = [];
+
+    for(var i=0; i<=31; i++) {
+        var sp = new jsp.Sprite();
+        sp.init();
+        sp.loadImg('character.png');
+        sp.h=55;
+        sp.w=30;
+        sp.yoffset=-2;
+        sp.x=8 * i + 10;
+        sp.y=50 + ((i%4) * 60);
+        sprites.push(sp);
+    }
+
+    var cycle_left = new jsp.Cycle([[0, -2, 5], [-30, -2, 5], [-60, -2, 5], [-90, -2, 5], [-120, -2, 5], [-150, -2, 5], [-180, -2, 5]]);
+    var cycle_right = new jsp.Cycle([[-180, -62, 5], [-150, -62, 5], [-120, -62, 5], [-90, -62, 5], [-60, -62, 5], [-30, -62, 5], [0, -62, 5]]);
+    cycle_left.sprites = sprites;
+    cycle_right.sprites = sprites;
+
+    var sin_cycle = 0;
+    var ms_to_render = 0;
+    var display_ticks = 0;
+    var average_ms = 0;
+    setInterval(function() {
+        var start = new Date().getTime();
+        sin_cycle = sin_cycle + 0.05
+        var xv = Math.sin(sin_cycle) * 2;
+        if(xv<0)
+            var cycle = cycle_left;
+        else
+            var cycle = cycle_right;
+        cycle.next();
+        for(var i=0; i<sprites.length; i++) {
+            var sp = sprites[i];
+            sp.move(xv, 0);
+            sp.update();
+        }
+        ms_to_render = ms_to_render + new Date().getTime() - start;
+        if(display_ticks % 60 == 0) {
+            average_ms = Math.round(ms_to_render/60)
+            g('result').innerHTML = average_ms + 'ms spent in the display loop.';
+            display_ticks = 0;
+            ms_to_render = 0;
+        }
+        display_ticks = display_ticks + 1;
+    }, 35);
+
+}
+
+
+</script>
+
+</html>
