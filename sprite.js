@@ -33,8 +33,6 @@ function Sprite() {
 Sprite.prototype.init = function() {
     var d = document.createElement('div');
     d.className = 'sprite';
-    d.style['overflow'] = 'hidden';
-    d.style['position'] = 'absolute';
     this.dom = d;
     document.body.appendChild(this.dom);
 };
