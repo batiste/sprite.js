@@ -58,23 +58,9 @@ Sprite.prototype.move = function (x, y) {
     this.y = this.y+y;
 };
 
-Sprite.prototype.update2 = function updateDomProperties () {
-    var style = this.dom.style;
-    style.width=this.w;
-    style.height=this.h;
-    style.top=this.y+'px';
-    style.left=this.x+'px';
-    this.img.style.left=this.xoffset+'px';
-    this.img.style.top=this.yoffset+'px';
-    if(this.transform_changed) {
-        style[sjs.tproperty] = 'rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+')';
-        this.transform_changed = false;
-    }
-};
-
 Sprite.prototype.update = function updateCssText () {
     /* my tests show that cssText is way more efficient on firefox.
-    somewhat better on webkit and a bit worse on Opera */
+     * somewhat better on webkit and a bit worse on Opera. */
     var cssText = "";
     cssText+='width:'+this.w+'px;';
     cssText+='height:'+this.h+'px;';
@@ -88,6 +74,22 @@ Sprite.prototype.update = function updateCssText () {
         this.transform_changed = false;
     }
     this.dom.style.cssText = cssText;
+};
+
+Sprite.prototype.update2 = function updateDomProperties () {
+    /* alternative update function. This might be faster in some situation, especially
+     * when few properties have been changed. */
+    var style = this.dom.style;
+    style.width=this.w;
+    style.height=this.h;
+    style.top=this.y+'px';
+    style.left=this.x+'px';
+    this.img.style.left=this.xoffset+'px';
+    this.img.style.top=this.yoffset+'px';
+    if(this.transform_changed) {
+        style[sjs.tproperty] = 'rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+')';
+        this.transform_changed = false;
+    }
 };
 
 Sprite.prototype.toString = function () {
