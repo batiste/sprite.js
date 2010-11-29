@@ -13,10 +13,14 @@ function Sprite() {
 
     // image
     this.img = null;
-    // weight, height
-    this.w = 100;
-    this.h = 100;
+    this.img_natural_width = 0;
+    this.img_natural_height = 0;
 
+    // width and height of the sprite view port
+    this.w = null;
+    this.h = null;
+
+    // offsets of the image within the viewport
     this.xoffset=0;
     this.yoffset=0;
 
@@ -92,6 +96,30 @@ Sprite.prototype.update2 = function updateDomProperties () {
     }
 };
 
+Sprite.prototype.update3 = function updateCssText () {
+    /* Try an alternative scale method. Tests don't
+     * produce any noticeable improvement. */
+    var cssText = "";
+    var xs = Math.abs(this.xscale);
+    var ys = Math.abs(this.yscale);
+    cssText+='width:'+xs*this.w+'px;';
+    cssText+='height:'+ys*this.h+'px;';
+    cssText+='top:'+this.y+'px;';
+    cssText+='left:'+this.x+'px;';
+    this.img.style.left=xs*this.xoffset+'px';
+    this.img.style.top=ys*this.yoffset+'px';
+
+    this.img.style.width=xs*this.img_natural_width+'px';
+    this.img.style.height=ys*this.img_natural_height+'px';
+
+    // this has pretty bad perfs implication on Opera, don't update the value if nothing changed
+    if(this.transform_changed) {
+        cssText+=sjs.cproperty+':rotate('+this.r+'rad);';
+        this.transform_changed = false;
+    }
+    this.dom.style.cssText = cssText;
+};
+
 Sprite.prototype.toString = function () {
     return String(this.x) + ',' + String(this.y);
 };
@@ -101,6 +129,12 @@ Sprite.prototype.loadImg = function (src) {
     var there = this;
     this.img.onload = function() {
         there.dom.appendChild(there.img);
+        there.img_natural_width = there.img.width;
+        there.img_natural_height = there.img.img_natural_height;
+        if(there.w === null)
+            there.w = img.width;
+        if(there.h === null)
+            there.h = img.height;
     };
     this.img.src = src;
 };
