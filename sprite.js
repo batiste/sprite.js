@@ -47,7 +47,10 @@ Sprite.prototype.rotate = function (v) {
 Sprite.prototype.scale = function (x, y) {
     this.transform_changed = true;
     this.xscale = x;
-    this.yscale = y;
+    if(y === undefined)
+        this.yscale = x;
+    else
+        this.yscale = y;
 };
 
 Sprite.prototype.move = function (x, y) {
