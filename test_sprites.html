@@ -27,7 +27,7 @@ window.onload = function() {
     var sprites = [];
 
     for(var i=0; i<=31; i++) {
-        var sp = new jsp.Sprite();
+        var sp = new sjs.Sprite();
         sp.init();
         sp.loadImg('character.png');
         sp.h=55;
@@ -38,8 +38,8 @@ window.onload = function() {
         sprites.push(sp);
     }
 
-    var cycle_left = new jsp.Cycle([[0, -2, 5], [-30, -2, 5], [-60, -2, 5], [-90, -2, 5], [-120, -2, 5], [-150, -2, 5], [-180, -2, 5]]);
-    var cycle_right = new jsp.Cycle([[-180, -62, 5], [-150, -62, 5], [-120, -62, 5], [-90, -62, 5], [-60, -62, 5], [-30, -62, 5], [0, -62, 5]]);
+    var cycle_left = new sjs.Cycle([[0, -2, 5], [-30, -2, 5], [-60, -2, 5], [-90, -2, 5], [-120, -2, 5], [-150, -2, 5], [-180, -2, 5]]);
+    var cycle_right = new sjs.Cycle([[-180, -62, 5], [-150, -62, 5], [-120, -62, 5], [-90, -62, 5], [-60, -62, 5], [-30, -62, 5], [0, -62, 5]]);
     cycle_left.sprites = sprites;
     cycle_right.sprites = sprites;
 

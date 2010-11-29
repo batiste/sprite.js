@@ -30,14 +30,14 @@ function Sprite() {
     this.transform_changed = false;
 }
 
+Sprite.prototype.constructor = Sprite;
+
 Sprite.prototype.init = function() {
     var d = document.createElement('div');
     d.className = 'sprite';
     this.dom = d;
     document.body.appendChild(this.dom);
 };
-
-Sprite.prototype.constructor = Sprite;
 
 Sprite.prototype.rotate = function (v) {
     this.transform_changed = true;
@@ -64,7 +64,7 @@ Sprite.prototype.update2 = function updateDomProperties () {
     this.img.style.left=this.xoffset+'px';
     this.img.style.top=this.yoffset+'px';
     if(this.transform_changed) {
-        style[jsp.tproperty] = 'rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+')';
+        style[sjs.tproperty] = 'rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+')';
         this.transform_changed = false;
     }
 };
@@ -81,7 +81,7 @@ Sprite.prototype.update = function updateCssText () {
     this.img.style.top=this.yoffset+'px';
     // this has pretty bad perfs implication on Opera, don't update the value if nothing changed
     if(this.transform_changed) {
-        cssText+=jsp.cproperty+':rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+');';
+        cssText+=sjs.cproperty+':rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+');';
         this.transform_changed = false;
     }
     this.dom.style.cssText = cssText;
@@ -139,13 +139,13 @@ function SquaredSprite() {
 SquaredSprite.prototype = new Sprite();
 SquaredSprite.prototype.constructor = SquaredSprite;
 
-var jsp = {};
-jsp.Sprite = Sprite;
-jsp.SquaredSprite = SquaredSprite;
-jsp.Cycle = Cycle;
+var sjs = {};
+sjs.Sprite = Sprite;
+sjs.SquaredSprite = SquaredSprite;
+sjs.Cycle = Cycle;
 
-jsp.tproperty = false;
-jsp.cproperty = false;
+sjs.tproperty = false;
+sjs.cproperty = false;
 function getTransformProperty() {
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
     var css_properties = ['transform', '-webkit-transform', '-moz-transform', '-o-transform'];
@@ -153,13 +153,13 @@ function getTransformProperty() {
     while (p = properties.shift()) {
         var c = css_properties.shift();
         if (typeof document.body.style[p] != 'undefined') {
-            jsp.tproperty = p;
-            jsp.cproperty = c;
+            sjs.tproperty = p;
+            sjs.cproperty = c;
         }
     }
 }
  // TODO: be sure the body is loaded before doing that
 getTransformProperty();
-window.jsp = jsp;
+window.sjs = sjs;
 
 })();
