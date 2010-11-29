@@ -38,6 +38,12 @@ window.onload = function() {
         sprites.push(sp);
     }
 
+    var logo = new sjs.Sprite();
+    logo.x = 120
+    logo.y = 150
+    logo.init();
+    logo.loadImg('spritejs.png');
+
     var cycle_left = new sjs.Cycle([[0, -2, 5], [-30, -2, 5], [-60, -2, 5], [-90, -2, 5], [-120, -2, 5], [-150, -2, 5], [-180, -2, 5]]);
     var cycle_right = new sjs.Cycle([[-180, -62, 5], [-150, -62, 5], [-120, -62, 5], [-90, -62, 5], [-60, -62, 5], [-30, -62, 5], [0, -62, 5]]);
     cycle_left.sprites = sprites;
@@ -61,6 +67,11 @@ window.onload = function() {
             sp.move(xv, 0);
             sp.update();
         }
+
+        logo.scale(xv);
+        logo.rotate(0.02);
+        logo.update();
+
         ms_to_render = ms_to_render + new Date().getTime() - start;
         if(display_ticks % 60 == 0) {
             average_ms = Math.round(ms_to_render/60)

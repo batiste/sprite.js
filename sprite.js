@@ -128,9 +128,10 @@ Sprite.prototype.loadImg = function (src) {
     this.img = new Image();
     var there = this;
     this.img.onload = function() {
-        there.dom.appendChild(there.img);
-        there.img_natural_width = there.img.width;
-        there.img_natural_height = there.img.img_natural_height;
+        var img = there.img;
+        there.dom.appendChild(img);
+        there.img_natural_width = img.width;
+        there.img_natural_height = img.img_natural_height;
         if(there.w === null)
             there.w = img.width;
         if(there.h === null)
