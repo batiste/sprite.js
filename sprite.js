@@ -32,15 +32,17 @@ function Sprite() {
     this.r = 0;
 
     this.transform_changed = false;
+
+    var d = document.createElement('div');
+    d.className = 'sprite';
+    this.dom = d;
+    document.body.appendChild(this.dom);
 }
 
 Sprite.prototype.constructor = Sprite;
 
 Sprite.prototype.init = function() {
-    var d = document.createElement('div');
-    d.className = 'sprite';
-    this.dom = d;
-    document.body.appendChild(this.dom);
+
 };
 
 Sprite.prototype.rotate = function (v) {

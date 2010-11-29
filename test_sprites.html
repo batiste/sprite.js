@@ -28,7 +28,6 @@ window.onload = function() {
 
     for(var i=0; i<=31; i++) {
         var sp = new sjs.Sprite();
-        sp.init();
         sp.loadImg('character.png');
         sp.h=55;
         sp.w=30;
@@ -41,7 +40,6 @@ window.onload = function() {
     var logo = new sjs.Sprite();
     logo.x = 120
     logo.y = 150
-    logo.init();
     logo.loadImg('spritejs.png');
 
     var cycle_left = new sjs.Cycle([[0, -2, 5], [-30, -2, 5], [-60, -2, 5], [-90, -2, 5], [-120, -2, 5], [-150, -2, 5], [-180, -2, 5]]);
