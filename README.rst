@@ -22,8 +22,6 @@ Example of a basic use::
     <script>
     // create the Sprite object;
     var sp = new sjs.Sprite();
-    // Bind the object with a DOM element in the page
-    sp.init();
     // load the sprite image
     sp.loadImg('character.png');
     // change the visible size of the sprite
