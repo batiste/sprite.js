@@ -20,13 +20,11 @@
 <script src="sprite.js"></script>
 <script>
 
-function g(id){return document.getElementById(id)}
-
 window.onload = function() {
 
     var sprites = [];
 
-    for(var i=0; i<=31; i++) {
+    for(var i=0; i<32; i++) {
         var sp = new sjs.Sprite();
         sp.loadImg('character.png');
         sp.h=55;
@@ -38,51 +36,51 @@ window.onload = function() {
     }
 
     var logo = new sjs.Sprite();
-    logo.x = 120
-    logo.y = 150
+    logo.x = 120;
+    logo.y = 150;
     logo.loadImg('spritejs.png');
 
-    var cycle_left = new sjs.Cycle([[0, -2, 5], [-30, -2, 5], [-60, -2, 5], [-90, -2, 5], [-120, -2, 5], [-150, -2, 5], [-180, -2, 5]]);
-    var cycle_right = new sjs.Cycle([[-180, -62, 5], [-150, -62, 5], [-120, -62, 5], [-90, -62, 5], [-60, -62, 5], [-30, -62, 5], [0, -62, 5]]);
-    cycle_left.sprites = sprites;
-    cycle_right.sprites = sprites;
+    var cycle = new sjs.Cycle([[0, -2, 5],
+                               [-30, -2, 5],
+                               [-60, -2, 5],
+                               [-90, -2, 5],
+                               [-120, -2, 5],
+                               [-150, -2, 5],
+                               [-180, -2, 5]]);
+    cycle.sprites = sprites;
 
-    var sin_cycle = 0;
-    var ms_to_render = 0;
-    var display_ticks = 0;
-    var average_ms = 0;
+    var sin_cycle = 0,
+        ms_to_render = 0,
+        display_ticks = 0,
+        average_ms = 0,
+        result = document.getElementById('result');
     setInterval(function() {
-        var start = new Date().getTime();
-        sin_cycle = sin_cycle + 0.05
-        var xv = Math.sin(sin_cycle) * 2;
-        if(xv<0)
-            var cycle = cycle_left;
-        else
-            var cycle = cycle_right;
+        sin_cycle = sin_cycle + 0.05;
+        var start = new Date().getTime(),
+            xv = Math.sin(sin_cycle) * 2,
+            xscale = xv < 0 ? 1 : -1;
+
         cycle.next();
-        for(var i=0; i<sprites.length; i++) {
-            var sp = sprites[i];
-            sp.move(xv, 0);
-            sp.update();
+        for(var i=0, sp; sp = sprites[i]; i++) {
+            sp.move(xv, 0)
+              .scale(xscale, 1)
+              .update();
         }
 
-        logo.scale(xv);
-        logo.rotate(0.02);
-        logo.update();
+        logo.scale(xv)
+            .rotate(0.02)
+            .update();
 
         ms_to_render = ms_to_render + new Date().getTime() - start;
         if(display_ticks % 60 == 0) {
             average_ms = Math.round(ms_to_render/60)
-            g('result').innerHTML = average_ms + 'ms spent in the display loop.';
+            result.innerHTML = average_ms + 'ms spent in the display loop.';
             display_ticks = 0;
             ms_to_render = 0;
         }
         display_ticks = display_ticks + 1;
     }, 35);
 
-}
-
-
+};
 </script>
-
 </html>
