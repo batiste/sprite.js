@@ -156,7 +156,10 @@ function Cycle(triplet) {
 
 Cycle.prototype.next = function () {
     if(this.tick > this.cycle_duration) {
-
+        if(this.repeat)
+            this.tick = 0;
+        else
+            return;
     }
     for(var i=0; i<this.changing_ticks.length; i++) {
         if(this.tick == this.changing_ticks[i]) {
@@ -167,8 +170,6 @@ Cycle.prototype.next = function () {
         }
     }
     this.tick = this.tick + 1;
-    if(this.tick > this.cycle_duration)
-        this.tick = 0;
 };
 
 function SquaredSprite() {
