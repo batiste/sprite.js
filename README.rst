@@ -10,12 +10,15 @@ For an example of the what the framework offers, have a look at test_sprites.htm
 Example usage
 =================
 
+Example of a basic use::
+
     <style>
     .sprite {overflow:hidden;position:absolute;}
     .sprite img{position:relative;}
     </style>
 
     <script src="sprite.js"></script>
+
     <script>
     // create the Sprite object;
     var sp = new sjs.Sprite();
