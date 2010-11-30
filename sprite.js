@@ -53,12 +53,16 @@ Sprite.prototype.rotate = function (v) {
 };
 
 Sprite.prototype.scale = function (x, y) {
-    this.transform_changed = true;
-    this.xscale = x;
+    if(this.xscale != x) {
+        this.xscale = x;
+        this.transform_changed = true;
+    }
     if(y === undefined)
-        this.yscale = x;
-    else
+        var y = x;
+    if(this.yscale != y) {
         this.yscale = y;
+        this.transform_changed = true;
+    }
     return this;
 };
 
@@ -68,7 +72,24 @@ Sprite.prototype.move = function (x, y) {
     return this;
 };
 
-Sprite.prototype.update = function updateCssText () {
+Sprite.prototype.update = function updateDomProperties () {
+    /* alternative update function. This might be faster in some situation, especially
+     * when few properties have been changed. */
+    var style = this.dom.style;
+    style.width=this.w+'px';
+    style.height=this.h+'px';
+    style.top=this.y+'px';
+    style.left=this.x+'px';
+    this.img.style.left=this.xoffset+'px';
+    this.img.style.top=this.yoffset+'px';
+    if(this.transform_changed) {
+        style[sjs.tproperty] = 'rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+')';
+        this.transform_changed = false;
+    }
+    return this;
+};
+
+Sprite.prototype.update2 = function updateCssText () {
     /* my tests show that cssText is way more efficient on firefox.
      * somewhat better on webkit and a bit worse on Opera. */
     var cssText = "";
@@ -83,24 +104,8 @@ Sprite.prototype.update = function updateCssText () {
         cssText+=sjs.cproperty+':rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+');';
         this.transform_changed = false;
     }
+    // this has the annoying side effect of reseting values like transforms
     this.dom.style.cssText = cssText;
-    return this;
-};
-
-Sprite.prototype.update2 = function updateDomProperties () {
-    /* alternative update function. This might be faster in some situation, especially
-     * when few properties have been changed. */
-    var style = this.dom.style;
-    style.width=this.w;
-    style.height=this.h;
-    style.top=this.y+'px';
-    style.left=this.x+'px';
-    this.img.style.left=this.xoffset+'px';
-    this.img.style.top=this.yoffset+'px';
-    if(this.transform_changed) {
-        style[sjs.tproperty] = 'rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+')';
-        this.transform_changed = false;
-    }
     return this;
 };
 
