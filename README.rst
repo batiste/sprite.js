@@ -34,7 +34,7 @@ Example of a basic use::
     sp.xoffset=-50;
     sp.yoffset=-50;
 
-    // diverse transformation
+    // diverse transformations
     sp.move(100, 100);
     sp.rotate(3.14 / 4);
     sp.scale(2);
