@@ -37,6 +37,7 @@ function Sprite() {
     d.className = 'sprite';
     this.dom = d;
     document.body.appendChild(this.dom);
+    return this;
 }
 
 Sprite.prototype.constructor = Sprite;
@@ -48,6 +49,7 @@ Sprite.prototype.init = function() {
 Sprite.prototype.rotate = function (v) {
     this.transform_changed = true;
     this.r = this.r+v;
+    return this;
 };
 
 Sprite.prototype.scale = function (x, y) {
@@ -57,11 +59,13 @@ Sprite.prototype.scale = function (x, y) {
         this.yscale = x;
     else
         this.yscale = y;
+    return this;
 };
 
 Sprite.prototype.move = function (x, y) {
     this.x = this.x+x;
     this.y = this.y+y;
+    return this;
 };
 
 Sprite.prototype.update = function updateCssText () {
@@ -80,6 +84,7 @@ Sprite.prototype.update = function updateCssText () {
         this.transform_changed = false;
     }
     this.dom.style.cssText = cssText;
+    return this;
 };
 
 Sprite.prototype.update2 = function updateDomProperties () {
@@ -96,6 +101,7 @@ Sprite.prototype.update2 = function updateDomProperties () {
         style[sjs.tproperty] = 'rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+')';
         this.transform_changed = false;
     }
+    return this;
 };
 
 Sprite.prototype.update3 = function updateCssText () {
@@ -140,6 +146,7 @@ Sprite.prototype.loadImg = function (src) {
             there.h = img.height;
     };
     this.img.src = src;
+    return this;
 };
 
 function Cycle(triplet) {
@@ -162,7 +169,7 @@ Cycle.prototype.next = function () {
         if(this.repeat)
             this.tick = 0;
         else
-            return;
+            return this;
     }
     for(var i=0; i<this.changing_ticks.length; i++) {
         if(this.tick == this.changing_ticks[i]) {
@@ -173,6 +180,7 @@ Cycle.prototype.next = function () {
         }
     }
     this.tick = this.tick + 1;
+    return this;
 };
 
 function SquaredSprite() {
@@ -182,20 +190,21 @@ function SquaredSprite() {
 SquaredSprite.prototype = new Sprite();
 SquaredSprite.prototype.constructor = SquaredSprite;
 
-var sjs = {};
-sjs.Sprite = Sprite;
-sjs.SquaredSprite = SquaredSprite;
-sjs.Cycle = Cycle;
+var sjs = {
+    Sprite: Sprite,
+    SquareSprite: SquaredSprite,
+    Cycle: Cycle,
+    tproperty: false,
+    cproperty: false
+};
 
-sjs.tproperty = false;
-sjs.cproperty = false;
 function getTransformProperty() {
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
     var css_properties = ['transform', '-webkit-transform', '-moz-transform', '-o-transform'];
     var p = false;
     while (p = properties.shift()) {
         var c = css_properties.shift();
-        if (typeof document.body.style[p] != 'undefined') {
+        if (typeof document.body.style[p] !== 'undefined') {
             sjs.tproperty = p;
             sjs.cproperty = c;
         }
