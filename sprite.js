@@ -42,10 +42,6 @@ function Sprite() {
 
 Sprite.prototype.constructor = Sprite;
 
-Sprite.prototype.init = function() {
-
-};
-
 Sprite.prototype.rotate = function (v) {
     this.transform_changed = true;
     this.r = this.r+v;
@@ -72,6 +68,11 @@ Sprite.prototype.move = function (x, y) {
     return this;
 };
 
+Sprite.prototype.offset = function (x, y) {
+    this.xoffset=x;
+    this.yoffset=y;
+};
+
 Sprite.prototype.update = function updateDomProperties () {
     /* alternative update function. This might be faster in some situation, especially
      * when few properties have been changed. */
@@ -82,8 +83,16 @@ Sprite.prototype.update = function updateDomProperties () {
     style.left=this.x+'px';
     this.img.style.left=this.xoffset+'px';
     this.img.style.top=this.yoffset+'px';
+    // those transformation have pretty bad perfs implication on Opera,
+    // don't update those values if nothing changed
     if(this.transform_changed) {
-        style[sjs.tproperty] = 'rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+')';
+        var trans = "";
+        if(this.r!=0)
+            trans += 'rotate('+this.r+'rad) ';
+        if(this.xscale!=1 || this.yscale!=1) {
+            trans += ' scale('+this.xscale+', '+this.yscale+')';
+        }
+        style[sjs.tproperty] = trans;
         this.transform_changed = false;
     }
     return this;
@@ -99,8 +108,9 @@ Sprite.prototype.update2 = function updateCssText () {
     cssText+='left:'+this.x+'px;';
     this.img.style.left=this.xoffset+'px';
     this.img.style.top=this.yoffset+'px';
-    // this has pretty bad perfs implication on Opera, don't update the value if nothing changed
-    if(this.transform_changed) {
+    // those transformation have pretty bad perfs implication on Opera,
+    // don't update those values if nothing changed
+    if(this.xscale!=1 || this.yscale!=1) {
         cssText+=sjs.cproperty+':rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+');';
         this.transform_changed = false;
     }
