@@ -39,6 +39,8 @@ Example of a basic use::
 Sprite object public methods
 ==============================
 
+You can use those methods to modify the sprite object::
+
     Sprite(src)
     Sprite.rotate(radiant)
     Sprite.scale(x, y)
