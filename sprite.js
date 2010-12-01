@@ -46,6 +46,7 @@ function Sprite() {
 
     var d = document.createElement('div');
     d.className = 'sprite';
+    d.style.position = 'absolute';
     this.dom = d;
     document.body.appendChild(this.dom);
     return this;
@@ -108,26 +109,6 @@ Sprite.prototype.update = function updateDomProperties () {
         style[sjs.tproperty] = trans;
     }
     this.changed = {};
-    return this;
-};
-
-Sprite.prototype.update2 = function updateCssText () {
-    /* my tests show that cssText is way more efficient on firefox.
-     * somewhat better on webkit and a bit worse on Opera. */
-    var cssText = "";
-    cssText+='width:'+this.w+'px;';
-    cssText+='height:'+this.h+'px;';
-    cssText+='top:'+this.y+'px;';
-    cssText+='left:'+this.x+'px;';
-    this.img.style.left=this.xoffset+'px';
-    this.img.style.top=this.yoffset+'px';
-    // those transformation have pretty bad perfs implication on Opera,
-    // don't update those values if nothing changed
-    if(this.xscale!=1 || this.yscale!=1) {
-        cssText+=sjs.cproperty+':rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+');';
-    }
-    // this has the annoying side effect of reseting values like transforms
-    this.dom.style.cssText = cssText;
     return this;
 };
 

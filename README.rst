@@ -12,11 +12,6 @@ Example usage
 
 Example of a basic use::
 
-    <style>
-    .sprite {overflow:hidden;position:absolute;}
-    .sprite img{position:relative;}
-    </style>
-
     <script src="sprite.js"></script>
 
     <script>
