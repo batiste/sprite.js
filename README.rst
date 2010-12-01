@@ -3,7 +3,10 @@ sprite.js
 ===========
 
 This framework is there to help you creates animations and games
-using sprites in an efficient way.
+using sprites in an efficient way. The goal is to have common
+framework for Desktop and mobile browsers.
+
+sprite.js is has been tested on Chromium, Firefox, Android emulator and Opera.
 
 For an example of the what the framework offers, have a look at test_sprites.html.
 
