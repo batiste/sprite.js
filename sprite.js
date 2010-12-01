@@ -42,7 +42,7 @@ function Sprite(src) {
 
     property('xscale', 1);
     property('yscale', 1);
-    property('r');
+    property('angle', 0);
 
     var d = document.createElement('div');
     d.className = 'sprite';
@@ -58,7 +58,7 @@ function Sprite(src) {
 Sprite.prototype.constructor = Sprite;
 
 Sprite.prototype.rotate = function (v) {
-    this.r = this.r + v;
+    this.angle = this.angle + v;
     return this;
 };
 
@@ -102,15 +102,16 @@ Sprite.prototype.update = function updateDomProperties () {
 
     // those transformation have pretty bad perfs implication on Opera,
     // don't update those values if nothing changed
-    if(this.changed['xscale'] || this.changed['yscale'] || this.changed['r']) {
+    if(this.changed['xscale'] || this.changed['yscale'] || this.changed['angle']) {
         var trans = "";
-        if(this.r!=0)
-            trans += 'rotate('+this.r+'rad) ';
+        if(this.angle!=0)
+            trans += 'rotate('+this.angle+'rad) ';
         if(this.xscale!=1 || this.yscale!=1) {
             trans += ' scale('+this.xscale+', '+this.yscale+')';
         }
         style[sjs.tproperty] = trans;
     }
+    // reset
     this.changed = {};
     return this;
 };

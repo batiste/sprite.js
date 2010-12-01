@@ -36,16 +36,29 @@ Example of a basic use::
     sp.update();
     </script>
 
-Sprite object public methods
-==============================
+Sprite object public methods and attributes
+============================================
 
-You can use those methods to modify the sprite object::
+You can use those attributes methods to modify the sprite object::
+
+    Sprite.y
+    Sprite.x
+    Sprite.w
+    Sprite.h
+    Sprite.xoffset
+    Sprite.yoffset
+    Sprite.xscale
+    Sprite.yscale
+    Sprite.angle
 
     Sprite(src)
     Sprite.rotate(radiant)
     Sprite.scale(x, y)
     Sprite.move(x, y)
     Sprite.offset(x, y)
+
+At the end, you must call the visual update to see any real change::
+
     Sprite.update()
 
 Ticker object
