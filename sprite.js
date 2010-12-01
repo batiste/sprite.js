@@ -3,13 +3,28 @@
 (function(){
 
 function Sprite() {
+
+    var sp = this;
+    this.changed = {};
+
+    function property(name, default_value) {
+        if(default_value === undefined)
+            sp['_'+name] = 0;
+        else
+            sp['_'+name] = default_value;
+        sp.__defineGetter__(name, function() {
+            return sp['_'+name];
+        });
+
+        sp.__defineSetter__(name, function(value) {
+            sp['_'+name] = value;
+            sp.changed[name] = true;
+        });
+    }
+
     // positions
-    this.x = 0;
-    this.y = 0;
-    // x velocity
-    this.xv = 0;
-    // y velocity
-    this.yv = 0;
+    property('y');
+    property('x');
 
     // image
     this.img = null;
@@ -17,21 +32,18 @@ function Sprite() {
     this.img_natural_height = 0;
 
     // width and height of the sprite view port
-    this.w = null;
-    this.h = null;
+    property('w', null);
+    property('h', null);
 
     // offsets of the image within the viewport
-    this.xoffset=0;
-    this.yoffset=0;
+    property('xoffset');
+    property('yoffset');
 
     this.dom = null;
 
-    this.xscale = 1;
-    this.yscale = 1;
-    // radial position
-    this.r = 0;
-
-    this.transform_changed = false;
+    property('xscale', 1);
+    property('yscale', 1);
+    property('r');
 
     var d = document.createElement('div');
     d.className = 'sprite';
@@ -43,21 +55,18 @@ function Sprite() {
 Sprite.prototype.constructor = Sprite;
 
 Sprite.prototype.rotate = function (v) {
-    this.transform_changed = true;
-    this.r = this.r+v;
+    this.r = this.r + v;
     return this;
 };
 
 Sprite.prototype.scale = function (x, y) {
     if(this.xscale != x) {
         this.xscale = x;
-        this.transform_changed = true;
     }
     if(y === undefined)
         var y = x;
     if(this.yscale != y) {
         this.yscale = y;
-        this.transform_changed = true;
     }
     return this;
 };
@@ -77,15 +86,21 @@ Sprite.prototype.update = function updateDomProperties () {
     /* alternative update function. This might be faster in some situation, especially
      * when few properties have been changed. */
     var style = this.dom.style;
-    style.width=this.w+'px';
-    style.height=this.h+'px';
-    style.top=this.y+'px';
-    style.left=this.x+'px';
-    this.img.style.left=this.xoffset+'px';
-    this.img.style.top=this.yoffset+'px';
+    if(this.changed['w'])
+        style.width=this.w+'px';
+    if(this.changed['h'])
+        style.height=this.h+'px';
+    if(this.changed['y'])
+        style.top=this.y+'px';
+    if(this.changed['x'])
+        style.left=this.x+'px';
+    if(this.changed['xoffset'])
+        this.img.style.left=this.xoffset+'px';
+    if(this.changed['yoffset'])
+        this.img.style.top=this.yoffset+'px';
     // those transformation have pretty bad perfs implication on Opera,
     // don't update those values if nothing changed
-    if(this.transform_changed) {
+    if(this.changed['xscale'] || this.changed['yscale'] || this.changed['r']) {
         var trans = "";
         if(this.r!=0)
             trans += 'rotate('+this.r+'rad) ';
@@ -93,8 +108,8 @@ Sprite.prototype.update = function updateDomProperties () {
             trans += ' scale('+this.xscale+', '+this.yscale+')';
         }
         style[sjs.tproperty] = trans;
-        this.transform_changed = false;
     }
+    this.changed = {};
     return this;
 };
 
@@ -112,7 +127,6 @@ Sprite.prototype.update2 = function updateCssText () {
     // don't update those values if nothing changed
     if(this.xscale!=1 || this.yscale!=1) {
         cssText+=sjs.cproperty+':rotate('+this.r+'rad) scale('+this.xscale+', '+this.yscale+');';
-        this.transform_changed = false;
     }
     // this has the annoying side effect of reseting values like transforms
     this.dom.style.cssText = cssText;
@@ -136,10 +150,8 @@ Sprite.prototype.update3 = function updateCssText () {
     this.img.style.height=ys*this.img_natural_height+'px';
 
     // this has pretty bad perfs implication on Opera, don't update the value if nothing changed
-    if(this.transform_changed) {
-        cssText+=sjs.cproperty+':rotate('+this.r+'rad);';
-        this.transform_changed = false;
-    }
+    cssText+=sjs.cproperty+':rotate('+this.r+'rad);';
+    this.transform_changed = false;
     this.dom.style.cssText = cssText;
 };
 
