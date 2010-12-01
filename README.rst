@@ -16,9 +16,8 @@ Example of a basic use::
 
     <script>
     // create the Sprite object;
-    var sp = new sjs.Sprite();
-    // load the sprite image
-    sp.loadImg('character.png');
+    var sp = new sjs.Sprite('character.png');
+
     // change the visible size of the sprite
     sp.h=55;
     sp.w=30;

@@ -2,7 +2,7 @@
 
 (function(){
 
-function Sprite() {
+function Sprite(src) {
 
     var sp = this;
     this.changed = {};
@@ -49,6 +49,9 @@ function Sprite() {
     d.style.position = 'absolute';
     this.dom = d;
     document.body.appendChild(this.dom);
+
+    if(src)
+        this.loadImg(src)
     return this;
 }
 

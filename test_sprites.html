@@ -17,8 +17,7 @@ window.onload = function() {
     var sprites = [];
 
     for(var i=0; i<32; i++) {
-        var sp = new sjs.Sprite();
-        sp.loadImg('character.png');
+        var sp = new sjs.Sprite('character.png');
         sp.h=55;
         sp.w=30;
         sp.yoffset=-2;
