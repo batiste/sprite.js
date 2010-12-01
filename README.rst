@@ -36,6 +36,16 @@ Example of a basic use::
     sp.update();
     </script>
 
+Sprite object public methods
+==============================
+
+    Sprite(src)
+    Sprite.rotate(radiant)
+    Sprite.scale(x, y)
+    Sprite.move(x, y)
+    Sprite.offset(x, y)
+    Sprite.update()
+
 Ticker object
 ==============
 
