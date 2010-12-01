@@ -7,6 +7,8 @@ using sprites in an efficient way.
 
 For an example of the what the framework offers, have a look at test_sprites.html.
 
+You can see the demon online here: http://batiste.dosimple.ch/sprite.js/test_sprites.html
+
 Example usage
 =================
 
