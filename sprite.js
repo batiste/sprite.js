@@ -27,7 +27,6 @@ function Sprite() {
     property('x');
 
     // image
-    this.img = null;
     this.img_natural_width = 0;
     this.img_natural_height = 0;
 
@@ -94,10 +93,9 @@ Sprite.prototype.update = function updateDomProperties () {
         style.top=this.y+'px';
     if(this.changed['x'])
         style.left=this.x+'px';
-    if(this.changed['xoffset'])
-        this.img.style.left=this.xoffset+'px';
-    if(this.changed['yoffset'])
-        this.img.style.top=this.yoffset+'px';
+    if(this.changed['xoffset'] || this.changed['yoffset'])
+        this.dom.style.backgroundPosition=this.xoffset+'px '+this.yoffset+'px';
+
     // those transformation have pretty bad perfs implication on Opera,
     // don't update those values if nothing changed
     if(this.changed['xscale'] || this.changed['yscale'] || this.changed['r']) {
@@ -133,28 +131,6 @@ Sprite.prototype.update2 = function updateCssText () {
     return this;
 };
 
-Sprite.prototype.update3 = function updateCssText () {
-    /* Try an alternative scale method. Tests don't
-     * produce any noticeable improvement. */
-    var cssText = "";
-    var xs = Math.abs(this.xscale);
-    var ys = Math.abs(this.yscale);
-    cssText+='width:'+xs*this.w+'px;';
-    cssText+='height:'+ys*this.h+'px;';
-    cssText+='top:'+this.y+'px;';
-    cssText+='left:'+this.x+'px;';
-    this.img.style.left=xs*this.xoffset+'px';
-    this.img.style.top=ys*this.yoffset+'px';
-
-    this.img.style.width=xs*this.img_natural_width+'px';
-    this.img.style.height=ys*this.img_natural_height+'px';
-
-    // this has pretty bad perfs implication on Opera, don't update the value if nothing changed
-    cssText+=sjs.cproperty+':rotate('+this.r+'rad);';
-    this.transform_changed = false;
-    this.dom.style.cssText = cssText;
-};
-
 Sprite.prototype.toString = function () {
     return String(this.x) + ',' + String(this.y);
 };
@@ -164,9 +140,9 @@ Sprite.prototype.loadImg = function (src) {
     var there = this;
     this.img.onload = function() {
         var img = there.img;
-        there.dom.appendChild(img);
+        there.dom.style.backgroundImage = 'url('+src+')';
         there.img_natural_width = img.width;
-        there.img_natural_height = img.img_natural_height;
+        there.img_natural_height = img.height;
         if(there.w === null)
             there.w = img.width;
         if(there.h === null)
