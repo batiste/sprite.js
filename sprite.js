@@ -148,7 +148,10 @@ function Cycle(triplet) {
     this.tick = 0;
 };
 
-Cycle.prototype.next = function () {
+Cycle.prototype.next = function (ticks) {
+    if(ticks === undefined)
+        ticks = 1;
+    this.tick = this.tick + ticks;
     if(this.tick > this.cycle_duration) {
         if(this.repeat)
             this.tick = 0;
@@ -163,7 +166,6 @@ Cycle.prototype.next = function () {
             }
         }
     }
-    this.tick = this.tick + 1;
     return this;
 };
 
@@ -174,12 +176,32 @@ function SquaredSprite() {
 SquaredSprite.prototype = new Sprite();
 SquaredSprite.prototype.constructor = SquaredSprite;
 
+function Ticker(tick_duration) {
+    if(tick_duration === undefined)
+        this.tick_duration = 25;
+    else
+        this.tick_duration = tick_duration;
+
+    this.start = new Date().getTime();
+    this.tick_elapsed = 0;
+    this.current_tick = 0;
+}
+
+Ticker.prototype.next = function() {
+    var now = new Date().getTime();
+    var tick_elapsed = Math.round((now - this.start) / this.tick_duration);
+    this.last_tick_elapsed = tick_elapsed - this.current_tick;
+    this.current_tick = tick_elapsed;
+    return this.last_tick_elapsed;
+}
+
 var sjs = {
     Sprite: Sprite,
     SquareSprite: SquaredSprite,
     Cycle: Cycle,
     tproperty: false,
-    cproperty: false
+    cproperty: false,
+    Ticker: Ticker
 };
 
 function getTransformProperty() {
