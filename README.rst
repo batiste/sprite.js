@@ -53,7 +53,7 @@ You can use those attributes methods to modify the sprite object::
 
     Sprite(src)
     Sprite.rotate(radiant)
-    Sprite.scale(x, y)
+    Sprite.scale(x, y) // if y is not defined, y take the same value as x
     Sprite.move(x, y)
     Sprite.offset(x, y)
 
