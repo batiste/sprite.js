@@ -195,6 +195,18 @@ Ticker.prototype.next = function() {
     return this.last_tick_elapsed;
 }
 
+Ticker.prototype.run = function(paint) {
+    if(paint)
+        this.paint = paint;
+    var t = this;
+    setTimeout(function(){t.run()}, this.tick_duration/2);
+    var ticks_elapsed = this.next();
+    // no update needed
+    if(ticks_elapsed == 0)
+        return
+    this.paint(this);
+}
+
 var sjs = {
     Sprite: Sprite,
     SquareSprite: SquaredSprite,

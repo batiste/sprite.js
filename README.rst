@@ -36,3 +36,36 @@ Example of a basic use::
 
     sp.update();
     </script>
+
+Ticker object
+==============
+
+Keeping track of time in javascript is tricky, setInterval and setTimeout are not accurate enough. Sprite.js provide
+a Ticker object to deal with those issues.
+
+A ticker object is an object that will help you keeping track of time properly to render the changes in the sprite scene.
+The ticker gives accurate ticks. A game tick is the time duration between every Sprites and Physic update in your engine. To setup
+a game ticker::
+
+    var ticker = new sjs.Ticker(35); // we want a tick every 35ms
+
+    function paint() {
+
+        my_cycles.next(ticker.ticks_elapsed);
+
+        // do your stuff
+
+    }
+    ticker.run(paint);
+
+
+Cycle object
+============
+
+A cycle object can help you to handle an sprite animation. A cycle is defined by list of triplet (x offset, y offset, game tick duration)
+and the sprites the cycle work on. Here we have a cycle with 3 position, during 5 game tick each::
+
+    var cycle = new sjs.Cycle([[0, -2, 5],
+                            [-30, -2, 5],
+                            [-60, -2, 5]);
+    cycle.sprites = [sjs.Sprite("walk.png")];

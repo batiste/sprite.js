@@ -48,18 +48,13 @@ window.onload = function() {
         average_ms = 0,
         result = document.getElementById('result');
 
-    setInterval(function() {
-        var ticks_elapsed = ticker.next();
-
-        // no update needed
-        if(ticks_elapsed == 0)
-            return
+    function paint() {
 
         var start = new Date().getTime(),
             xv = Math.sin(ticker.current_tick / 15) * 2,
             xscale = xv < 0 ? 1 : -1;
 
-        cycle.next(ticks_elapsed);
+        cycle.next(ticker.ticks_elapsed);
         for(var i=0, sp; sp = sprites[i]; i++) {
             sp.move(xv, 0)
               .scale(xscale, 1)
@@ -76,7 +71,8 @@ window.onload = function() {
             result.innerHTML = average_ms + 'ms spent in the display loop.';
             ms_to_render = 0;
         }
-    }, 10);
+    };
+    ticker.run(paint);
 
 };
 </script>
