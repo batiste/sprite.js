@@ -44,7 +44,7 @@ Example of a basic use::
 Activate canvas backend
 ========================
 
-Sprite.js provides 2 rendering backend: HTML, canvas. By default HTML rednering is used. You can switch
+Sprite.js provides 2 rendering backend: HTML, canvas. By default HTML rendering is used. You can switch
 to cavnas by setting the use_canvas settings before creating your sprites::
 
     sjs.use_canvas = true;
@@ -102,9 +102,9 @@ Cycle object
 A cycle object can help you to handle an sprite animation. A cycle is defined by list of triplet (x offset, y offset, game tick duration)
 and the sprites the cycle work on. Here we have a cycle with 3 position, during 5 game tick each::
 
-    var cycle = new sjs.Cycle([[0, -2, 5],
-                            [-30, -2, 5],
-                            [-60, -2, 5]);
+    var cycle = new sjs.Cycle([[0, 2, 5],
+                            [30, 2, 5],
+                            [60, 2, 5]);
     cycle.sprites = [sjs.Sprite("walk.png")];
 
     cycle.next() // apply the next cycle to the sprite
