@@ -263,6 +263,8 @@ function Input() {
 
     this.keyboard = {};
     var that = this;
+    this.mousedown = false;
+    this.keydown = true;
 
     function update_keyboard(e, val) {
         if(e.keyCode==40 || e.keyCode==83)
@@ -293,7 +295,7 @@ function Input() {
         that.mousedown = true;
     }
     document.onmouseup = function(event) {
-        that.mouse_down = false;
+        that.mousedown = false;
     }
     document.onclick = function(event) {
         //this.click(event);
@@ -313,6 +315,12 @@ function Input() {
     document.onkeypress = function(e) {
 
     };
+
+    document.onblur = function (e) {
+        that.keyboard = {}
+        that.keydown = false;
+        that.mousedown = false;
+    }
 }
 
 Input.prototype.arrows = function arrows() {
