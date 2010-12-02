@@ -10,7 +10,7 @@ sprite.js is has been tested on Chromium, Firefox, Android emulator and Opera.
 
 For an example of the what the framework offers, have a look at test_sprites.html.
 
-You can see the demon online here: http://batiste.dosimple.ch/sprite.js/test_sprites.html
+You can see a demo online here: http://batiste.dosimple.ch/sprite.js/test_sprites.html http://batiste.dosimple.ch/sprite.js/test_input.html
 
 Example usage
 =================

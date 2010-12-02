@@ -298,10 +298,11 @@ function Input() {
         that.mousedown = false;
     }
     document.onclick = function(event) {
-        //this.click(event);
+        that.click(event);
     }
     document.onmousemove = function(event) {
-        //this.mousemove(event);
+        that.xmouse = event.clientX;
+        that.ymouse = event.clientY;
     }
     document.onkeydown = function(e) {
         that.keydown = true;
@@ -329,11 +330,7 @@ Input.prototype.arrows = function arrows() {
 }
 
 Input.prototype.click = function click(event) {
-
-}
-
-Input.prototype.mousemove = function mousemouve(event) {
-
+    // to override
 }
 
 function getTransformProperty() {
