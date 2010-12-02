@@ -69,9 +69,10 @@ You can use those attributes methods to modify the sprite object::
 
     Sprite(src)
     Sprite.rotate(radiant)
-    Sprite.scale(x, y) // if y is not defined, y take the same value as x
+    Sprite.scale(x, y)   // if y is not defined, y take the same value as x
     Sprite.move(x, y)
     Sprite.offset(x, y)
+    Sprite.size(w, h)    // set the width and height of the visible sprite
 
 At the end, you must call the visual update to see any real change::
 
@@ -110,6 +111,26 @@ and the sprites the cycle work on. Here we have a cycle with 3 position, during 
     var cycle = new sjs.Cycle([[0, 2, 5],
                             [30, 2, 5],
                             [60, 2, 5]);
-    cycle.sprites = [sjs.Sprite("walk.png")];
+    var sprite = sjs.Sprite("walk.png")
+    cycle.sprites = [sprite];
 
     cycle.next() // apply the next cycle to the sprite
+    cycle.next(2) // apply the second next cycle to the sprite
+    cycle.reset() // reset the cycle to the original position
+
+Input object
+==============
+
+The input object help you with the annoyance of dealing with user input::
+
+    var input  = new sjs.Input();
+    if(input.keyboard.right) {
+        sprite.move(5, 0);
+    }
+    // arrows is true if any directionnal keyboard arrows are pressed
+    if(input.arrows())
+        cycle.next();
+    else
+        cycle.reset();
+
+

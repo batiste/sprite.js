@@ -1,0 +1,78 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test 32 sprites in a cycle animation</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+</head>
+<body>
+
+<p>Input tests, use WASD or arrows keys to move: <span id="result"></span></p>
+
+</body>
+<script src="sprite.js"></script>
+<script>
+
+window.onload = function() {
+
+    var sprite = new sjs.Sprite('character.png');;
+    sprite.x = 100;
+    sprite.y = 100;
+    sprite.size(30, 55);
+
+
+
+    var cycle = new sjs.Cycle([[0, 2, 2],
+                               [30, 2, 3],
+                               [60, 2, 3],
+                               [90, 2, 3],
+                               [120, 2, 3],
+                               [150, 2, 3],
+                               [180, 2, 3]]);
+    cycle.sprites = [sprite];
+
+    var ticker = new sjs.Ticker(35);
+    var input  = new sjs.Input();
+
+    var ms_to_render = 0,
+        average_ms = 0,
+        result = document.getElementById('result');
+
+    function paint() {
+
+        var start = new Date().getTime();
+
+        var xv = 0, yv = 0;
+        if(input.keyboard.left) {
+            sprite.move(-4, 0);
+            sprite.scale(1, 1);
+        }
+        if(input.keyboard.right) {
+            sprite.move(4, 0);
+            sprite.scale(-1, 1);
+        }
+        if(input.keyboard.up) {
+            sprite.move(0, -3);
+        }
+        if(input.keyboard.down) {
+            sprite.move(0, 3);
+        }
+
+        if(input.arrows())
+            cycle.next(ticker.ticks_elapsed);
+        else
+            cycle.reset();
+
+        sprite.update();
+
+        ms_to_render = ms_to_render + new Date().getTime() - start;
+        if(ticker.current_tick % 60 == 0) {
+            average_ms = Math.round(ms_to_render/60)
+            result.innerHTML = average_ms + 'ms spent in the display loop.';
+            ms_to_render = 0;
+        }
+    };
+    ticker.run(paint);
+
+};
+</script>
+</html>

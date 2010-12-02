@@ -16,8 +16,8 @@ var sjs = {
     Sprite: Sprite,
     Cycle: Cycle,
     tproperty: false,
-    cproperty: false,
-    Ticker: Ticker
+    Ticker: Ticker,
+    Input: Input,
 };
 
 function Sprite(src) {
@@ -103,6 +103,11 @@ Sprite.prototype.move = function (x, y) {
 Sprite.prototype.offset = function (x, y) {
     this.xoffset=x;
     this.yoffset=y;
+};
+
+Sprite.prototype.size = function (w, h) {
+    this.w=w;
+    this.h=h;
 };
 
 Sprite.prototype.update = function updateDomProperties () {
@@ -208,6 +213,15 @@ Cycle.prototype.next = function (ticks) {
     return this;
 };
 
+Cycle.prototype.reset = function reset_cycle() {
+    this.tick = 0;
+    for(j=0; j<this.sprites.length; j++) {
+        this.sprites[j].xoffset = this.triplet[0][0];
+        this.sprites[j].yoffset = this.triplet[0][1];
+    }
+    return this;
+}
+
 function Ticker(tick_duration) {
     if(tick_duration === undefined)
         this.tick_duration = 25;
@@ -238,21 +252,90 @@ Ticker.prototype.run = function(paint) {
         return
     if(sjs.use_canvas) {
         ctx.clearRect(0,0, canvas.width, canvas.height);
-        // trick clear canvas, doesn't seems better after tests
+        // trick to clear canvas, doesn't seems to do any better according to tests
+        // http://skookum.com/blog/practical-canvas-test-charlottejs/
         // canvas.width = canvas.width
     }
     this.paint(this);
 }
 
+function Input() {
+
+    this.keyboard = {};
+    var that = this;
+
+    function update_keyboard(e, val) {
+        if(e.keyCode==40 || e.keyCode==83) {
+            that.keyboard['down'] = val;
+        }
+        if(e.keyCode==38 || e.keyCode==87) {
+            that.keyboard['up'] = val;
+        }
+        if(e.keyCode==39 || e.keyCode==68) {
+            that.keyboard['right'] = val;
+        }
+        if(e.keyCode==37 || e.keyCode==65) {
+            that.keyboard['left'] = val;
+        };
+        if(e.keyCode==32 || e.keyCode==17) {
+            that.keyboard['space'] = val;
+        }
+        if(e.keyCode==13) {
+            that.keyboard['enter'] = val;
+        }
+    };
+
+    document.ontouchstart = function(event) {
+        that.mouse_down = true;
+    }
+    document.ontouchend = function(event) {
+        that.mouse_down = false;
+    }
+    document.ontouchmove = function(event) {}
+
+    document.onmousedown = function(event) {
+        that.mouse_down = true;
+    }
+    document.onmouseup = function(event) {
+        that.mouse_down = false;
+    }
+    document.onclick = function(event) {
+        //this.click(event);
+    }
+    document.onmousemove = function(event) {
+        //this.mousemove(event);
+    }
+    document.onkeydown = function(e) {
+        update_keyboard(e, true);
+    };
+    document.onkeyup = function(e) {
+        update_keyboard(e, false);
+    };
+    // can be used to avoid key jamming
+    document.onkeypress = function(e) {
+
+    };
+}
+
+Input.prototype.arrows = function arrows() {
+    /* Return true if any arrow key is pressed */
+    return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
+}
+
+Input.prototype.click = function click(event) {
+
+}
+
+Input.prototype.mousemove = function mousemouve(event) {
+
+}
+
 function getTransformProperty() {
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
-    var css_properties = ['transform', '-webkit-transform', '-moz-transform', '-o-transform'];
     var p = false;
     while (p = properties.shift()) {
-        var c = css_properties.shift();
         if (typeof document.body.style[p] !== 'undefined') {
             sjs.tproperty = p;
-            sjs.cproperty = c;
         }
     }
 }
