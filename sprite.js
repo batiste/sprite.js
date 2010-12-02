@@ -265,36 +265,32 @@ function Input() {
     var that = this;
 
     function update_keyboard(e, val) {
-        if(e.keyCode==40 || e.keyCode==83) {
+        if(e.keyCode==40 || e.keyCode==83)
             that.keyboard['down'] = val;
-        }
-        if(e.keyCode==38 || e.keyCode==87) {
+        if(e.keyCode==38 || e.keyCode==87)
             that.keyboard['up'] = val;
-        }
-        if(e.keyCode==39 || e.keyCode==68) {
+        if(e.keyCode==39 || e.keyCode==68)
             that.keyboard['right'] = val;
-        }
-        if(e.keyCode==37 || e.keyCode==65) {
+        if(e.keyCode==37 || e.keyCode==65)
             that.keyboard['left'] = val;
-        };
-        if(e.keyCode==32 || e.keyCode==17) {
+        if(e.keyCode==32)
             that.keyboard['space'] = val;
-        }
-        if(e.keyCode==13) {
+        if(e.keyCode==17)
+            that.keyboard['ctrl'] = val;
+        if(e.keyCode==13)
             that.keyboard['enter'] = val;
-        }
     };
 
     document.ontouchstart = function(event) {
-        that.mouse_down = true;
+        that.mousedown = true;
     }
     document.ontouchend = function(event) {
-        that.mouse_down = false;
+        that.mousedown = false;
     }
     document.ontouchmove = function(event) {}
 
     document.onmousedown = function(event) {
-        that.mouse_down = true;
+        that.mousedown = true;
     }
     document.onmouseup = function(event) {
         that.mouse_down = false;
@@ -306,9 +302,11 @@ function Input() {
         //this.mousemove(event);
     }
     document.onkeydown = function(e) {
+        that.keydown = true;
         update_keyboard(e, true);
     };
     document.onkeyup = function(e) {
+        that.keydown = false;
         update_keyboard(e, false);
     };
     // can be used to avoid key jamming
