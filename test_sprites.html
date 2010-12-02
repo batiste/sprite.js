@@ -15,12 +15,13 @@
 window.onload = function() {
 
     var sprites = [];
+    sjs.use_canvas = true;
 
     for(var i=0; i<32; i++) {
         var sp = new sjs.Sprite('character.png');
         sp.h=55;
         sp.w=30;
-        sp.yoffset=-2;
+        sp.yoffset=2;
         sp.x=8 * i + 10;
         sp.y=50 + ((i%4) * 60);
         sprites.push(sp);
@@ -31,13 +32,13 @@ window.onload = function() {
     logo.y = 150;
     logo.loadImg('spritejs.png');
 
-    var cycle = new sjs.Cycle([[0, -2, 5],
-                               [-30, -2, 5],
-                               [-60, -2, 5],
-                               [-90, -2, 5],
-                               [-120, -2, 5],
-                               [-150, -2, 5],
-                               [-180, -2, 5]]);
+    var cycle = new sjs.Cycle([[0, 2, 5],
+                               [30, 2, 5],
+                               [60, 2, 5],
+                               [90, 2, 5],
+                               [120, 2, 5],
+                               [150, 2, 5],
+                               [180, 2, 5]]);
     cycle.sprites = sprites;
 
     var ticker = new sjs.Ticker(35);

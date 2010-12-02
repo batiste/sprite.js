@@ -41,6 +41,14 @@ Example of a basic use::
     sp.update();
     </script>
 
+Activate canvas backend
+========================
+
+Sprite.js provides 2 rendering backend: HTML, canvas. By default HTML rednering is used. You can switch
+to cavnas by setting the use_canvas settings before creating your sprites::
+
+    sjs.use_canvas = true;
+
 Sprite object public methods and attributes
 ============================================
 
@@ -98,3 +106,5 @@ and the sprites the cycle work on. Here we have a cycle with 3 position, during 
                             [-30, -2, 5],
                             [-60, -2, 5]);
     cycle.sprites = [sjs.Sprite("walk.png")];
+
+    cycle.next() // apply the next cycle to the sprite

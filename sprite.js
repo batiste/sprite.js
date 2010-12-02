@@ -2,6 +2,24 @@
 
 (function(){
 
+var canvas = document.createElement('canvas');
+canvas.height = 400;
+canvas.width = 400;
+canvas.style.position = 'absolute';
+canvas.style.top = '0px';
+canvas.style.left = '0px';
+document.body.appendChild(canvas);
+var ctx = canvas.getContext('2d');
+
+var sjs = {
+    use_canvas: false,
+    Sprite: Sprite,
+    Cycle: Cycle,
+    tproperty: false,
+    cproperty: false,
+    Ticker: Ticker
+};
+
 function Sprite(src) {
 
     var sp = this;
@@ -35,8 +53,8 @@ function Sprite(src) {
     property('h', null);
 
     // offsets of the image within the viewport
-    property('xoffset');
-    property('yoffset');
+    property('xoffset', 0);
+    property('yoffset', 0);
 
     this.dom = null;
 
@@ -44,11 +62,13 @@ function Sprite(src) {
     property('yscale', 1);
     property('angle', 0);
 
-    var d = document.createElement('div');
-    d.className = 'sprite';
-    d.style.position = 'absolute';
-    this.dom = d;
-    document.body.appendChild(this.dom);
+    if(sjs.use_canvas == false) {
+        var d = document.createElement('div');
+        d.className = 'sprite';
+        d.style.position = 'absolute';
+        this.dom = d;
+        document.body.appendChild(this.dom);
+    }
 
     if(src)
         this.loadImg(src)
@@ -88,6 +108,9 @@ Sprite.prototype.offset = function (x, y) {
 Sprite.prototype.update = function updateDomProperties () {
     /* alternative update function. This might be faster in some situation, especially
      * when few properties have been changed. */
+    if(sjs.use_canvas == true) {
+        return this.canvasUpdate();
+    }
     var style = this.dom.style;
     if(this.changed['w'])
         style.width=this.w+'px';
@@ -98,7 +121,7 @@ Sprite.prototype.update = function updateDomProperties () {
     if(this.changed['x'])
         style.left=this.x+'px';
     if(this.changed['xoffset'] || this.changed['yoffset'])
-        this.dom.style.backgroundPosition=this.xoffset+'px '+this.yoffset+'px';
+        this.dom.style.backgroundPosition=-this.xoffset+'px '+-this.yoffset+'px';
 
     // those transformation have pretty bad perfs implication on Opera,
     // don't update those values if nothing changed
@@ -116,6 +139,17 @@ Sprite.prototype.update = function updateDomProperties () {
     return this;
 };
 
+Sprite.prototype.canvasUpdate = function updateCanvas () {
+    ctx.save();
+    ctx.translate(this.x + (this.w/2), this.y + (this.h/2));
+    ctx.rotate(this.angle);
+    ctx.scale(this.xscale, this.yscale)
+    ctx.translate(-(this.w/2), -(this.h/2));
+    ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h, 0, 0, this.w, this.h);
+    ctx.restore();
+    return this;
+};
+
 Sprite.prototype.toString = function () {
     return String(this.x) + ',' + String(this.y);
 };
@@ -125,7 +159,8 @@ Sprite.prototype.loadImg = function (src) {
     var there = this;
     this.img.onload = function() {
         var img = there.img;
-        there.dom.style.backgroundImage = 'url('+src+')';
+        if(!sjs.use_canvas)
+            there.dom.style.backgroundImage = 'url('+src+')';
         there.img_natural_width = img.width;
         there.img_natural_height = img.height;
         if(there.w === null)
@@ -173,13 +208,6 @@ Cycle.prototype.next = function (ticks) {
     return this;
 };
 
-function SquaredSprite() {
-
-};
-
-SquaredSprite.prototype = new Sprite();
-SquaredSprite.prototype.constructor = SquaredSprite;
-
 function Ticker(tick_duration) {
     if(tick_duration === undefined)
         this.tick_duration = 25;
@@ -208,17 +236,9 @@ Ticker.prototype.run = function(paint) {
     // no update needed
     if(ticks_elapsed == 0)
         return
+    ctx.clearRect(0,0, canvas.width, canvas.height); // clear canvas
     this.paint(this);
 }
-
-var sjs = {
-    Sprite: Sprite,
-    SquareSprite: SquaredSprite,
-    Cycle: Cycle,
-    tproperty: false,
-    cproperty: false,
-    Ticker: Ticker
-};
 
 function getTransformProperty() {
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
