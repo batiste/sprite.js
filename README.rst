@@ -65,7 +65,7 @@ You can use those attributes methods to modify the sprite object::
     Sprite.yoffset
     Sprite.xscale
     Sprite.yscale
-    Sprite.angle
+    Sprite.angle // use radiant
 
     Sprite(src)
     Sprite.rotate(radiant)
@@ -91,7 +91,9 @@ a game ticker::
 
     function paint() {
 
-        my_cycles.next(ticker.ticks_elapsed);
+        my_cycles.next(ticker.ticks_elapsed); // tick elapsed is the number of ticks elapsed during 2 runs of the paint function.
+                                              // If performances are good the value should be 1. If it's more than 1 it mean that
+                                              // some frames were dropped and we need to drop a certain amount of cycle as well.
 
         // do your stuff
 
