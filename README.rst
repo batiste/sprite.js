@@ -49,7 +49,7 @@ to cavnas by setting the use_canvas settings before creating your sprites::
 
     sjs.use_canvas = true;
 
-Tests show that canvas backend is slower on Firefox, Opera and Chrome. Especially with high number of sprites
+Tests show that *canvas backend is slower* on Firefox, Opera and Chrome. Especially with high number of sprites
 and large canvas (clearing and redrawing the whole canvas is expensive).
 
 Sprite object public methods and attributes

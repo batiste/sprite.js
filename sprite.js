@@ -236,7 +236,11 @@ Ticker.prototype.run = function(paint) {
     // no update needed
     if(ticks_elapsed == 0)
         return
-    ctx.clearRect(0,0, canvas.width, canvas.height); // clear canvas
+    if(sjs.use_canvas) {
+        ctx.clearRect(0,0, canvas.width, canvas.height);
+        // trick clear canvas, doesn't seems better after tests
+        // canvas.width = canvas.width
+    }
     this.paint(this);
 }
 
