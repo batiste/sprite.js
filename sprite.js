@@ -4,7 +4,7 @@
 
 var canvas = document.createElement('canvas');
 canvas.height = 400;
-canvas.width = 400;
+canvas.width = 1200;
 canvas.style.position = 'absolute';
 canvas.style.top = '0px';
 canvas.style.left = '0px';
