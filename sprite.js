@@ -2,23 +2,34 @@
 
 (function(){
 
-var canvas = document.createElement('canvas');
-canvas.height = 400;
-canvas.width = 1200;
-canvas.style.position = 'absolute';
-canvas.style.top = '0px';
-canvas.style.left = '0px';
-document.body.appendChild(canvas);
-var ctx = canvas.getContext('2d');
-
 var sjs = {
-    use_canvas: false,
     Sprite: Sprite,
     Cycle: Cycle,
     tproperty: false,
     Ticker: Ticker,
     Input: Input,
 };
+
+var ctx = null;
+var use_canvas = false;
+
+sjs.__defineGetter__("use_canvas", function() {
+    return use_canvas;
+});
+
+sjs.__defineSetter__("use_canvas", function(value) {
+    if(value === true) {
+        var canvas = document.createElement('canvas');
+        canvas.height =  document.body.innerHeight;
+        canvas.width = document.body.innerWidth;
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0px';
+        canvas.style.left = '0px';
+        document.body.appendChild(canvas);
+        ctx = canvas.getContext('2d');
+    }
+    var use_canvas = value;
+});
 
 function Sprite(src) {
 
@@ -316,8 +327,7 @@ function Input() {
     document.onkeypress = function(e) {
 
     };
-
-    document.onblur = function (e) {
+    window.onblur = function (e) {
         that.keyboard = {}
         that.keydown = false;
         that.mousedown = false;
