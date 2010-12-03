@@ -8,8 +8,10 @@ var sjs = {
     tproperty: false,
     Ticker: Ticker,
     Input: Input,
+    layers: {},
 };
 
+function error(msg) {alert(msg)}
 var ctx = null;
 var use_canvas = false;
 
@@ -18,20 +20,10 @@ sjs.__defineGetter__("use_canvas", function() {
 });
 
 sjs.__defineSetter__("use_canvas", function(value) {
-    if(value === true) {
-        var canvas = document.createElement('canvas');
-        canvas.height =  document.body.innerHeight;
-        canvas.width = document.body.innerWidth;
-        canvas.style.position = 'absolute';
-        canvas.style.top = '0px';
-        canvas.style.left = '0px';
-        document.body.appendChild(canvas);
-        ctx = canvas.getContext('2d');
-    }
-    var use_canvas = value;
+    use_canvas = value;
 });
 
-function Sprite(src) {
+function Sprite(src, layer) {
 
     var sp = this;
     this.changed = {};
@@ -75,12 +67,21 @@ function Sprite(src) {
 
     property('opacity', 1);
 
+    if(layer === undefined) {
+        // important to delay the creation so use_canvas
+        // can still be changed
+        if(sjs.layers['default'] === undefined)
+            sjs.layers["default"] = new Layer("default");
+        layer = sjs.layers['default'];
+        this.layer = layer;
+    }
+
     if(sjs.use_canvas == false) {
         var d = document.createElement('div');
         d.className = 'sprite';
         d.style.position = 'absolute';
         this.dom = d;
-        document.body.appendChild(this.dom);
+        layer.dom.appendChild(d);
     }
 
     if(src)
@@ -161,6 +162,7 @@ Sprite.prototype.update = function updateDomProperties () {
 };
 
 Sprite.prototype.canvasUpdate = function updateCanvas () {
+    var ctx = this.layer.ctx;
     ctx.save();
     ctx.translate(this.x + (this.w/2), this.y + (this.h/2));
     ctx.rotate(this.angle);
@@ -267,11 +269,15 @@ Ticker.prototype.run = function(paint) {
     // no update needed
     if(ticks_elapsed == 0)
         return
+
     if(sjs.use_canvas) {
-        ctx.clearRect(0,0, canvas.width, canvas.height);
-        // trick to clear canvas, doesn't seems to do any better according to tests
-        // http://skookum.com/blog/practical-canvas-test-charlottejs/
-        // canvas.width = canvas.width
+        for(name in sjs.layers) {
+            var layer = sjs.layers[name];
+            layer.ctx.clearRect(0, 0, layer.dom.width, layer.dom.height);
+            // trick to clear canvas, doesn't seems to do any better according to tests
+            // http://skookum.com/blog/practical-canvas-test-charlottejs/
+            // canvas.width = canvas.width
+        }
     }
     this.paint(this);
 }
@@ -283,6 +289,7 @@ function Input() {
     this.mousedown = false;
     this.keydown = true;
 
+    // this is handling WASD, and arrows keys
     function update_keyboard(e, val) {
         if(e.keyCode==40 || e.keyCode==83)
             that.keyboard['down'] = val;
@@ -333,6 +340,8 @@ function Input() {
     document.onkeypress = function(e) {
 
     };
+    // make sure that the keyboard is rested when
+    // the user leave the page
     window.onblur = function (e) {
         that.keyboard = {}
         that.keydown = false;
@@ -347,6 +356,33 @@ Input.prototype.arrows = function arrows() {
 
 Input.prototype.click = function click(event) {
     // to override
+}
+
+function Layer(name) {
+    this.name = name;
+    if(sjs.layers[name] === undefined)
+        sjs.layers[name] = this;
+    else
+        error('Layer '+ name + ' already exist.');
+
+    if(sjs.use_canvas) {
+        var canvas = document.createElement('canvas');
+        canvas.height = window.innerHeight;
+        canvas.width = window.innerWidth;
+        canvas.style.position = 'absolute';
+        canvas.style.top = '0px';
+        canvas.style.left = '0px';
+        document.body.appendChild(canvas);
+        this.dom = canvas;
+        this.ctx = canvas.getContext('2d');
+    } else {
+        var div = document.createElement('div');
+        div.style.position = 'absolute';
+        div.style.top = '0px';
+        div.style.left = '0px';
+        this.dom = div;
+        document.body.appendChild(this.dom);
+    }
 }
 
 function getTransformProperty() {
