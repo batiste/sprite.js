@@ -46,8 +46,6 @@ window.onload = function() {
                                [180, 2, 5]]);
     cycle.sprites = sprites;
 
-    var ticker = new sjs.Ticker(35);
-
     var sin_cycle = 0,
         ms_to_render = 0,
         average_ms = 0,
@@ -78,7 +76,8 @@ window.onload = function() {
             ms_to_render = 0;
         }
     };
-    ticker.run(paint);
+    var ticker = new sjs.Ticker(35, paint);
+    ticker.run();
 
 };
 </script>

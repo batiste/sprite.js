@@ -239,7 +239,8 @@ Cycle.prototype.reset = function reset_cycle() {
     return this;
 }
 
-function Ticker(tick_duration) {
+function Ticker(tick_duration, paint) {
+    this.paint = paint;
     if(tick_duration === undefined)
         this.tick_duration = 25;
     else
@@ -258,11 +259,10 @@ Ticker.prototype.next = function() {
     return this.last_tick_elapsed;
 }
 
-Ticker.prototype.run = function(paint) {
-    if(paint)
-        this.paint = paint;
+Ticker.prototype.run = function() {
     var t = this;
-    setTimeout(function(){t.run()}, this.tick_duration/2);
+    // this is not a cheap operation
+    setTimeout(function(){t.run()}, this.tick_duration);
     var ticks_elapsed = this.next();
     // no update needed
     if(ticks_elapsed == 0)
@@ -379,6 +379,7 @@ function Layer(name) {
         div.style.position = 'absolute';
         div.style.top = '0px';
         div.style.left = '0px';
+        div.style.zIndex = '-1';
         this.dom = div;
         document.body.appendChild(this.dom);
     }

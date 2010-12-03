@@ -30,7 +30,6 @@ window.onload = function() {
                                [180, 2, 3]]);
     cycle.sprites = [sprite];
 
-    var ticker = new sjs.Ticker(35);
     var input  = new sjs.Input();
 
     var ms_to_render = 0,
@@ -71,7 +70,8 @@ window.onload = function() {
             ms_to_render = 0;
         }
     };
-    ticker.run(paint);
+    var ticker = new sjs.Ticker(35, paint);
+    ticker.run();
 
 };
 </script>

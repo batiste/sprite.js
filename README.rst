@@ -93,8 +93,6 @@ A ticker object is an object that will help you keeping track of time properly t
 The ticker gives accurate ticks. A game tick is the time duration between every Sprites and Physic update in your engine. To setup
 a game ticker::
 
-    var ticker = new sjs.Ticker(35); // we want a tick every 35ms
-
     function paint() {
 
         my_cycles.next(ticker.ticks_elapsed); // tick elapsed is the number of ticks elapsed during 2 runs of the paint function.
@@ -104,7 +102,8 @@ a game ticker::
         // do your stuff
 
     }
-    ticker.run(paint);
+    var ticker = new sjs.Ticker(35, paint); // we want a tick every 35ms
+    ticker.run();
 
 
 Cycle object
