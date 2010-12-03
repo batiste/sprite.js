@@ -73,6 +73,8 @@ function Sprite(src) {
     property('yscale', 1);
     property('angle', 0);
 
+    property('opacity', 1);
+
     if(sjs.use_canvas == false) {
         var d = document.createElement('div');
         d.className = 'sprite';
@@ -137,7 +139,10 @@ Sprite.prototype.update = function updateDomProperties () {
     if(this.changed['x'])
         style.left=this.x+'px';
     if(this.changed['xoffset'] || this.changed['yoffset'])
-        this.dom.style.backgroundPosition=-this.xoffset+'px '+-this.yoffset+'px';
+        style.backgroundPosition=-this.xoffset+'px '+-this.yoffset+'px';
+
+    if(this.changed['opacity'])
+        style.opacity = this.opacity;
 
     // those transformation have pretty bad perfs implication on Opera,
     // don't update those values if nothing changed
@@ -159,7 +164,8 @@ Sprite.prototype.canvasUpdate = function updateCanvas () {
     ctx.save();
     ctx.translate(this.x + (this.w/2), this.y + (this.h/2));
     ctx.rotate(this.angle);
-    ctx.scale(this.xscale, this.yscale)
+    ctx.scale(this.xscale, this.yscale);
+    ctx.globalAlpha = this.opacity;
     ctx.translate(-(this.w/2), -(this.h/2));
     ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h, 0, 0, this.w, this.h);
     ctx.restore();

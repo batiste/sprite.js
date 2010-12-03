@@ -65,11 +65,12 @@ You can use those attributes methods to modify the sprite object::
     Sprite.x
     Sprite.w
     Sprite.h
-    Sprite.xoffset
+    Sprite.xoffset // offset in the image where you want to start painting
     Sprite.yoffset
     Sprite.xscale
     Sprite.yscale
     Sprite.angle // use radiant
+    Sprite.opacity
 
     Sprite(src)
     Sprite.rotate(radiant)
