@@ -6,7 +6,7 @@
 </head>
 <body>
 
-<p>32 animated sprites: <span id="result"></span></p>
+<p>32 animated sprites: <span id="result"></span> <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
 
 </body>
 <script src="sprite.js"></script>
@@ -15,7 +15,12 @@
 window.onload = function() {
 
     var sprites = [];
-    sjs.use_canvas = true;
+    if(window.location.href.indexOf('canvas') != -1) {
+        sjs.use_canvas = true;
+        document.getElementById('canvas-mode').style.display = 'none';
+    } else {
+        document.getElementById('html-mode').style.display = 'none';
+    }
 
     for(var i=0; i<32; i++) {
         var sp = new sjs.Sprite('character.png');
@@ -23,13 +28,13 @@ window.onload = function() {
         sp.w=30;
         sp.yoffset=2;
         sp.x=8 * i + 10;
-        sp.y=50 + ((i%4) * 60);
+        sp.y=70 + ((i%4) * 60);
         sprites.push(sp);
     }
 
     var logo = new sjs.Sprite();
     logo.x = 120;
-    logo.y = 150;
+    logo.y = 170;
     logo.loadImg('spritejs.png');
 
     var cycle = new sjs.Cycle([[0, 2, 5],

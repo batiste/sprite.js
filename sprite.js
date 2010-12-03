@@ -8,25 +8,17 @@ var sjs = {
     tproperty: false,
     Ticker: Ticker,
     Input: Input,
+    use_canvas: false,
     layers: {},
 };
 
 function error(msg) {alert(msg)}
-var ctx = null;
-var use_canvas = false;
-
-sjs.__defineGetter__("use_canvas", function() {
-    return use_canvas;
-});
-
-sjs.__defineSetter__("use_canvas", function(value) {
-    use_canvas = value;
-});
 
 function Sprite(src, layer) {
 
     var sp = this;
-    this.changed = {};
+    this._changed = {};
+    this.changed = false;
 
     function property(name, default_value) {
         if(default_value === undefined)
@@ -39,13 +31,16 @@ function Sprite(src, layer) {
 
         sp.__defineSetter__(name, function(value) {
             sp['_'+name] = value;
-            sp.changed[name] = true;
+            if(!sjs.use_canvas) {
+                sp._changed[name] = true;
+                sp.changed = true;
+            }
         });
     }
 
     // positions
-    property('y');
-    property('x');
+    property('y', 0);
+    property('x', 0);
 
     // image
     this.img_natural_width = 0;
@@ -78,7 +73,6 @@ function Sprite(src, layer) {
 
     if(sjs.use_canvas == false) {
         var d = document.createElement('div');
-        d.className = 'sprite';
         d.style.position = 'absolute';
         this.dom = d;
         layer.dom.appendChild(d);
@@ -130,24 +124,28 @@ Sprite.prototype.update = function updateDomProperties () {
     if(sjs.use_canvas == true) {
         return this.canvasUpdate();
     }
+    if(this.changed == false)
+        return;
+    this.changed = false;
+
     var style = this.dom.style;
-    if(this.changed['w'])
+    if(this._changed['w'])
         style.width=this.w+'px';
-    if(this.changed['h'])
+    if(this._changed['h'])
         style.height=this.h+'px';
-    if(this.changed['y'])
+    if(this._changed['y'])
         style.top=this.y+'px';
-    if(this.changed['x'])
+    if(this._changed['x'])
         style.left=this.x+'px';
-    if(this.changed['xoffset'] || this.changed['yoffset'])
+    if(this._changed['xoffset'] || this._changed['yoffset'])
         style.backgroundPosition=-this.xoffset+'px '+-this.yoffset+'px';
 
-    if(this.changed['opacity'])
+    if(this._changed['opacity'])
         style.opacity = this.opacity;
 
     // those transformation have pretty bad perfs implication on Opera,
     // don't update those values if nothing changed
-    if(this.changed['xscale'] || this.changed['yscale'] || this.changed['angle']) {
+    if(this._changed['xscale'] || this._changed['yscale'] || this._changed['angle']) {
         var trans = "";
         if(this.angle!=0)
             trans += 'rotate('+this.angle+'rad) ';
@@ -157,7 +155,7 @@ Sprite.prototype.update = function updateDomProperties () {
         style[sjs.tproperty] = trans;
     }
     // reset
-    this.changed = {};
+    this._changed = {};
     return this;
 };
 
@@ -370,6 +368,7 @@ function Layer(name) {
         canvas.height = window.innerHeight;
         canvas.width = window.innerWidth;
         canvas.style.position = 'absolute';
+        canvas.style.zIndex = '-1';
         canvas.style.top = '0px';
         canvas.style.left = '0px';
         document.body.appendChild(canvas);

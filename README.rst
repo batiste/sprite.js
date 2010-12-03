@@ -139,3 +139,14 @@ The input object help you with the annoyance of dealing with user input::
         cycle.reset();
 
 
+Layer object
+=============
+
+If you need to separate you sprites into logical layer, you should user the Layer object::
+
+    var background = new sjs.Layer('background')
+    var sprite = new sjs.Sprite('bg.png', background);
+
+You should then pass the layer as the second argument of the contructor of your sprite.
+
+
