@@ -79,6 +79,9 @@ You can use those attributes methods to modify the sprite object::
     Sprite.offset(x, y)
     Sprite.size(w, h)    // set the width and height of the visible sprite
 
+    Sprite.isPointIn(x, y) // return true if the point (x,y) is within the sprite surface (angles don't affect this function)
+    Sprite.hasCollision(Sprite) // return true if the Sprite is in collision with the other Sprite (angles don't affect this function)
+
 At the end, you must call the visual update to see any real change::
 
     Sprite.update()

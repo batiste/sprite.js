@@ -1,0 +1,78 @@
+<!DOCTYPE html><html>
+<head>
+<title>Sprite.js test suites</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+</head>
+<body>
+
+<p>Sprite.js test suites</p>
+
+<textarea id="result" style="width:90%;height:600px"></textarea>
+
+</body>
+<script src="sprite.js"></script>
+<script>
+
+window.onload = function() {
+
+    var result = document.getElementById('result');
+    function getText(text) {
+        if(!text)
+            return "No description"
+        return text
+    }
+    function assertTrue(value, text) {
+        text = getText(text)
+        if(value) {
+            result.value += text + ': pass\n';
+        } else {
+            result.value += text + ': fail ("'+value+'" is not true)\n';
+        }
+    }
+    function assertFalse(value, text) {
+        text = getText(text)
+        if(!value) {
+            result.value += text + ': pass\n';
+        } else {
+            result.value += text + ': fail ("'+value+'" is not false)\n';
+        }
+    }
+    function assertEqual(value1, value2, text) {
+        text = getText(text)
+        if(value1 == value2) {
+            result.value += text + ': pass\n';
+        } else {
+            result.value += text + ': fail\n';
+        }
+    }
+
+    var sp1 = new sjs.Sprite('character.png');
+    sp1.size(10, 10);
+    sp1.move(10, 10);
+
+    assertFalse(sp1.isPointIn(0, 0), "isPointIn test1");
+    assertFalse(sp1.isPointIn(21, 21), "isPointIn test2");
+    assertFalse(sp1.isPointIn(15, 21), "isPointIn test3");
+
+    assertTrue(sp1.isPointIn(15, 15), "isPointIn test4");
+    assertTrue(sp1.isPointIn(15, 20), "isPointIn test5");
+
+
+    var sp2 = new sjs.Sprite('character.png');
+    sp2.size(10, 10);
+    sp2.move(15, 10);
+
+     var sp3 = new sjs.Sprite('character.png');
+    sp3.size(10, 10);
+    sp3.move(21, 10);
+
+    assertTrue(sp1.hasCollision(sp1), "hasCollision test1");
+    assertTrue(sp1.hasCollision(sp2), "hasCollision test2");
+    assertTrue(sp2.hasCollision(sp1), "hasCollision test3");
+
+    assertFalse(sp1.hasCollision(sp3), "hasCollision test4");
+    assertTrue(sp2.hasCollision(sp3), "hasCollision test5");
+};
+</script>
+</html>

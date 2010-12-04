@@ -12,6 +12,8 @@ var sjs = {
     layers: {},
 };
 
+
+
 function error(msg) {alert(msg)}
 
 function Sprite(src, layer) {
@@ -193,6 +195,20 @@ Sprite.prototype.loadImg = function (src) {
     this.img.src = src;
     return this;
 };
+
+
+Sprite.prototype.isPointIn = function pointIn(x, y) {
+    // return true if the point is in the sprite surface
+    return (x >= this.x && x <= this.x+this.w
+        && y >= this.y && y <= this.y+this.h)
+}
+
+Sprite.prototype.hasCollision = function hasCollision(sprite) {
+   return (this.isPointIn(sprite.x, sprite.y)
+       || this.isPointIn(sprite.x+sprite.w, sprite.y)
+       || this.isPointIn(sprite.x+sprite.w, sprite.y)
+       || this.isPointIn(sprite.x, sprite.y+sprite.h));
+}
 
 function Cycle(triplet) {
     /* Cycle for the Sprite image.
