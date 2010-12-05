@@ -8,11 +8,10 @@ var sjs = {
     tproperty: false,
     Ticker: Ticker,
     Input: Input,
-    use_canvas: false,
+    Layer: Layer,
+    use_canvas: (window.location.href.indexOf('canvas') != -1),
     layers: {},
 };
-
-
 
 function error(msg) {alert(msg)}
 
@@ -45,8 +44,8 @@ function Sprite(src, layer) {
     property('x', 0);
 
     // image
-    this.img_natural_width = 0;
-    this.img_natural_height = 0;
+    this.img_natural_width = null;
+    this.img_natural_height = null;
 
     // width and height of the sprite view port
     property('w', null);
@@ -70,8 +69,8 @@ function Sprite(src, layer) {
         if(sjs.layers['default'] === undefined)
             sjs.layers["default"] = new Layer("default");
         layer = sjs.layers['default'];
-        this.layer = layer;
     }
+    this.layer = layer;
 
     if(sjs.use_canvas == false) {
         var d = document.createElement('div');
@@ -123,7 +122,7 @@ Sprite.prototype.size = function (w, h) {
 Sprite.prototype.update = function updateDomProperties () {
     /* alternative update function. This might be faster in some situation, especially
      * when few properties have been changed. */
-    if(sjs.use_canvas == true) {
+    if(sjs.use_canvas == true && this.img_loaded) {
         return this.canvasUpdate();
     }
     if(this.changed == false)
@@ -169,7 +168,23 @@ Sprite.prototype.canvasUpdate = function updateCanvas () {
     ctx.scale(this.xscale, this.yscale);
     ctx.globalAlpha = this.opacity;
     ctx.translate(-(this.w/2), -(this.h/2));
-    ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h, 0, 0, this.w, this.h);
+    // handle repeating images, a way to implement repeating background in canvas
+    if(this.img_natural_width < this.w || this.img_natural_height < this.h) {
+        var repeat_w = Math.floor(this.w / this.img_natural_width);
+        while(repeat_w >= 0) {
+            var repeat_y = Math.floor(this.h / this.img_natural_height);
+            while(repeat_y >= 0) {
+                ctx.drawImage(this.img, this.xoffset, this.yoffset, this.img_natural_width,
+                            this.img_natural_height, repeat_w*this.img_natural_width, 0,
+                            this.img_natural_width, this.img_natural_height);
+            repeat_y = repeat_y-1;
+            }
+            repeat_w = repeat_w-1;
+        }
+    } else {
+        // image with normal size or with
+        ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h, 0, 0, this.w, this.h);
+    }
     ctx.restore();
     return this;
 };
@@ -181,8 +196,9 @@ Sprite.prototype.toString = function () {
 Sprite.prototype.loadImg = function (src) {
     this.img = new Image();
     var there = this;
-    this.img.onload = function() {
-        var img = there.img;
+    this.img.onload = function(e) {
+        there.img_loaded = true;
+        var img = this;
         if(!sjs.use_canvas)
             there.dom.style.backgroundImage = 'url('+src+')';
         there.img_natural_width = img.width;
@@ -191,6 +207,7 @@ Sprite.prototype.loadImg = function (src) {
             there.w = img.width;
         if(there.h === null)
             there.h = img.height;
+        there.update();
     };
     this.img.src = src;
     return this;

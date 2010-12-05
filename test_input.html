@@ -14,12 +14,16 @@
 
 window.onload = function() {
 
-    var sprite = new sjs.Sprite('character.png');;
+    var background =  new sjs.Layer('background')
+    var ground = new sjs.Sprite('ground.png', background);
+    ground.w = window.innerWidth;
+    ground.y = 120;
+    ground.x = 0;
+
+    var sprite = new sjs.Sprite('character.png');
     sprite.x = 100;
     sprite.y = 100;
     sprite.size(30, 55);
-
-
 
     var cycle = new sjs.Cycle([[0, 2, 2],
                                [30, 2, 3],
@@ -61,6 +65,7 @@ window.onload = function() {
         else
             cycle.reset();
 
+        ground.update();
         sprite.update();
 
         ms_to_render = ms_to_render + new Date().getTime() - start;

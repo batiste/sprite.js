@@ -63,9 +63,10 @@ You can use those attributes methods to modify the sprite object::
 
     Sprite.y
     Sprite.x
-    Sprite.w
+    Sprite.w // this is a way to control the view surface of the image. To have repeating sprites
+             // set the width or height value bigger than the natural size of the image.
     Sprite.h
-    Sprite.xoffset // offset in the image where you want to start painting
+    Sprite.xoffset // offset in the image where you want to start painting in the view surface
     Sprite.yoffset
     Sprite.xscale
     Sprite.yscale
