@@ -16,13 +16,13 @@ window.onload = function() {
 
     var background =  new sjs.Layer('background')
     var ground = new sjs.Sprite('ground.png', background);
-    ground.w = window.innerWidth;
-    ground.y = 120;
+    ground.w = window.innerWidth / 2;
+    ground.y = 160;
     ground.x = 0;
 
     var sprite = new sjs.Sprite('character.png');
     sprite.x = 100;
-    sprite.y = 100;
+    sprite.y = 80;
     sprite.size(30, 55);
 
     var cycle = new sjs.Cycle([[0, 2, 2],
@@ -38,13 +38,18 @@ window.onload = function() {
 
     var ms_to_render = 0,
         average_ms = 0,
+        yv = 0,
         result = document.getElementById('result');
 
     function paint() {
 
         var start = new Date().getTime();
 
-        var xv = 0, yv = 0;
+        var xv = 0;
+        // gravity
+        yv += 0.3;
+        var collision = ground.hasCollision(sprite);
+
         if(input.keyboard.left) {
             sprite.move(-4, 0);
             sprite.scale(1, 1);
@@ -53,11 +58,15 @@ window.onload = function() {
             sprite.move(4, 0);
             sprite.scale(-1, 1);
         }
-        if(input.keyboard.up) {
-            sprite.move(0, -3);
-        }
-        if(input.keyboard.down) {
-            sprite.move(0, 3);
+
+        if(!collision)
+            sprite.move(0, yv);
+        else {
+            yv = 0;
+            if(input.keyboard.up) {
+                yv = -5;
+                sprite.move(0, yv);
+            }
         }
 
         if(input.arrows())

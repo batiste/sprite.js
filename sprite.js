@@ -171,15 +171,16 @@ Sprite.prototype.canvasUpdate = function updateCanvas () {
     // handle repeating images, a way to implement repeating background in canvas
     if(this.img_natural_width < this.w || this.img_natural_height < this.h) {
         var repeat_w = Math.floor(this.w / this.img_natural_width);
-        while(repeat_w >= 0) {
-            var repeat_y = Math.floor(this.h / this.img_natural_height);
-            while(repeat_y >= 0) {
-                ctx.drawImage(this.img, this.xoffset, this.yoffset, this.img_natural_width,
-                            this.img_natural_height, repeat_w*this.img_natural_width, 0,
-                            this.img_natural_width, this.img_natural_height);
-            repeat_y = repeat_y-1;
-            }
+        while(repeat_w > 0) {
             repeat_w = repeat_w-1;
+            var repeat_y = Math.floor(this.h / this.img_natural_height);
+            while(repeat_y > 0) {
+                repeat_y = repeat_y-1;
+                ctx.drawImage(this.img, this.xoffset, this.yoffset, this.img_natural_width,
+                            this.img_natural_height, repeat_w*this.img_natural_width, repeat_y*this.img_natural_width,
+                            this.img_natural_width, this.img_natural_height);
+            }
+
         }
     } else {
         // image with normal size or with
