@@ -77,8 +77,8 @@ window.onload = function() {
     var sp1 = new sjs.Sprite('character.png');
     sp1.size(100, 200);
 
-    assertFalse(sp3.hasCollision(sp1), "hasCollision test5");
-    assertFalse(sp1.hasCollision(sp3), "hasCollision test6");
+    assertTrue(sp3.hasCollision(sp1), "hasCollision test5");
+    assertTrue(sp1.hasCollision(sp3), "hasCollision test6");
 
 };
 </script>

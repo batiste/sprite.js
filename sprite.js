@@ -221,11 +221,15 @@ Sprite.prototype.isPointIn = function pointIn(x, y) {
         && y >= this.y && y <= this.y+this.h)
 }
 
-Sprite.prototype.hasCollision = function hasCollision(sprite) {
+Sprite.prototype.areVerticesIn = function hasCollision(sprite) {
    return (this.isPointIn(sprite.x, sprite.y)
        || this.isPointIn(sprite.x+sprite.w, sprite.y)
        || this.isPointIn(sprite.x+sprite.w, sprite.y)
-       || this.isPointIn(sprite.x, sprite.y+sprite.h));
+       || this.isPointIn(sprite.x, sprite.y + sprite.h));
+}
+
+Sprite.prototype.hasCollision = function hasCollision(sprite) {
+   return this.areVerticesIn(sprite) || sprite.areVerticesIn(this);
 }
 
 function Cycle(triplet) {
