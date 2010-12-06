@@ -321,7 +321,7 @@ Ticker.prototype.run = function() {
     var time_to_paint = (new Date().getTime()) - this.now;
     // We need some pause to let the browser catch up the update. Here at least 12 ms of pause
     var next_paint = Math.max(this.tick_duration - time_to_paint, 12);
-    setTimeout(function(){t.run()}, this.tick_duration);
+    setTimeout(function(){t.run()}, next_paint);
 }
 
 function Input() {
