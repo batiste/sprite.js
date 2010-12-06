@@ -20,8 +20,15 @@ window.onload = function() {
     ground.y = 160;
     ground.x = 0;
 
+    var rock1 = new sjs.Sprite('rock.png', background);
+    rock1.y = 140;
+    rock1.x = 150;
+    var rock2 = new sjs.Sprite('rock.png', background);
+    rock2.y = 140;
+    rock2.x = 350;
+
     var sprite = new sjs.Sprite('character.png');
-    sprite.x = 100;
+    sprite.x = 50;
     sprite.y = 80;
     sprite.size(30, 55);
 
@@ -52,16 +59,21 @@ window.onload = function() {
 
         if(input.keyboard.left) {
             sprite.move(-4, 0);
+            if(sprite.hasCollision([rock1, rock2]))
+                sprite.move(4, 0);
             sprite.scale(1, 1);
         }
         if(input.keyboard.right) {
             sprite.move(4, 0);
+            if(sprite.hasCollision([rock1, rock2]))
+                sprite.move(-4, 0);
             sprite.scale(-1, 1);
         }
 
         if(!collision)
             sprite.move(0, yv);
         else {
+            sprite.y = 108;
             yv = 0;
             if(input.keyboard.up) {
                 yv = -5;

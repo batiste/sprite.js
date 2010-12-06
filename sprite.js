@@ -221,15 +221,24 @@ Sprite.prototype.isPointIn = function pointIn(x, y) {
         && y >= this.y && y <= this.y+this.h)
 }
 
-Sprite.prototype.areVerticesIn = function hasCollision(sprite) {
-   return (this.isPointIn(sprite.x, sprite.y)
+Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
+    return (this.isPointIn(sprite.x, sprite.y)
        || this.isPointIn(sprite.x+sprite.w, sprite.y)
        || this.isPointIn(sprite.x+sprite.w, sprite.y)
        || this.isPointIn(sprite.x, sprite.y + sprite.h));
 }
 
-Sprite.prototype.hasCollision = function hasCollision(sprite) {
-   return this.areVerticesIn(sprite) || sprite.areVerticesIn(this);
+Sprite.prototype.hasCollision = function hasCollision(sprites) {
+    // detect arrays
+    if(sprites.length !== undefined) {
+        for(var i=0; i < sprites.length; i++) {
+            if(this.areVerticesIn(sprites[i]) || sprites[i].areVerticesIn(this)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    return this.areVerticesIn(sprites) || sprites.areVerticesIn(this);
 }
 
 function Cycle(triplet) {
