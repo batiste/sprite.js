@@ -69,11 +69,8 @@ window.onload = function() {
             .rotate(0.02)
             .update();
 
-        ms_to_render = ms_to_render + new Date().getTime() - start;
-        if(ticker.current_tick % 60 == 0) {
-            average_ms = Math.round(ms_to_render/60)
-            result.innerHTML = average_ms + 'ms spent in the display loop.';
-            ms_to_render = 0;
+        if(ticker.current_tick % 30 == 0) {
+            result.innerHTML = ticker.time_to_paint + 'ms spent in the paint function.';
         }
     };
     var ticker = new sjs.Ticker(35, paint);

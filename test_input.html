@@ -43,10 +43,7 @@ window.onload = function() {
 
     var input  = new sjs.Input();
 
-    var ms_to_render = 0,
-        average_ms = 0,
-        yv = 0,
-        result = document.getElementById('result');
+    var yv = 0, result = document.getElementById('result');
 
     function paint() {
 
@@ -86,14 +83,15 @@ window.onload = function() {
         else
             cycle.reset();
 
-        ground.update();
         sprite.update();
 
-        ms_to_render = ms_to_render + new Date().getTime() - start;
-        if(ticker.current_tick % 60 == 0) {
-            average_ms = Math.round(ms_to_render/60)
-            result.innerHTML = average_ms + 'ms spent in the display loop.';
-            ms_to_render = 0;
+        // this shoudn't be necessary if nothing changed with canvas
+        rock2.update();
+        rock1.update();
+        ground.update();
+
+        if(ticker.current_tick % 30 == 0) {
+            result.innerHTML = ticker.time_to_paint + 'ms spent in the paint function.';
         }
     };
     var ticker = new sjs.Ticker(35, paint);
