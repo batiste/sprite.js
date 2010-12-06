@@ -30,15 +30,15 @@ window.onload = function() {
     var sprite = new sjs.Sprite('character.png');
     sprite.x = 50;
     sprite.y = 80;
-    sprite.size(30, 55);
+    sprite.size(21, 51);
 
-    var cycle = new sjs.Cycle([[0, 2, 2],
-                               [30, 2, 3],
-                               [60, 2, 3],
-                               [90, 2, 3],
-                               [120, 2, 3],
-                               [150, 2, 3],
-                               [180, 2, 3]]);
+    var cycle = new sjs.Cycle([[4, 3, 2],
+                               [34, 3, 3],
+                               [64, 3, 3],
+                               [94, 3, 3],
+                               [124, 3, 3],
+                               [154, 3, 3],
+                               [184, 3, 3]]);
     cycle.sprites = [sprite];
 
     var input  = new sjs.Input();
@@ -70,15 +70,15 @@ window.onload = function() {
             sprite.scale(-1, 1);
         }
 
-        if(!collision)
-            sprite.move(0, yv);
-        else {
-            sprite.y = 108;
+
+        if(sprite.hasCollision([rock1, rock2, ground])) {
             yv = 0;
             if(input.keyboard.up) {
                 yv = -5;
                 sprite.move(0, yv);
             }
+        } else {
+            sprite.move(0, yv);
         }
 
         if(input.arrows())
