@@ -290,8 +290,7 @@ function Ticker(tick_duration, paint) {
 }
 
 Ticker.prototype.next = function() {
-    var now = new Date().getTime();
-    var tick_elapsed = Math.round((now - this.start) / this.tick_duration);
+    var tick_elapsed = Math.round((this.now - this.start) / this.tick_duration);
     this.last_tick_elapsed = tick_elapsed - this.current_tick;
     this.current_tick = tick_elapsed;
     return this.last_tick_elapsed;
@@ -299,12 +298,14 @@ Ticker.prototype.next = function() {
 
 Ticker.prototype.run = function() {
     var t = this;
-    // this is not a cheap operation
-    setTimeout(function(){t.run()}, this.tick_duration);
+    this.now = new Date().getTime();
     var ticks_elapsed = this.next();
-    // no update needed
-    if(ticks_elapsed == 0)
+    // no update needed, this happen on the first run
+    if(ticks_elapsed == 0) {
+        // this is not a cheap operation
+        setTimeout(function(){t.run()}, this.tick_duration);
         return
+    }
 
     if(sjs.use_canvas) {
         for(name in sjs.layers) {
@@ -316,6 +317,11 @@ Ticker.prototype.run = function() {
         }
     }
     this.paint(this);
+
+    var time_to_paint = (new Date().getTime()) - this.now;
+    // We need some pause to let the browser catch up the update. Here at least 12 ms of pause
+    var next_paint = Math.max(this.tick_duration - time_to_paint, 12);
+    setTimeout(function(){t.run()}, this.tick_duration);
 }
 
 function Input() {
