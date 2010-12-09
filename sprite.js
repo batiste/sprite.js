@@ -252,14 +252,14 @@ Sprite.prototype.hasCollision = function hasCollision(sprites) {
     return this.areVerticesIn(sprites) || sprites.areVerticesIn(this);
 }
 
-function Cycle(triplet) {
+function Cycle(triplets) {
     /* Cycle for the Sprite image.
     A cycle is a list of triplet (x offset, y offset, game tick duration) */
-    this.triplet = triplet;
+    this.triplets = triplets;
     this.cycle_duration = 0;
     this.changing_ticks = [];
-    for(var i=0; i<triplet.length; i++) {
-        this.cycle_duration = this.cycle_duration + triplet[i][2];
+    for(var i=0, triplet; triplet=triplets[i]; i++) {
+        this.cycle_duration = this.cycle_duration + triplet[2];
         this.changing_ticks.push(this.cycle_duration);
     }
     this.sprites = [];
@@ -280,8 +280,8 @@ Cycle.prototype.next = function (ticks) {
     for(var i=0; i<this.changing_ticks.length; i++) {
         if(this.tick == this.changing_ticks[i]) {
             for(j=0; j<this.sprites.length; j++) {
-                this.sprites[j].xoffset = this.triplet[i][0];
-                this.sprites[j].yoffset = this.triplet[i][1];
+                this.sprites[j].xoffset = this.triplets[i][0];
+                this.sprites[j].yoffset = this.triplets[i][1];
             }
         }
     }
@@ -291,8 +291,8 @@ Cycle.prototype.next = function (ticks) {
 Cycle.prototype.reset = function reset_cycle() {
     this.tick = 0;
     for(j=0; j<this.sprites.length; j++) {
-        this.sprites[j].xoffset = this.triplet[0][0];
-        this.sprites[j].yoffset = this.triplet[0][1];
+        this.sprites[j].xoffset = this.triplets[0][0];
+        this.sprites[j].yoffset = this.triplets[0][1];
     }
     return this;
 }
@@ -460,7 +460,8 @@ function getTransformProperty() {
     }
 }
  // TODO: be sure the body is loaded before doing that
-getTransformProperty();
+    window.addEventListener("load", getTransformProperty, false);
+    //getTransformProperty();
 window.sjs = sjs;
 
 })();
