@@ -112,11 +112,13 @@ Sprite.prototype.move = function (x, y) {
 Sprite.prototype.offset = function (x, y) {
     this.xoffset=x;
     this.yoffset=y;
+    return this;
 };
 
 Sprite.prototype.size = function (w, h) {
     this.w=w;
     this.h=h;
+    return this;
 };
 
 Sprite.prototype.remove = function remove() {
