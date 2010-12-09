@@ -242,8 +242,8 @@ Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
 Sprite.prototype.hasCollision = function hasCollision(sprites) {
     // detect arrays
     if(sprites.length !== undefined) {
-        for(var i=0; i < sprites.length; i++) {
-            if(this.areVerticesIn(sprites[i]) || sprites[i].areVerticesIn(this)) {
+        for(var i=0, sprite; sprite = sprites[i]; i++) {
+            if(this.areVerticesIn(sprite) || sprite.areVerticesIn(this)) {
                 return true;
             }
         }
@@ -279,9 +279,9 @@ Cycle.prototype.next = function (ticks) {
     }
     for(var i=0; i<this.changing_ticks.length; i++) {
         if(this.tick == this.changing_ticks[i]) {
-            for(j=0; j<this.sprites.length; j++) {
-                this.sprites[j].xoffset = this.triplets[i][0];
-                this.sprites[j].yoffset = this.triplets[i][1];
+            for(var j=0, sprite; sprite = this.sprites[j]; j++) {
+                sprite.xoffset = this.triplets[i][0];
+                sprite.yoffset = this.triplets[i][1];
             }
         }
     }
@@ -290,9 +290,9 @@ Cycle.prototype.next = function (ticks) {
 
 Cycle.prototype.reset = function reset_cycle() {
     this.tick = 0;
-    for(j=0; j<this.sprites.length; j++) {
-        this.sprites[j].xoffset = this.triplets[0][0];
-        this.sprites[j].yoffset = this.triplets[0][1];
+    for(var j=0, sprite; sprite = this.sprites[j]; j++) {
+        sprites.xoffset = this.triplets[0][0];
+        sprites.yoffset = this.triplets[0][1];
     }
     return this;
 }
@@ -328,7 +328,7 @@ Ticker.prototype.run = function() {
     }
 
     if(sjs.use_canvas) {
-        for(name in sjs.layers) {
+        for(var name in sjs.layers) {
             var layer = sjs.layers[name];
             layer.ctx.clearRect(0, 0, layer.dom.width, layer.dom.height);
             // trick to clear canvas, doesn't seems to do any better according to tests
