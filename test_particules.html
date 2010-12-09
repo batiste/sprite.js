@@ -4,7 +4,7 @@
 <meta name = "viewport" content = "user-scalable=no, width=device-width">
 
 </head>
-<body>
+<body style="overflow:hidden">
 
 <p>This demo is gonna produce particles and stop when 75% percent load is reached.<br>
 <span id="nb"></span> particules, system load <span id="load"></span>% <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
@@ -53,7 +53,6 @@ window.onload = function() {
             l.innerHTML = ticker.load;
             nb.innerHTML = particules.length;
         }
-
 
     };
     var ticker = new sjs.Ticker(25, paint);
