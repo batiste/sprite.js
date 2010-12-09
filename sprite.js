@@ -119,6 +119,15 @@ Sprite.prototype.size = function (w, h) {
     this.h=h;
 };
 
+Sprite.prototype.remove = function remove() {
+    if(sjs.use_canvas == false) {
+        this.layer.dom.removeChild(this.dom);
+        this.dom = null;
+    }
+    this.layer = null;
+    this.img = null;
+}
+
 Sprite.prototype.update = function updateDomProperties () {
     /* alternative update function. This might be faster in some situation, especially
      * when few properties have been changed. */
@@ -313,7 +322,7 @@ Ticker.prototype.run = function() {
     if(ticks_elapsed == 0) {
         // this is not a cheap operation
         setTimeout(function(){t.run()}, this.tick_duration);
-        return
+        return;
     }
 
     if(sjs.use_canvas) {
@@ -328,6 +337,7 @@ Ticker.prototype.run = function() {
     this.paint(this);
 
     this.time_to_paint = (new Date().getTime()) - this.now;
+    this.load = Math.round((this.time_to_paint / this.tick_duration) * 100);
     // We need some pause to let the browser catch up the update. Here at least 12 ms of pause
     var next_paint = Math.max(this.tick_duration - this.time_to_paint, 12);
     setTimeout(function(){t.run()}, next_paint);

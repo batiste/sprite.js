@@ -27,7 +27,7 @@ window.onload = function() {
         sp.h=55;
         sp.w=30;
         sp.yoffset=2;
-        sp.x=8 * i + 10;
+        sp.x=6 * i + 10;
         sp.y=70 + ((i%4) * 60);
         sprites.push(sp);
     }
@@ -70,7 +70,7 @@ window.onload = function() {
             .update();
 
         if(ticker.current_tick % 30 == 0) {
-            result.innerHTML = ticker.time_to_paint + 'ms spent in the paint function.';
+            result.innerHTML = 'system load ' + ticker.load + '%';
         }
     };
     var ticker = new sjs.Ticker(35, paint);

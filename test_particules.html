@@ -1,0 +1,64 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test 32 sprites in a cycle animation</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+</head>
+<body>
+
+<p>This demo is gonna produce particles and stop when 75% percent load is reached.<br>
+<span id="nb"></span> particules, system load <span id="load"></span>% <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
+
+</body>
+<script src="sprite.js"></script>
+<script>
+
+window.onload = function() {
+
+    var l = document.getElementById('load');
+    var nb = document.getElementById('nb');
+
+    if(window.location.href.indexOf('canvas') != -1) {
+        sjs.use_canvas = true;
+        document.getElementById('canvas-mode').style.display = 'none';
+    } else {
+        document.getElementById('html-mode').style.display = 'none';
+    }
+
+    var particules = [];
+
+    function paint() {
+
+        if(ticker.load <= 75) {
+            particule = new sjs.Sprite('particule.png');
+            particule.x = window.innerWidth / 2;
+            particule.y = window.innerHeight / 3;
+            particule.xv = (Math.random() - 0.5) * 5;
+            particule.yv = (Math.random() - 1.5) * 5;
+            particules.push(particule);
+        }
+        for(var i=0; i<particules.length; i++) {
+            var particule = particules[i];
+            particule.yv += 0.05;
+            particule.move(particule.xv, particule.yv);
+            if(particule.y > window.innerHeight) {
+                particules.splice(i, 1);
+                i--;
+                particule.remove();
+            } else {
+                particule.update();
+            }
+        }
+        if(ticker.current_tick % 30 == 0) {
+            l.innerHTML = ticker.load;
+            nb.innerHTML = particules.length;
+        }
+
+
+    };
+    var ticker = new sjs.Ticker(25, paint);
+    ticker.run();
+
+};
+</script>
+</html>

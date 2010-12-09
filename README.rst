@@ -45,6 +45,11 @@ Example of a basic use::
     sp.update();
     </script>
 
+Performance
+====================
+
+The HTML backend has received a particular attention to be as efficient as possible.
+
 Activate canvas backend
 ========================
 

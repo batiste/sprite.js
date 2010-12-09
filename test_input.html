@@ -91,7 +91,7 @@ window.onload = function() {
         ground.update();
 
         if(ticker.current_tick % 30 == 0) {
-            result.innerHTML = ticker.time_to_paint + 'ms spent in the paint function.';
+            result.innerHTML = 'system load ' + ticker.load + '%';
         }
     };
     var ticker = new sjs.Ticker(35, paint);
