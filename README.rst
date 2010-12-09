@@ -12,6 +12,8 @@ For an example of the what the framework offers, have a look at test_sprites.htm
 
 You can see some demos online here:
 
+http://batiste.dosimple.ch/sprite.js/test_particules.html
+
 http://batiste.dosimple.ch/sprite.js/test_sprites.html
 
 http://batiste.dosimple.ch/sprite.js/test_input.html
