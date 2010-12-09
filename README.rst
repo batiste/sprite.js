@@ -35,14 +35,15 @@ Example of a basic use::
     // apply the latest visual changes to the sprite;
     sp.update();
 
-    // change the offset of the image in the sprite
-    sp.xoffset=-50;
-    sp.yoffset=-50;
+    // change the offset of the image in the sprite (this works the opposite way of a CSS background)
+    sp.xoffset=50;
+    sp.yoffset=50;
 
     // diverse transformations
     sp.move(100, 100);
     sp.rotate(3.14 / 4);
     sp.scale(2);
+    sp.opacity = 0.8;
 
     sp.update();
     </script>
