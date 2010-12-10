@@ -91,13 +91,16 @@ Sprites provide the following attributes and methods::
     Sprite.offset(x, y)
     Sprite.size(w, h)    // set the width and height of the visible sprite
 
+    Sprite.loadImg(src, bool resetSize)    // change the image sprite. The size of the srpite will be rested by
+                                           // the new image if resetSize is true.
+
     Sprite.isPointIn(x, y) // return true if the point (x,y) is within
                            // the sprite surface (angles don't affect this function)
 
     Sprite.hasCollision(Sprite) // return true if the Sprite is in
                                 // collision with the other Sprite (angles don't affect this function)
 
-To update the view after modifyint the sprite, call "update"::
+To update the view after modifying the sprite, call "update"::
 
     Sprite.update()
 

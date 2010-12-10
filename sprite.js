@@ -205,7 +205,7 @@ Sprite.prototype.toString = function () {
     return String(this.x) + ',' + String(this.y);
 };
 
-Sprite.prototype.loadImg = function (src) {
+Sprite.prototype.loadImg = function (src, resetSize) {
     this.img = new Image();
     var there = this;
     this.img.onload = function(e) {
@@ -215,9 +215,9 @@ Sprite.prototype.loadImg = function (src) {
             there.dom.style.backgroundImage = 'url('+src+')';
         there.img_natural_width = img.width;
         there.img_natural_height = img.height;
-        if(there.w === null)
+        if(there.w === null || resetSize)
             there.w = img.width;
-        if(there.h === null)
+        if(there.h === null || resetSize)
             there.h = img.height;
         there.update();
     };
@@ -291,8 +291,8 @@ Cycle.prototype.next = function (ticks) {
 Cycle.prototype.reset = function reset_cycle() {
     this.tick = 0;
     for(var j=0, sprite; sprite = this.sprites[j]; j++) {
-        sprites.xoffset = this.triplets[0][0];
-        sprites.yoffset = this.triplets[0][1];
+        sprite.xoffset = this.triplets[0][0];
+        sprite.yoffset = this.triplets[0][1];
     }
     return this;
 }
