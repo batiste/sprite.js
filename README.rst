@@ -67,6 +67,13 @@ redrawing the whole canvas is expensive.
 
 Canvas seems faster when there is a lot of transformations applied to the sprite.
 
+Mobile performances can be very weak depending on the phone. Here is what we got using the particules test::
+
+    * Android emulator: 10 sprites
+    * HTC Hero: 10 sprites
+    * HTC Desire: 40-45 sprites
+
+
 Sprite object public methods and attributes
 ===========================================
 
