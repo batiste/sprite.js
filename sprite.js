@@ -425,6 +425,8 @@ Input.prototype.click = function click(event) {
     // to override
 }
 
+var layer_zindex = -100;
+
 function Layer(name) {
     this.name = name;
     if(sjs.layers[name] === undefined)
@@ -437,7 +439,7 @@ function Layer(name) {
         canvas.height = window.innerHeight;
         canvas.width = window.innerWidth;
         canvas.style.position = 'absolute';
-        canvas.style.zIndex = '-1';
+        canvas.style.zIndex = String(layer_zindex);
         canvas.style.top = '0px';
         canvas.style.left = '0px';
         document.body.appendChild(canvas);
@@ -448,10 +450,11 @@ function Layer(name) {
         div.style.position = 'absolute';
         div.style.top = '0px';
         div.style.left = '0px';
-        div.style.zIndex = '-1';
+        div.style.zIndex = String(layer_zindex);
         this.dom = div;
         document.body.appendChild(this.dom);
     }
+    layer_zindex += 1;
 }
 
 function getTransformProperty() {

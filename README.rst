@@ -91,7 +91,7 @@ Sprites provide the following attributes and methods::
     Sprite.offset(x, y)
     Sprite.size(w, h)    // set the width and height of the visible sprite
 
-    Sprite.loadImg(src, bool resetSize)    // change the image sprite. The size of the srpite will be rested by
+    Sprite.loadImg(src, bool resetSize)    // change the image sprite. The size of the sprite will be rested by
                                            // the new image if resetSize is true.
 
     Sprite.isPointIn(x, y) // return true if the point (x,y) is within
