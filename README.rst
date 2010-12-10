@@ -118,14 +118,14 @@ To setup a ticker::
 
     function paint() {
 
-        my_cycles.next(ticker.ticks_elapsed);
+        my_cycles.next(ticker.last_ticks_elapsed);
         // do your stuff
 
     }
     var ticker = new sjs.Ticker(35, paint); // we want a tick every 35ms
     ticker.run();
 
-ticks_elapsed is the number of ticks elapsed during 2 runs of the paint
+last_ticks_elapsed is the number of ticks elapsed during 2 runs of the paint
 function. If performances are good the value should be 1. If the number
 is higher than 1, it means that there have been more game ticks than calls
 to the paint function since the last time paint was called. In essence,
