@@ -1,5 +1,12 @@
 /* This the library file for the Sprite Javascript framework -- sprite.js */
 
+/* coding style:
+ *
+ *
+ * camelCase for methods
+ * camelCase for public attributes
+ */
+
 (function(){
 
 var sjs = {
@@ -18,7 +25,7 @@ function error(msg) {alert(msg)}
 function Sprite(src, layer) {
 
     var sp = this;
-    this._changed = {};
+    this._dirty = {};
     this.changed = false;
 
     function property(name, default_value) {
@@ -33,7 +40,7 @@ function Sprite(src, layer) {
         sp.__defineSetter__(name, function(value) {
             sp['_'+name] = value;
             if(!sjs.use_canvas) {
-                sp._changed[name] = true;
+                sp._dirty[name] = true;
                 sp.changed = true;
             }
         });
@@ -131,33 +138,31 @@ Sprite.prototype.remove = function remove() {
 }
 
 Sprite.prototype.update = function updateDomProperties () {
-    /* alternative update function. This might be faster in some situation, especially
-     * when few properties have been changed. */
+    /* This is the CPU heavy function. */
     if(sjs.use_canvas == true && this.img_loaded) {
         return this.canvasUpdate();
     }
     if(this.changed == false)
         return;
-    this.changed = false;
 
     var style = this.dom.style;
-    if(this._changed['w'])
+    if(this._dirty['w'])
         style.width=this.w+'px';
-    if(this._changed['h'])
+    if(this._dirty['h'])
         style.height=this.h+'px';
-    if(this._changed['y'])
+    if(this._dirty['y'])
         style.top=this.y+'px';
-    if(this._changed['x'])
+    if(this._dirty['x'])
         style.left=this.x+'px';
-    if(this._changed['xoffset'] || this._changed['yoffset'])
+    if(this._dirty['xoffset'] || this._dirty['yoffset'])
         style.backgroundPosition=-this.xoffset+'px '+-this.yoffset+'px';
 
-    if(this._changed['opacity'])
+    if(this._dirty['opacity'])
         style.opacity = this.opacity;
 
     // those transformation have pretty bad perfs implication on Opera,
     // don't update those values if nothing changed
-    if(this._changed['xscale'] || this._changed['yscale'] || this._changed['angle']) {
+    if(this._dirty['xscale'] || this._dirty['yscale'] || this._dirty['angle']) {
         var trans = "";
         if(this.angle!=0)
             trans += 'rotate('+this.angle+'rad) ';
@@ -167,7 +172,8 @@ Sprite.prototype.update = function updateDomProperties () {
         style[sjs.tproperty] = trans;
     }
     // reset
-    this._changed = {};
+    this.changed = false;
+    this._dirty = {};
     return this;
 };
 
@@ -239,7 +245,7 @@ Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
        || this.isPointIn(sprite.x, sprite.y + sprite.h));
 }
 
-Sprite.prototype.hasCollision = function hasCollision(sprites) {
+Sprite.prototype.collidesWith = function hasCollision(sprites) {
     // detect arrays
     if(sprites.length !== undefined) {
         for(var i=0, sprite; sprite = sprites[i]; i++) {
@@ -315,9 +321,9 @@ function Ticker(tick_duration, paint) {
 
 Ticker.prototype.next = function() {
     var ticks_elapsed = Math.round((this.now - this.start) / this.tick_duration);
-    this.last_ticks_elapsed = ticks_elapsed - this.current_tick;
+    this.lastTicksElapsed = ticks_elapsed - this.current_tick;
     this.current_tick = ticks_elapsed;
-    return this.last_ticks_elapsed;
+    return this.lastTicksElapsed;
 }
 
 Ticker.prototype.run = function() {

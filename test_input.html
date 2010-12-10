@@ -52,23 +52,23 @@ window.onload = function() {
         var xv = 0;
         // gravity
         yv += 0.3;
-        var collision = ground.hasCollision(sprite);
+        var collision = ground.collidesWith(sprite);
 
         if(input.keyboard.left) {
             sprite.move(-4, 0);
-            if(sprite.hasCollision([rock1, rock2]))
+            if(sprite.collidesWith([rock1, rock2]))
                 sprite.move(4, 0);
             sprite.scale(1, 1);
         }
         if(input.keyboard.right) {
             sprite.move(4, 0);
-            if(sprite.hasCollision([rock1, rock2]))
+            if(sprite.collidesWith([rock1, rock2]))
                 sprite.move(-4, 0);
             sprite.scale(-1, 1);
         }
 
 
-        if(sprite.hasCollision([rock1, rock2, ground])) {
+        if(sprite.collidesWith([rock1, rock2, ground])) {
             yv = 0;
             if(input.keyboard.up) {
                 yv = -5;
@@ -79,7 +79,7 @@ window.onload = function() {
         }
 
         if(input.arrows())
-            cycle.next(ticker.last_ticks_elapsed);
+            cycle.next(ticker.lastTicksElapsed);
         else
             cycle.reset();
 

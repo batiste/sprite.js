@@ -39,7 +39,7 @@ window.onload = function() {
         }
         for(var i=0; i<particules.length; i++) {
             var particule = particules[i];
-            particule.yv += 0.05;
+            particule.yv += 0.03;
             particule.move(particule.xv, particule.yv);
             if(particule.y > window.innerHeight) {
                 particules.splice(i, 1);

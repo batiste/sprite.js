@@ -65,7 +65,7 @@ Tests show that *the canvas backend is slower* on Firefox, Opera and Chrome.
 Especially with a high number of sprites and a large canvas. Clearing and
 redrawing the whole canvas is expensive.
 
-
+Canvas seems faster when there is a lot of transformations applied to the sprite.
 
 Sprite object public methods and attributes
 ===========================================
@@ -97,8 +97,9 @@ Sprites provide the following attributes and methods::
     Sprite.isPointIn(x, y) // return true if the point (x,y) is within
                            // the sprite surface (angles don't affect this function)
 
-    Sprite.hasCollision(Sprite) // return true if the Sprite is in
-                                // collision with the other Sprite (angles don't affect this function)
+    Sprite.collidesWith(Sprite) // return true if the Sprite is in
+                                // collision with the other Sprite (angles don't affect this function).
+                                // You can also pass an array of sprites to the method.
 
 To update the view after modifying the sprite, call "update"::
 
@@ -118,14 +119,14 @@ To setup a ticker::
 
     function paint() {
 
-        my_cycles.next(ticker.last_ticks_elapsed);
+        my_cycles.next(ticker.lastTicksElapsed);
         // do your stuff
 
     }
     var ticker = new sjs.Ticker(35, paint); // we want a tick every 35ms
     ticker.run();
 
-last_ticks_elapsed is the number of ticks elapsed during 2 runs of the paint
+lastTicksElapsed is the number of ticks elapsed during 2 runs of the paint
 function. If performances are good the value should be 1. If the number
 is higher than 1, it means that there have been more game ticks than calls
 to the paint function since the last time paint was called. In essence,
