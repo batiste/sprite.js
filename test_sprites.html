@@ -57,7 +57,7 @@ window.onload = function() {
             xv = Math.sin(ticker.current_tick / 15) * 2,
             xscale = xv < 0 ? 1 : -1;
 
-        cycle.next(ticker.ticks_elapsed);
+        cycle.next(ticker.last_ticks_elapsed);
         for(var i=0, sp; sp = sprites[i]; i++) {
             sp.move(xv, 0)
               .scale(xscale, 1)
