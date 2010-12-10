@@ -256,13 +256,17 @@ function Cycle(triplets) {
     /* Cycle for the Sprite image.
     A cycle is a list of triplet (x offset, y offset, game tick duration) */
     this.triplets = triplets;
+    // total duration of the animation in ticks
     this.cycle_duration = 0;
+    // this array knows on which ticks in the animation
+    // an image change is needed
     this.changing_ticks = [];
     for(var i=0, triplet; triplet=triplets[i]; i++) {
         this.cycle_duration = this.cycle_duration + triplet[2];
         this.changing_ticks.push(this.cycle_duration);
     }
     this.sprites = [];
+    // if set to false, the animation will stop automaticaly after one run
     this.repeat = true;
     this.tick = 0;
 };

@@ -149,6 +149,7 @@ cycle applies to. this is a cycle with 3 position, each lasting 5 game ticks::
     cycle.next() // apply the next cycle to the sprite
     cycle.next(2) // apply the second next cycle to the sprite
     cycle.reset() // reset the cycle to the original position
+    cycle.repeat = false // if set to false, the animation will stop automaticaly after one run
 
 
 Input object
