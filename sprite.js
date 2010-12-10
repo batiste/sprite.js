@@ -305,15 +305,15 @@ function Ticker(tick_duration, paint) {
         this.tick_duration = tick_duration;
 
     this.start = new Date().getTime();
-    this.tick_elapsed = 0;
+    this.ticks_elapsed = 0;
     this.current_tick = 0;
 }
 
 Ticker.prototype.next = function() {
-    var tick_elapsed = Math.round((this.now - this.start) / this.tick_duration);
-    this.last_tick_elapsed = tick_elapsed - this.current_tick;
-    this.current_tick = tick_elapsed;
-    return this.last_tick_elapsed;
+    var ticks_elapsed = Math.round((this.now - this.start) / this.tick_duration);
+    this.last_ticks_elapsed = ticks_elapsed - this.current_tick;
+    this.current_tick = ticks_elapsed;
+    return this.last_ticks_elapsed;
 }
 
 Ticker.prototype.run = function() {
