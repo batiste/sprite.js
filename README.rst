@@ -14,6 +14,8 @@ You can see some demos online here:
 
 http://batiste.dosimple.ch/sprite.js/test_particules.html
 
+http://batiste.dosimple.ch/sprite.js/test_game.html
+
 http://batiste.dosimple.ch/sprite.js/test_sprites.html
 
 http://batiste.dosimple.ch/sprite.js/test_input.html
@@ -115,9 +117,8 @@ To update the view after modifying the sprite, call "update"::
 Ticker object
 ==============
 
-Keeping track of time in javascript is tricky, setInterval and setTimeout
-are not accurate enough. Sprite.js provides a Ticker object to deal with
-those issues.
+Keeping track of time in javascript is tricky. Sprite.js provides a Ticker object to deal with
+this issue.
 
 A ticker is an object that keeps track of time properly, so it's straight
 forward to render the changes in the scene. The ticker gives accurate ticks.
