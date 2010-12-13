@@ -20,6 +20,25 @@ var sjs = {
     layers: {},
 };
 
+sjs.__defineGetter__('h', function() {
+    return this._h;
+});
+
+sjs.__defineSetter__('h', function(value) {
+    this._h = value;
+    this.dom.style.height = value + 'px';
+});
+
+sjs.__defineGetter__('w', function() {
+    return this._w;
+});
+
+sjs.__defineSetter__('w', function(value) {
+    this._w = value;
+    this.dom.style.width = value + 'px';
+});
+
+
 function error(msg) {alert(msg)}
 
 function Sprite(src, layer) {
@@ -431,7 +450,7 @@ Input.prototype.click = function click(event) {
     // to override
 }
 
-var layer_zindex = -100;
+var layer_zindex = 1;
 
 function Layer(name) {
     this.name = name;
@@ -440,15 +459,17 @@ function Layer(name) {
     else
         error('Layer '+ name + ' already exist.');
 
+    var dom = initDom();
+
     if(sjs.use_canvas) {
         var canvas = document.createElement('canvas');
-        canvas.height = window.innerHeight;
-        canvas.width = window.innerWidth;
+        canvas.height = sjs.h;
+        canvas.width = sjs.w;
         canvas.style.position = 'absolute';
         canvas.style.zIndex = String(layer_zindex);
         canvas.style.top = '0px';
         canvas.style.left = '0px';
-        document.body.appendChild(canvas);
+        dom.appendChild(canvas);
         this.dom = canvas;
         this.ctx = canvas.getContext('2d');
     } else {
@@ -458,12 +479,13 @@ function Layer(name) {
         div.style.left = '0px';
         div.style.zIndex = String(layer_zindex);
         this.dom = div;
-        document.body.appendChild(this.dom);
+        dom.appendChild(this.dom);
     }
     layer_zindex += 1;
 }
 
-function getTransformProperty() {
+function init() {
+    initDom();
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
     var p = false;
     while (p = properties.shift()) {
@@ -472,9 +494,22 @@ function getTransformProperty() {
         }
     }
 }
- // TODO: be sure the body is loaded before doing that
-    window.addEventListener("load", getTransformProperty, false);
-    //getTransformProperty();
+
+function initDom() {
+    if(!sjs.dom) {
+        var div = document.createElement('div');
+        div.style.overflow = 'hidden';
+        div.style.position = 'relative';
+        div.id = 'sjs';
+        document.body.appendChild(div);
+        sjs.dom = div;
+        sjs.w = 480;
+        sjs.h = 320;
+    }
+    return sjs.dom;
+}
+
+window.addEventListener("load", init, false);
 window.sjs = sjs;
 
 })();
