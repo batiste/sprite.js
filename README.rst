@@ -73,6 +73,7 @@ Mobile performances can be very weak depending on the phone. Here is what we got
 
     * Android emulator: 10 sprites
     * HTC Hero: 10 sprites
+    * iPhone 3G: 20-25 sprites
     * HTC Desire: 40-45 sprites
 
 
