@@ -88,6 +88,7 @@ function Sprite(src, layer) {
     property('angle', 0);
 
     property('opacity', 1);
+    property('color', false);
 
     if(layer === undefined) {
         // important to delay the creation so use_canvas
@@ -178,6 +179,9 @@ Sprite.prototype.update = function updateDomProperties () {
 
     if(this._dirty['opacity'])
         style.opacity = this.opacity;
+
+    if(this._dirty['color'])
+        style.backgroundColor = this.color;
 
     // those transformation have pretty bad perfs implication on Opera,
     // don't update those values if nothing changed

@@ -91,8 +91,9 @@ Sprites provide the following attributes and methods::
     Sprite.yoffset
     Sprite.xscale
     Sprite.yscale
-    Sprite.angle // use radians
+    Sprite.angle   // use radians
     Sprite.opacity // use float in the range 0-1
+    Sprite.color   // Background color of th sprite. Use the rgb/hexadecimal CSS notation.
 
     Sprite(src)
     Sprite.rotate(radians)
