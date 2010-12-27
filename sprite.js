@@ -52,6 +52,7 @@ function Sprite(src, layer) {
             sp['_'+name] = 0;
         else
             sp['_'+name] = default_value;
+
         sp.__defineGetter__(name, function() {
             return sp['_'+name];
         });
@@ -70,6 +71,7 @@ function Sprite(src, layer) {
     property('x', 0);
 
     // image
+    this.img = null;
     this.img_natural_width = null;
     this.img_natural_height = null;
 
@@ -159,7 +161,7 @@ Sprite.prototype.remove = function remove() {
 
 Sprite.prototype.update = function updateDomProperties () {
     /* This is the CPU heavy function. */
-    if(sjs.use_canvas == true && this.img_loaded) {
+    if(sjs.use_canvas == true) {
         return this.canvasUpdate();
     }
     if(this.changed == false)
@@ -208,23 +210,30 @@ Sprite.prototype.canvasUpdate = function updateCanvas () {
     ctx.scale(this.xscale, this.yscale);
     ctx.globalAlpha = this.opacity;
     ctx.translate(-(this.w/2), -(this.h/2));
+    // handle background colors.
+    if(this.color) {
+        ctx.fillStyle = this.color;
+        ctx.fillRect(0, 0, this.w, this.h);
+    }
     // handle repeating images, a way to implement repeating background in canvas
-    if(this.img_natural_width < this.w || this.img_natural_height < this.h) {
-        var repeat_w = Math.floor(this.w / this.img_natural_width);
-        while(repeat_w > 0) {
-            repeat_w = repeat_w-1;
-            var repeat_y = Math.floor(this.h / this.img_natural_height);
-            while(repeat_y > 0) {
-                repeat_y = repeat_y-1;
-                ctx.drawImage(this.img, this.xoffset, this.yoffset, this.img_natural_width,
-                            this.img_natural_height, repeat_w*this.img_natural_width, repeat_y*this.img_natural_width,
-                            this.img_natural_width, this.img_natural_height);
-            }
+    if(this.img_loaded && this.img) {
+        if(this.img_natural_width < this.w || this.img_natural_height < this.h) {
+            var repeat_w = Math.floor(this.w / this.img_natural_width);
+            while(repeat_w > 0) {
+                repeat_w = repeat_w-1;
+                var repeat_y = Math.floor(this.h / this.img_natural_height);
+                while(repeat_y > 0) {
+                    repeat_y = repeat_y-1;
+                    ctx.drawImage(this.img, this.xoffset, this.yoffset, this.img_natural_width,
+                                this.img_natural_height, repeat_w*this.img_natural_width, repeat_y*this.img_natural_width,
+                                this.img_natural_width, this.img_natural_height);
+                }
 
+            }
+        } else {
+            // image with normal size or with
+            ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h, 0, 0, this.w, this.h);
         }
-    } else {
-        // image with normal size or with
-        ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h, 0, 0, this.w, this.h);
     }
     ctx.restore();
     return this;
