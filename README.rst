@@ -112,6 +112,10 @@ Sprites provide the following attributes and methods::
                                 // collision with the other Sprite (angles don't affect this function).
                                 // You can also pass an array of sprites to the method.
 
+    Sprite.onload(callback)     // call the function "callabck" the sprite's image is loaded.
+                                // If the image is already loaded the function is called immediatly.
+
+
 To update the view after modifying the sprite, call "update"::
 
     Sprite.update()
