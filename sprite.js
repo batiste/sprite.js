@@ -225,7 +225,7 @@ Sprite.prototype.canvasUpdate = function updateCanvas () {
                 while(repeat_y > 0) {
                     repeat_y = repeat_y-1;
                     ctx.drawImage(this.img, this.xoffset, this.yoffset, this.img_natural_width,
-                                this.img_natural_height, repeat_w*this.img_natural_width, repeat_y*this.img_natural_width,
+                                this.img_natural_height, repeat_w*this.img_natural_width, repeat_y*this.img_natural_height,
                                 this.img_natural_width, this.img_natural_height);
                 }
 
@@ -243,6 +243,14 @@ Sprite.prototype.toString = function () {
     return String(this.x) + ',' + String(this.y);
 };
 
+Sprite.prototype.onload = function(callback) {
+    if(callback)
+        this._callback = callback
+    if(this.img_loaded && this._callback) {
+        this._callback();
+    }
+};
+
 Sprite.prototype.loadImg = function (src, resetSize) {
     this.img = new Image();
     var there = this;
@@ -258,6 +266,7 @@ Sprite.prototype.loadImg = function (src, resetSize) {
         if(there.h === null || resetSize)
             there.h = img.height;
         there.update();
+        there.onload();
     };
     this.img.src = src;
     return this;
