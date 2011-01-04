@@ -313,7 +313,6 @@ function Cycle(triplets) {
         this.changing_ticks.push(this.cycle_duration);
     }
     this.changing_ticks.pop()
-    console.log(this.changing_ticks)
     this.sprites = [];
     // if set to false, the animation will stop automaticaly after one run
     this.repeat = true;
