@@ -307,11 +307,13 @@ function Cycle(triplets) {
     this.cycle_duration = 0;
     // this array knows on which ticks in the animation
     // an image change is needed
-    this.changing_ticks = [];
+    this.changing_ticks = [0];
     for(var i=0, triplet; triplet=triplets[i]; i++) {
         this.cycle_duration = this.cycle_duration + triplet[2];
         this.changing_ticks.push(this.cycle_duration);
     }
+    this.changing_ticks.pop()
+    console.log(this.changing_ticks)
     this.sprites = [];
     // if set to false, the animation will stop automaticaly after one run
     this.repeat = true;
