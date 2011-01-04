@@ -18,6 +18,7 @@ var sjs = {
     Layer: Layer,
     use_canvas: (window.location.href.indexOf('canvas') != -1),
     layers: {},
+    dom:null,
 };
 
 sjs.__defineGetter__('h', function() {
@@ -42,6 +43,9 @@ sjs.__defineSetter__('w', function(value) {
 function error(msg) {alert(msg)}
 
 function Sprite(src, layer) {
+
+    if(this.constructor !== arguments.callee)
+        return new Sprite(src, layer);
 
     var sp = this;
     this._dirty = {};
@@ -476,13 +480,17 @@ Input.prototype.click = function click(event) {
 var layer_zindex = 1;
 
 function Layer(name) {
+
+    if(this.constructor !== arguments.callee)
+        return new Layer(name);
+
     this.name = name;
     if(sjs.layers[name] === undefined)
         sjs.layers[name] = this;
     else
         error('Layer '+ name + ' already exist.');
 
-    var dom = initDom();
+    var sjs_dom = initDom();
 
     if(sjs.use_canvas) {
         var canvas = document.createElement('canvas');
@@ -492,7 +500,8 @@ function Layer(name) {
         canvas.style.zIndex = String(layer_zindex);
         canvas.style.top = '0px';
         canvas.style.left = '0px';
-        dom.appendChild(canvas);
+        canvas.id = name;
+        sjs_dom.appendChild(canvas);
         this.dom = canvas;
         this.ctx = canvas.getContext('2d');
     } else {
@@ -501,8 +510,9 @@ function Layer(name) {
         div.style.top = '0px';
         div.style.left = '0px';
         div.style.zIndex = String(layer_zindex);
+        div.id = name;
         this.dom = div;
-        dom.appendChild(this.dom);
+        sjs_dom.appendChild(this.dom);
     }
     layer_zindex += 1;
 }
