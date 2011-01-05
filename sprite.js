@@ -393,6 +393,8 @@ Ticker.prototype.run = function() {
         }
     }
     this.paint(this);
+    // reset the keyboard change
+    input_singleton.keyboardChange = {};
 
     this.time_to_paint = (new Date().getTime()) - this.now;
     this.load = Math.round((this.time_to_paint / this.tick_duration) * 100);
@@ -401,29 +403,55 @@ Ticker.prototype.run = function() {
     setTimeout(function(){t.run()}, next_paint);
 }
 
-function Input() {
+/* let's have a singleton here */
+var input_singleton = new _Input()
+function Input(){return input_singleton};
+function _Input() {
 
     this.keyboard = {};
+    this.keyboardChange = {};
     var that = this;
     this.mousedown = false;
     this.keydown = true;
 
+    this.keyPressed = function(name) {
+        return that.keyboardChange[name] !== undefined && that.keyboardChange[name] == true;
+    }
+
+    this.keyReleased = function(name) {
+        return that.keyboardChange[name] !== undefined && that.keyboardChange[name] == false;
+    }
+
+    function updateKeyChange(name, val) {
+        if(that.keyboard[name] != val) {
+            that.keyboard[name] = val;
+            that.keyboardChange[name] = val;
+        }
+    }
+
     // this is handling WASD, and arrows keys
     function update_keyboard(e, val) {
-        if(e.keyCode==40 || e.keyCode==83)
-            that.keyboard['down'] = val;
-        if(e.keyCode==38 || e.keyCode==87)
-            that.keyboard['up'] = val;
-        if(e.keyCode==39 || e.keyCode==68)
-            that.keyboard['right'] = val;
-        if(e.keyCode==37 || e.keyCode==65)
-            that.keyboard['left'] = val;
-        if(e.keyCode==32)
-            that.keyboard['space'] = val;
-        if(e.keyCode==17)
-            that.keyboard['ctrl'] = val;
-        if(e.keyCode==13)
-            that.keyboard['enter'] = val;
+        if(e.keyCode==40 || e.keyCode==83) {
+            updateKeyChange('down', val);
+        }
+        if(e.keyCode==38 || e.keyCode==87) {
+            updateKeyChange('up', val);
+        }
+        if(e.keyCode==39 || e.keyCode==68) {
+            updateKeyChange('right', val);
+        }
+        if(e.keyCode==37 || e.keyCode==65) {
+            updateKeyChange('left', val);
+        }
+        if(e.keyCode==32) {
+            updateKeyChange('space', val);
+        }
+        if(e.keyCode==17) {
+            updateKeyChange('ctrl', val);
+        }
+        if(e.keyCode==13) {
+            updateKeyChange('enter', val);
+        }
     };
 
     document.ontouchstart = function(event) {
@@ -440,9 +468,9 @@ function Input() {
     document.onmouseup = function(event) {
         that.mousedown = false;
     }
-    document.onclick = function(event) {
-        that.click(event);
-    }
+    //document.onclick = function(event) {
+        //that.click(event);
+    //}
     document.onmousemove = function(event) {
         that.xmouse = event.clientX;
         that.ymouse = event.clientY;

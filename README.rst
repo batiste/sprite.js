@@ -177,12 +177,18 @@ that will be true if the key is pressed::
     if(input.keyboard.right) {
         sprite.move(5, 0);
     }
+
     // arrows is true if any directionnal keyboard arrows are pressed
     if(input.arrows())
         cycle.next();
     else
         cycle.reset();
 
+    // input.keyboard is a memory of which key is down and up. If you need to know which key
+    // has just been pressed or released you can use those functions
+
+    input.keyPressed('up')
+    input.keyReleased('up')
 
 Layer object
 =============
