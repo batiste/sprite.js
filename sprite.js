@@ -7,7 +7,7 @@
  * camelCase for public attributes
  */
 
-(function(){
+(function(global, undefined){
 
 var sjs = {
     Sprite: Sprite,
@@ -16,9 +16,9 @@ var sjs = {
     Ticker: Ticker,
     Input: Input,
     Layer: Layer,
-    use_canvas: (window.location.href.indexOf('canvas') != -1),
+    use_canvas: (global.location.href.indexOf('canvas') != -1),
     layers: {},
-    dom:null,
+    dom:null
 };
 
 sjs.__defineGetter__('h', function() {
@@ -105,13 +105,12 @@ function Sprite(src, layer) {
     }
     this.layer = layer;
 
-    if(sjs.use_canvas == false) {
+    if(!sjs.use_canvas) {
         var d = document.createElement('div');
         d.style.position = 'absolute';
         this.dom = d;
         layer.dom.appendChild(d);
     }
-
     if(src)
         this.loadImg(src)
     return this;
@@ -155,7 +154,7 @@ Sprite.prototype.size = function (w, h) {
 };
 
 Sprite.prototype.remove = function remove() {
-    if(sjs.use_canvas == false) {
+    if(!sjs.use_canvas) {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
     }
@@ -165,10 +164,10 @@ Sprite.prototype.remove = function remove() {
 
 Sprite.prototype.update = function updateDomProperties () {
     /* This is the CPU heavy function. */
-    if(sjs.use_canvas == true) {
+    if(sjs.use_canvas) {
         return this.canvasUpdate();
     }
-    if(this.changed == false)
+    if(!this.changed)
         return;
 
     var style = this.dom.style;
@@ -489,25 +488,27 @@ function _Input() {
     };
     // make sure that the keyboard is rested when
     // the user leave the page
-    window.onblur = function (e) {
+    global.onblur = function (e) {
         that.keyboard = {}
         that.keydown = false;
         that.mousedown = false;
     }
 }
 
-Input.prototype.arrows = function arrows() {
+_Input.prototype.arrows = function arrows() {
     /* Return true if any arrow key is pressed */
     return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
 }
 
-Input.prototype.click = function click(event) {
+_Input.prototype.click = function click(event) {
     // to override
 }
 
 var layer_zindex = 1;
 
 function Layer(name) {
+
+    var canvas, domElement;
 
     if(this.constructor !== arguments.callee)
         return new Layer(name);
@@ -518,35 +519,43 @@ function Layer(name) {
     else
         error('Layer '+ name + ' already exist.');
 
-    var sjs_dom = initDom();
+		domElement = document.getElementById(name);
 
-    if(sjs.use_canvas) {
-        var canvas = document.createElement('canvas');
-        canvas.height = sjs.h;
-        canvas.width = sjs.w;
-        canvas.style.position = 'absolute';
-        canvas.style.zIndex = String(layer_zindex);
-        canvas.style.top = '0px';
-        canvas.style.left = '0px';
-        canvas.id = name;
-        sjs_dom.appendChild(canvas);
-        this.dom = canvas;
-        this.ctx = canvas.getContext('2d');
-    } else {
-        var div = document.createElement('div');
-        div.style.position = 'absolute';
-        div.style.top = '0px';
-        div.style.left = '0px';
-        div.style.zIndex = String(layer_zindex);
-        div.id = name;
-        this.dom = div;
-        sjs_dom.appendChild(this.dom);
-    }
+        if(sjs.use_canvas) {
+            if (domElement && domElement.nodeName.toLowerCase() != "canvas") {
+                error("Cannot use HTMLElement " + domElement.nodeName + " with canvas renderer.");
+            }
+            if (!domElement) {
+                domElement = document.createElement('canvas');
+                domElement.height = sjs.h;
+                domElement.width = sjs.w;
+                domElement.style.position = 'absolute';
+                domElement.style.zIndex = String(layer_zindex);
+                domElement.style.top = '0px';
+                domElement.style.left = '0px';
+                domElement.id = name;
+                sjs.dom.appendChild(domElement);
+            }
+            this.dom = domElement;
+            this.ctx = domElement.getContext('2d');
+        } else {
+            if (!domElement) {
+                domElement = document.createElement('div');
+                domElement.style.position = 'absolute';
+                domElement.style.top = '0px';
+                domElement.style.left = '0px';
+                domElement.style.zIndex = String(layer_zindex);
+                domElement.id = name;
+                sjs.dom.appendChild(domElement);
+            }
+            this.dom = domElement;
+        }
+
     layer_zindex += 1;
 }
 
 function init() {
-    initDom();
+	initDom()
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
     var p = false;
     while (p = properties.shift()) {
@@ -570,7 +579,7 @@ function initDom() {
     return sjs.dom;
 }
 
-window.addEventListener("load", init, false);
-window.sjs = sjs;
+global.addEventListener("load", init, false);
+global.sjs = sjs;
 
-})();
+})(this);
