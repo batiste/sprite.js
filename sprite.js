@@ -112,7 +112,7 @@ function Sprite(src, layer) {
         layer.dom.appendChild(d);
     }
     if(src)
-        this.loadImg(src)
+        this.loadImg(src);
     return this;
 }
 
@@ -128,7 +128,7 @@ Sprite.prototype.scale = function (x, y) {
         this.xscale = x;
     }
     if(y === undefined)
-        var y = x;
+        y = x;
     if(this.yscale != y) {
         this.yscale = y;
     }
@@ -160,7 +160,7 @@ Sprite.prototype.remove = function remove() {
     }
     this.layer = null;
     this.img = null;
-}
+};
 
 Sprite.prototype.update = function updateDomProperties () {
     /* This is the CPU heavy function. */
@@ -248,7 +248,7 @@ Sprite.prototype.toString = function () {
 
 Sprite.prototype.onload = function(callback) {
     if(callback)
-        this._callback = callback
+        this._callback = callback;
     if(this.img_loaded && this._callback) {
         this._callback();
     }
@@ -280,14 +280,14 @@ Sprite.prototype.isPointIn = function pointIn(x, y) {
     // return true if the point is in the sprite surface
     return (x >= this.x && x <= this.x+this.w
         && y >= this.y && y <= this.y+this.h)
-}
+};
 
 Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
     return (this.isPointIn(sprite.x, sprite.y)
        || this.isPointIn(sprite.x+sprite.w, sprite.y)
        || this.isPointIn(sprite.x+sprite.w, sprite.y)
        || this.isPointIn(sprite.x, sprite.y + sprite.h));
-}
+};
 
 Sprite.prototype.collidesWith = function hasCollision(sprites) {
     // detect arrays
@@ -300,7 +300,7 @@ Sprite.prototype.collidesWith = function hasCollision(sprites) {
         return false;
     }
     return this.areVerticesIn(sprites) || sprites.areVerticesIn(this);
-}
+};
 
 function Cycle(triplets) {
     /* Cycle for the Sprite image.
@@ -315,16 +315,15 @@ function Cycle(triplets) {
         this.cycle_duration = this.cycle_duration + triplet[2];
         this.changing_ticks.push(this.cycle_duration);
     }
-    this.changing_ticks.pop()
+    this.changing_ticks.pop();
     this.sprites = [];
     // if set to false, the animation will stop automaticaly after one run
     this.repeat = true;
     this.tick = 0;
-};
+}
 
 Cycle.prototype.next = function (ticks) {
-    if(ticks === undefined)
-        ticks = 1;
+	ticks = ticks || 1; // default tick: 1
     this.tick = this.tick + ticks;
     if(this.tick > this.cycle_duration) {
         if(this.repeat)
@@ -350,7 +349,7 @@ Cycle.prototype.reset = function reset_cycle() {
         sprite.yoffset = this.triplets[0][1];
     }
     return this;
-}
+};
 
 function Ticker(tick_duration, paint) {
     this.paint = paint;
@@ -369,7 +368,7 @@ Ticker.prototype.next = function() {
     this.lastTicksElapsed = ticks_elapsed - this.current_tick;
     this.current_tick = ticks_elapsed;
     return this.lastTicksElapsed;
-}
+};
 
 Ticker.prototype.run = function() {
     var t = this;
@@ -400,26 +399,27 @@ Ticker.prototype.run = function() {
     // We need some pause to let the browser catch up the update. Here at least 12 ms of pause
     var next_paint = Math.max(this.tick_duration - this.time_to_paint, 12);
     setTimeout(function(){t.run()}, next_paint);
-}
+};
 
 /* let's have a singleton here */
-var input_singleton = new _Input()
-function Input(){return input_singleton};
+var input_singleton = new _Input();
+function Input(){return input_singleton}
 function _Input() {
+
+	var that = this;
 
     this.keyboard = {};
     this.keyboardChange = {};
-    var that = this;
     this.mousedown = false;
     this.keydown = true;
 
     this.keyPressed = function(name) {
-        return that.keyboardChange[name] !== undefined && that.keyboardChange[name] == true;
-    }
+        return that.keyboardChange[name] !== undefined && that.keyboardChange[name];
+    };
 
     this.keyReleased = function(name) {
-        return that.keyboardChange[name] !== undefined && that.keyboardChange[name] == false;
-    }
+        return that.keyboardChange[name] !== undefined && !that.keyboardChange[name];
+    };
 
     function updateKeyChange(name, val) {
         if(that.keyboard[name] != val) {
@@ -451,29 +451,29 @@ function _Input() {
         if(e.keyCode==13) {
             updateKeyChange('enter', val);
         }
-    };
+    }
 
     document.ontouchstart = function(event) {
         that.mousedown = true;
-    }
+    };
     document.ontouchend = function(event) {
         that.mousedown = false;
-    }
-    document.ontouchmove = function(event) {}
+    };
+    document.ontouchmove = function(event) {};
 
     document.onmousedown = function(event) {
         that.mousedown = true;
-    }
+    };
     document.onmouseup = function(event) {
         that.mousedown = false;
-    }
+    };
     //document.onclick = function(event) {
         //that.click(event);
     //}
     document.onmousemove = function(event) {
         that.xmouse = event.clientX;
         that.ymouse = event.clientY;
-    }
+    };
     document.onkeydown = function(e) {
         that.keydown = true;
         update_keyboard(e, true);
@@ -483,13 +483,11 @@ function _Input() {
         update_keyboard(e, false);
     };
     // can be used to avoid key jamming
-    document.onkeypress = function(e) {
-
-    };
+    document.onkeypress = function(e) {};
     // make sure that the keyboard is rested when
     // the user leave the page
     global.onblur = function (e) {
-        that.keyboard = {}
+        that.keyboard = {};
         that.keydown = false;
         that.mousedown = false;
     }
@@ -498,11 +496,11 @@ function _Input() {
 _Input.prototype.arrows = function arrows() {
     /* Return true if any arrow key is pressed */
     return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
-}
+};
 
 _Input.prototype.click = function click(event) {
     // to override
-}
+};
 
 var layer_zindex = 1;
 
@@ -555,7 +553,7 @@ function Layer(name) {
 }
 
 function init() {
-	initDom()
+	initDom();
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
     var p = false;
     while (p = properties.shift()) {
