@@ -21,6 +21,9 @@ var sjs = {
     dom:null,
 };
 
+// a cache to load each sprite only one time
+var sprite_list = {};
+
 sjs.__defineGetter__('h', function() {
     return this._h;
 });
@@ -63,7 +66,7 @@ function Sprite(src, layer) {
 
         sp.__defineSetter__(name, function(value) {
             sp['_'+name] = value;
-            if(!sjs.use_canvas) {
+            if(!sp.layer.useCanvas) {
                 sp._dirty[name] = true;
                 sp.changed = true;
             }
@@ -105,7 +108,7 @@ function Sprite(src, layer) {
     }
     this.layer = layer;
 
-    if(sjs.use_canvas == false) {
+    if(this.layer.useCanvas == false) {
         var d = document.createElement('div');
         d.style.position = 'absolute';
         this.dom = d;
@@ -165,7 +168,7 @@ Sprite.prototype.remove = function remove() {
 
 Sprite.prototype.update = function updateDomProperties () {
     /* This is the CPU heavy function. */
-    if(sjs.use_canvas == true) {
+    if(this.layer.useCanvas) {
         return this.canvasUpdate();
     }
     if(this.changed == false)
@@ -256,12 +259,17 @@ Sprite.prototype.onload = function(callback) {
 };
 
 Sprite.prototype.loadImg = function (src, resetSize) {
-    this.img = new Image();
+    if(!sprite_list[src]) {
+        this.img = new Image();
+        sprite_list[src] = this.img;
+    } else {
+        this.img = sprite_list[src];
+    }
     var there = this;
-    this.img.onload = function(e) {
+    this.img.addEventListener('load', function(e) {
         there.img_loaded = true;
-        var img = this;
-        if(!sjs.use_canvas)
+        var img = there.img;
+        if(!there.layer.useCanvas)
             there.dom.style.backgroundImage = 'url('+src+')';
         there.img_natural_width = img.width;
         there.img_natural_height = img.height;
@@ -271,7 +279,7 @@ Sprite.prototype.loadImg = function (src, resetSize) {
             there.h = img.height;
         there.update();
         there.onload();
-    };
+    }, false);
     this.img.src = src;
     return this;
 };
@@ -383,15 +391,15 @@ Ticker.prototype.run = function() {
         return;
     }
 
-    if(sjs.use_canvas) {
-        for(var name in sjs.layers) {
-            var layer = sjs.layers[name];
-            layer.ctx.clearRect(0, 0, layer.dom.width, layer.dom.height);
-            // trick to clear canvas, doesn't seems to do any better according to tests
-            // http://skookum.com/blog/practical-canvas-test-charlottejs/
-            // canvas.width = canvas.width
-        }
+    for(var name in sjs.layers) {
+        var layer = sjs.layers[name];
+        if(layer.useCanvas && layer.autoClear)
+            layer.clear();
+        // trick to clear canvas, doesn't seems to do any better according to tests
+        // http://skookum.com/blog/practical-canvas-test-charlottejs/
+        // canvas.width = canvas.width
     }
+ 
     this.paint(this);
     // reset the keyboard change
     input_singleton.keyboardChange = {};
@@ -507,10 +515,23 @@ Input.prototype.click = function click(event) {
 
 var layer_zindex = 1;
 
-function Layer(name) {
+function Layer(name, options) {
 
+    if(!options)
+        options = {}
+  
+    if(options.autoClear === false)
+        this.autoClear = false;
+    else
+        this.autoClear = true;
+  
+    if(options.useCanvas === true)
+        this.useCanvas = true;
+    else
+        this.useCanvas = sjs.use_canvas;
+    
     if(this.constructor !== arguments.callee)
-        return new Layer(name);
+        return new Layer(name, options);
 
     this.name = name;
     if(sjs.layers[name] === undefined)
@@ -519,11 +540,11 @@ function Layer(name) {
         error('Layer '+ name + ' already exist.');
 
     var sjs_dom = initDom();
-
-    if(sjs.use_canvas) {
+    
+    if(this.useCanvas) {
         var canvas = document.createElement('canvas');
-        canvas.height = sjs.h;
-        canvas.width = sjs.w;
+        canvas.height = options.h || sjs.h;
+        canvas.width = options.w || sjs.w;
         canvas.style.position = 'absolute';
         canvas.style.zIndex = String(layer_zindex);
         canvas.style.top = '0px';
@@ -545,6 +566,10 @@ function Layer(name) {
     layer_zindex += 1;
 }
 
+Layer.prototype.clear = function() {
+    this.ctx.clearRect(0, 0, this.dom.width, this.dom.height); 
+}
+
 function init() {
     initDom();
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
@@ -560,7 +585,7 @@ function initDom() {
     if(!sjs.dom) {
         var div = document.createElement('div');
         div.style.overflow = 'hidden';
-        div.style.position = 'relative';
+        div.style.position = 'absolute';
         div.id = 'sjs';
         document.body.appendChild(div);
         sjs.dom = div;
