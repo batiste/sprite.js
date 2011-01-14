@@ -16,13 +16,13 @@ var sjs = {
     Ticker: Ticker,
     Input: Input,
     Layer: Layer,
-    use_canvas: (window.location.href.indexOf('canvas') != -1),
+    useCanvas: (window.location.href.indexOf('canvas') != -1),
     layers: {},
     dom:null,
 };
 
 // a cache to load each sprite only one time
-var sprite_list = {};
+var spriteList = {};
 
 sjs.__defineGetter__('h', function() {
     return this._h;
@@ -54,11 +54,11 @@ function Sprite(src, layer) {
     this._dirty = {};
     this.changed = false;
 
-    function property(name, default_value) {
-        if(default_value === undefined)
+    function property(name, defaultValue) {
+        if(defaultValue === undefined)
             sp['_'+name] = 0;
         else
-            sp['_'+name] = default_value;
+            sp['_'+name] = defaultValue;
 
         sp.__defineGetter__(name, function() {
             return sp['_'+name];
@@ -79,8 +79,8 @@ function Sprite(src, layer) {
 
     // image
     this.img = null;
-    this.img_natural_width = null;
-    this.img_natural_height = null;
+    this.imgNaturalWidth = null;
+    this.imgNaturalHeight = null;
 
     // width and height of the sprite view port
     property('w', null);
@@ -108,7 +108,7 @@ function Sprite(src, layer) {
     }
     this.layer = layer;
 
-    if(this.layer.useCanvas == false) {
+    if(!this.layer.useCanvas) {
         var d = document.createElement('div');
         d.style.position = 'absolute';
         this.dom = d;
@@ -158,7 +158,7 @@ Sprite.prototype.size = function (w, h) {
 };
 
 Sprite.prototype.remove = function remove() {
-    if(sjs.use_canvas == false) {
+    if(this.layer.useCanvas == false) {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
     }
@@ -168,7 +168,7 @@ Sprite.prototype.remove = function remove() {
 
 Sprite.prototype.update = function updateDomProperties () {
     /* This is the CPU heavy function. */
-    if(this.layer.useCanvas) {
+    if(this.layer.useCanvas == true) {
         return this.canvasUpdate();
     }
     if(this.changed == false)
@@ -223,17 +223,17 @@ Sprite.prototype.canvasUpdate = function updateCanvas () {
         ctx.fillRect(0, 0, this.w, this.h);
     }
     // handle repeating images, a way to implement repeating background in canvas
-    if(this.img_loaded && this.img) {
-        if(this.img_natural_width < this.w || this.img_natural_height < this.h) {
-            var repeat_w = Math.floor(this.w / this.img_natural_width);
+    if(this.imgLoaded && this.img) {
+        if(this.imgNaturalWidth < this.w || this.imgNaturalHeight < this.h) {
+            var repeat_w = Math.floor(this.w / this.imgNaturalWidth);
             while(repeat_w > 0) {
                 repeat_w = repeat_w-1;
-                var repeat_y = Math.floor(this.h / this.img_natural_height);
+                var repeat_y = Math.floor(this.h / this.imgNaturalHeight);
                 while(repeat_y > 0) {
                     repeat_y = repeat_y-1;
-                    ctx.drawImage(this.img, this.xoffset, this.yoffset, this.img_natural_width,
-                                this.img_natural_height, repeat_w*this.img_natural_width, repeat_y*this.img_natural_height,
-                                this.img_natural_width, this.img_natural_height);
+                    ctx.drawImage(this.img, this.xoffset, this.yoffset, this.imgNaturalWidth,
+                                this.imgNaturalHeight, repeat_w*this.imgNaturalWidth, repeat_y*this.imgNaturalHeight,
+                                this.imgNaturalWidth, this.imgNaturalHeight);
                 }
 
             }
@@ -253,26 +253,26 @@ Sprite.prototype.toString = function () {
 Sprite.prototype.onload = function(callback) {
     if(callback)
         this._callback = callback
-    if(this.img_loaded && this._callback) {
+    if(this.imgLoaded && this._callback) {
         this._callback();
     }
 };
 
 Sprite.prototype.loadImg = function (src, resetSize) {
-    if(!sprite_list[src]) {
+    if(!spriteList[src]) {
         this.img = new Image();
-        sprite_list[src] = this.img;
+        spriteList[src] = this.img;
     } else {
-        this.img = sprite_list[src];
+        this.img = spriteList[src];
     }
     var there = this;
     this.img.addEventListener('load', function(e) {
-        there.img_loaded = true;
+        there.imgLoaded = true;
         var img = there.img;
         if(!there.layer.useCanvas)
             there.dom.style.backgroundImage = 'url('+src+')';
-        there.img_natural_width = img.width;
-        there.img_natural_height = img.height;
+        there.imgNaturalWidth = img.width;
+        there.imgNaturalHeight = img.height;
         if(there.w === null || resetSize)
             there.w = img.width;
         if(there.h === null || resetSize)
@@ -316,15 +316,15 @@ function Cycle(triplets) {
     A cycle is a list of triplet (x offset, y offset, game tick duration) */
     this.triplets = triplets;
     // total duration of the animation in ticks
-    this.cycle_duration = 0;
+    this.cycleDuration = 0;
     // this array knows on which ticks in the animation
     // an image change is needed
-    this.changing_ticks = [0];
+    this.changingTicks = [0];
     for(var i=0, triplet; triplet=triplets[i]; i++) {
-        this.cycle_duration = this.cycle_duration + triplet[2];
-        this.changing_ticks.push(this.cycle_duration);
+        this.cycleDuration = this.cycleDuration + triplet[2];
+        this.changingTicks.push(this.cycleDuration);
     }
-    this.changing_ticks.pop()
+    this.changingTicks.pop()
     this.sprites = [];
     // if set to false, the animation will stop automaticaly after one run
     this.repeat = true;
@@ -335,14 +335,14 @@ Cycle.prototype.next = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     this.tick = this.tick + ticks;
-    if(this.tick > this.cycle_duration) {
+    if(this.tick > this.cycleDuration) {
         if(this.repeat)
             this.tick = 0;
         else
             return this;
     }
-    for(var i=0; i<this.changing_ticks.length; i++) {
-        if(this.tick == this.changing_ticks[i]) {
+    for(var i=0; i<this.changingTicks.length; i++) {
+        if(this.tick == this.changingTicks[i]) {
             for(var j=0, sprite; sprite = this.sprites[j]; j++) {
                 sprite.xoffset = this.triplets[i][0];
                 sprite.yoffset = this.triplets[i][1];
@@ -352,7 +352,7 @@ Cycle.prototype.next = function (ticks) {
     return this;
 };
 
-Cycle.prototype.reset = function reset_cycle() {
+Cycle.prototype.reset = function resetCycle() {
     this.tick = 0;
     for(var j=0, sprite; sprite = this.sprites[j]; j++) {
         sprite.xoffset = this.triplets[0][0];
@@ -361,33 +361,33 @@ Cycle.prototype.reset = function reset_cycle() {
     return this;
 }
 
-function Ticker(tick_duration, paint) {
+function Ticker(tickDuration, paint) {
     this.paint = paint;
-    if(tick_duration === undefined)
-        this.tick_duration = 25;
+    if(tickDuration === undefined)
+        this.tickDuration = 25;
     else
-        this.tick_duration = tick_duration;
+        this.tickDuration = tickDuration;
 
     this.start = new Date().getTime();
-    this.ticks_elapsed = 0;
-    this.current_tick = 0;
+    this.ticksElapsed = 0;
+    this.currentTick = 0;
 }
 
 Ticker.prototype.next = function() {
-    var ticks_elapsed = Math.round((this.now - this.start) / this.tick_duration);
-    this.lastTicksElapsed = ticks_elapsed - this.current_tick;
-    this.current_tick = ticks_elapsed;
+    var ticksElapsed = Math.round((this.now - this.start) / this.tickDuration);
+    this.lastTicksElapsed = ticksElapsed - this.currentTick;
+    this.currentTick = ticksElapsed;
     return this.lastTicksElapsed;
 }
 
 Ticker.prototype.run = function() {
     var t = this;
     this.now = new Date().getTime();
-    var ticks_elapsed = this.next();
+    var ticksElapsed = this.next();
     // no update needed, this happen on the first run
-    if(ticks_elapsed == 0) {
+    if(ticksElapsed == 0) {
         // this is not a cheap operation
-        setTimeout(function(){t.run()}, this.tick_duration);
+        setTimeout(function(){t.run()}, this.tickDuration);
         return;
     }
 
@@ -402,18 +402,18 @@ Ticker.prototype.run = function() {
  
     this.paint(this);
     // reset the keyboard change
-    input_singleton.keyboardChange = {};
+    inputSingleton.keyboardChange = {};
 
-    this.time_to_paint = (new Date().getTime()) - this.now;
-    this.load = Math.round((this.time_to_paint / this.tick_duration) * 100);
+    this.timeToPaint = (new Date().getTime()) - this.now;
+    this.load = Math.round((this.timeToPaint / this.tickDuration) * 100);
     // We need some pause to let the browser catch up the update. Here at least 12 ms of pause
-    var next_paint = Math.max(this.tick_duration - this.time_to_paint, 12);
-    setTimeout(function(){t.run()}, next_paint);
+    var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 12);
+    setTimeout(function(){t.run()}, _nextPaint);
 }
 
 /* let's have a singleton here */
-var input_singleton = new _Input()
-function Input(){return input_singleton};
+var inputSingleton = new _Input()
+function Input(){return inputSingleton};
 function _Input() {
 
     this.keyboard = {};
@@ -438,7 +438,7 @@ function _Input() {
     }
 
     // this is handling WASD, and arrows keys
-    function update_keyboard(e, val) {
+    function updateKeyboard(e, val) {
         if(e.keyCode==40 || e.keyCode==83) {
             updateKeyChange('down', val);
         }
@@ -485,11 +485,11 @@ function _Input() {
     }
     document.onkeydown = function(e) {
         that.keydown = true;
-        update_keyboard(e, true);
+        updateKeyboard(e, true);
     };
     document.onkeyup = function(e) {
         that.keydown = false;
-        update_keyboard(e, false);
+        updateKeyboard(e, false);
     };
     // can be used to avoid key jamming
     document.onkeypress = function(e) {
@@ -513,7 +513,7 @@ Input.prototype.click = function click(event) {
     // to override
 }
 
-var layer_zindex = 1;
+var layerZindex = 1;
 
 function Layer(name, options) {
 
@@ -528,7 +528,7 @@ function Layer(name, options) {
     if(options.useCanvas === true)
         this.useCanvas = true;
     else
-        this.useCanvas = sjs.use_canvas;
+        this.useCanvas = sjs.useCanvas;
     
     if(this.constructor !== arguments.callee)
         return new Layer(name, options);
@@ -546,7 +546,7 @@ function Layer(name, options) {
         canvas.height = options.h || sjs.h;
         canvas.width = options.w || sjs.w;
         canvas.style.position = 'absolute';
-        canvas.style.zIndex = String(layer_zindex);
+        canvas.style.zIndex = String(layerZindex);
         canvas.style.top = '0px';
         canvas.style.left = '0px';
         canvas.id = name;
@@ -558,12 +558,12 @@ function Layer(name, options) {
         div.style.position = 'absolute';
         div.style.top = '0px';
         div.style.left = '0px';
-        div.style.zIndex = String(layer_zindex);
+        div.style.zIndex = String(layerZindex);
         div.id = name;
         this.dom = div;
         sjs_dom.appendChild(this.dom);
     }
-    layer_zindex += 1;
+    layerZindex += 1;
 }
 
 Layer.prototype.clear = function() {
