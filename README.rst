@@ -52,22 +52,35 @@ Example of a basic use::
 
 
 
-Performance and backends
-========================
+Performance and different ways to draw
+=======================================
 
-The library provides 2 rendering backends: HTML and canvas. By default the HTML
-backend is used. The HTML backend displays sprites using DOM elements.
+This library provides 2 rendering backends: HTML and canvas. 
 
-Switching to the canvas backend is done by setting the 'use_canvas' flag before
+By default the HTML backend is used. The HTML backend displays sprites using DOM elements when the canvas
+backend draw the sprites on the canvas. Each layer of the application can have a different backend.
+This enable you to mix the 2 technics when if needed.
+
+Switching sprites.js to use the canvas backend is done by setting the 'useCanvas' flag before
 creating sprites::
 
-    sjs.use_canvas = true;
+    sjs.useCanvas = true;
 
-Tests show that *the canvas backend is slower* on Firefox, Opera and Chrome.
+You can also add a canvas GET parameter in the URL of any sprite.js application::
+
+    index.html?canvas=1
+
+Finaly, you can always overrides those defaults by using the useCanvas options when you create a layer.
+
+    var background = Layer('background', {useCanvas:true});
+
+Tests show that the canvas backend can be somewhat slower on Firefox, Opera and Chrome.
 Especially with a high number of sprites and a large canvas. Clearing and
-redrawing the whole canvas is expensive.
+redrawing the whole canvas can expensive. Canvas seems faster when there is a lot of transformations applied to the sprite.
 
-Canvas seems faster when there is a lot of transformations applied to the sprite.
+If you don't need to redraw the canvas every time, you can pass a special option to the layer::
+
+    var background = Layer('background', {useCanvas:true, autoClear:false});
 
 Mobile performances can be very weak depending on the phone. Here is what we got using the particules test::
 
@@ -120,6 +133,9 @@ To update the view after modifying the sprite, call "update"::
 
     Sprite.update()
 
+With a canvas backend, the canvas will be cleared before each game tick, so you will need to call update
+to draw the sprite on the canvas. If you don't want to do this you can set the autoClear options on the sprite's layer to false. 
+
 Ticker object
 ==============
 
@@ -133,7 +149,7 @@ To setup a ticker::
 
     function paint() {
 
-        my_cycles.next(ticker.lastTicksElapsed);
+        myCycles.next(ticker.lastTicksElapsed);
         // do your stuff
 
     }
@@ -196,7 +212,17 @@ Layer object
 If you need to separate you sprites into logical layers, you can use the Layer
 object::
 
-    var background = new sjs.Layer('background')
+    var background = new sjs.Layer('background', options);
+
+You should then pass the layer as the second argument of the contructor of your sprites::
+
     var sprite = new sjs.Sprite('bg.png', background);
 
-You should then pass the layer as the second argument of the contructor of your sprite.
+The layer object can take those options:
+
+    var options = {
+        useCanvas:true,   // force the use of the canvas on this layer, that enable you to mix HTML and canvas
+        autoClear:false   // disable the auto clearing of the canvas before every paint. 
+                          // It's recommanded to activate this on static background.
+    }
+
