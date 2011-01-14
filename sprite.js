@@ -517,21 +517,21 @@ var layerZindex = 1;
 
 function Layer(name, options) {
 
-    if(!options)
-        options = {}
-  
-    if(options.autoClear === false)
-        this.autoClear = false;
-    else
-        this.autoClear = true;
-  
-    if(options.useCanvas === true)
-        this.useCanvas = true;
-    else
-        this.useCanvas = sjs.useCanvas;
-    
     if(this.constructor !== arguments.callee)
         return new Layer(name, options);
+  
+    if(options === undefined)
+        options = {useCanvas:sjs.useCanvas, autoClear:true}
+  
+    if(options.autoClear === undefined)
+        this.autoClear = true;
+    else
+        this.autoClear = options.autoClear;
+  
+    if(options.useCanvas === undefined)
+        this.useCanvas = sjs.useCanvas;
+    else
+        this.useCanvas = options.useCanvas;
 
     this.name = name;
     if(sjs.layers[name] === undefined)
