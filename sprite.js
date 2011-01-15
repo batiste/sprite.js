@@ -2,9 +2,8 @@
 
 /* coding style:
  *
- *
- * camelCase for methods
- * camelCase for public attributes
+ * camelCase everywhere
+ * private attributes start with an underline 
  */
 
 (function(){
@@ -43,13 +42,13 @@ sjs.__defineSetter__('w', function(value) {
 });
 
 
-function error(msg) {alert(msg)}
+function error(msg) {alert(msg);}
 
 function Sprite(src, layer) {
-
+  
     if(this.constructor !== arguments.callee)
         return new Sprite(src, layer);
-
+    
     var sp = this;
     this._dirty = {};
     this.changed = false;
@@ -100,7 +99,7 @@ function Sprite(src, layer) {
     property('color', false);
 
     if(layer === undefined) {
-        // important to delay the creation so use_canvas
+        // important to delay the creation so useCanvas
         // can still be changed
         if(sjs.layers['default'] === undefined)
             sjs.layers["default"] = new Layer("default");
@@ -114,7 +113,7 @@ function Sprite(src, layer) {
         this.dom = d;
         layer.dom.appendChild(d);
     }
-
+    
     if(src)
         this.loadImg(src)
     return this;
@@ -261,12 +260,15 @@ Sprite.prototype.onload = function(callback) {
 Sprite.prototype.loadImg = function (src, resetSize) {
     if(!spriteList[src]) {
         this.img = new Image();
-        spriteList[src] = this.img;
+        spriteList[src] = [this.img, false];
+        var _loaded = false;
     } else {
-        this.img = spriteList[src];
+        this.img = spriteList[src][0];
+        var _loaded = spriteList[src][1];
     }
     var there = this;
-    this.img.addEventListener('load', function(e) {
+    function imageReady(e) {
+        spriteList[src][1] = true;
         there.imgLoaded = true;
         var img = there.img;
         if(!there.layer.useCanvas)
@@ -279,8 +281,13 @@ Sprite.prototype.loadImg = function (src, resetSize) {
             there.h = img.height;
         there.update();
         there.onload();
-    }, false);
-    this.img.src = src;
+    }
+    if(_loaded)
+        imageReady()
+    else {
+        this.img.addEventListener('load', imageReady, false);
+        this.img.src = src;
+    }
     return this;
 };
 
@@ -362,11 +369,18 @@ Cycle.prototype.reset = function resetCycle() {
 }
 
 function Ticker(tickDuration, paint) {
+  
+    
+  
+    if(this.constructor !== arguments.callee)
+        return new Ticker(tickDuration, paint);
+  
     this.paint = paint;
     if(tickDuration === undefined)
         this.tickDuration = 25;
     else
-        this.tickDuration = tickDuration;
+        // FF behave weirdly with anything less than 25
+        this.tickDuration = Math.max(tickDuration, 25);
 
     this.start = new Date().getTime();
     this.ticksElapsed = 0;
@@ -406,8 +420,8 @@ Ticker.prototype.run = function() {
 
     this.timeToPaint = (new Date().getTime()) - this.now;
     this.load = Math.round((this.timeToPaint / this.tickDuration) * 100);
-    // We need some pause to let the browser catch up the update. Here at least 12 ms of pause
-    var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 12);
+    // We need some pause to let the browser catch up the update. Here at least 16 ms of pause
+    var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 16);
     setTimeout(function(){t.run()}, _nextPaint);
 }
 
@@ -461,56 +475,61 @@ function _Input() {
             updateKeyChange('enter', val);
         }
     };
-
-    document.ontouchstart = function(event) {
+    
+    var addEvent = function(name, fct) {
+        document.addEventListener(name, fct, false);
+    }
+       
+    addEvent("touchstart", function(event) {
         that.mousedown = true;
-    }
-    document.ontouchend = function(event) {
+    });
+    
+    addEvent("touchend", function(event) {
         that.mousedown = false;
-    }
-    document.ontouchmove = function(event) {}
+    });
+    
+    addEvent("touchmove", function(event) {});
 
-    document.onmousedown = function(event) {
+    addEvent("mousedown", function(event) {
         that.mousedown = true;
-    }
-    document.onmouseup = function(event) {
+    });
+    
+    addEvent("mouseup", function(event) {
         that.mousedown = false;
-    }
+    });
+    
     //document.onclick = function(event) {
         //that.click(event);
     //}
-    document.onmousemove = function(event) {
+    addEvent("mousemove", function(event) {
         that.xmouse = event.clientX;
         that.ymouse = event.clientY;
-    }
-    document.onkeydown = function(e) {
+    });
+    
+    addEvent("keydown", function(e) {
         that.keydown = true;
         updateKeyboard(e, true);
-    };
-    document.onkeyup = function(e) {
+    });
+    
+    addEvent("keyup", function(e) {
         that.keydown = false;
         updateKeyboard(e, false);
-    };
+    });
+    
     // can be used to avoid key jamming
-    document.onkeypress = function(e) {
-
-    };
-    // make sure that the keyboard is rested when
+    addEvent("keypress", function(e) {});
+    // make sure that the keyboard is reseted when
     // the user leave the page
-    window.onblur = function (e) {
+    window.addEventListener("blur", function (e) {
         that.keyboard = {}
         that.keydown = false;
         that.mousedown = false;
-    }
+    }, false);
 }
 
 Input.prototype.arrows = function arrows() {
     /* Return true if any arrow key is pressed */
     return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
-}
-
-Input.prototype.click = function click(event) {
-    // to override
 }
 
 var layerZindex = 1;
