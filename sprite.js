@@ -29,7 +29,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * If you contribute don't forget to add your name in the AUTHORS file.
  */
 
-(function(){
+(function(global, undefined){
 
 var sjs = {
     Sprite: Sprite,
@@ -40,7 +40,7 @@ var sjs = {
     Layer: Layer,
     useCanvas: (window.location.href.indexOf('canvas') != -1),
     layers: {},
-    dom:null,
+    dom:null
 };
 
 // a cache to load each sprite only one time
@@ -136,9 +136,8 @@ function Sprite(src, layer) {
         this.dom = d;
         layer.dom.appendChild(d);
     }
-
     if(src)
-        this.loadImg(src)
+        this.loadImg(src);
     return this;
 }
 
@@ -154,7 +153,7 @@ Sprite.prototype.scale = function (x, y) {
         this.xscale = x;
     }
     if(y === undefined)
-        var y = x;
+        y = x;
     if(this.yscale != y) {
         this.yscale = y;
     }
@@ -186,14 +185,14 @@ Sprite.prototype.remove = function remove() {
     }
     this.layer = null;
     this.img = null;
-}
+};
 
 Sprite.prototype.update = function updateDomProperties () {
     /* This is the CPU heavy function. */
     if(this.layer.useCanvas == true) {
         return this.canvasUpdate();
     }
-    if(this.changed == false)
+    if(!this.changed)
         return;
 
     var style = this.dom.style;
@@ -273,10 +272,8 @@ Sprite.prototype.toString = function () {
 };
 
 Sprite.prototype.onload = function(callback) {
-    if(callback)
-        this._callback = callback
     if(this.imgLoaded && this._callback) {
-        this._callback();
+        this._callback = callback;
     }
 };
 
@@ -319,14 +316,14 @@ Sprite.prototype.isPointIn = function pointIn(x, y) {
     // return true if the point is in the sprite surface
     return (x >= this.x && x <= this.x+this.w
         && y >= this.y && y <= this.y+this.h)
-}
+};
 
 Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
     return (this.isPointIn(sprite.x, sprite.y)
        || this.isPointIn(sprite.x+sprite.w, sprite.y)
        || this.isPointIn(sprite.x+sprite.w, sprite.y)
        || this.isPointIn(sprite.x, sprite.y + sprite.h));
-}
+};
 
 Sprite.prototype.collidesWith = function hasCollision(sprites) {
     // detect arrays
@@ -339,7 +336,7 @@ Sprite.prototype.collidesWith = function hasCollision(sprites) {
         return false;
     }
     return this.areVerticesIn(sprites) || sprites.areVerticesIn(this);
-}
+};
 
 function Cycle(triplets) {
     /* Cycle for the Sprite image.
@@ -359,11 +356,10 @@ function Cycle(triplets) {
     // if set to false, the animation will stop automaticaly after one run
     this.repeat = true;
     this.tick = 0;
-};
+}
 
 Cycle.prototype.next = function (ticks) {
-    if(ticks === undefined)
-        ticks = 1;
+	ticks = ticks || 1; // default tick: 1
     this.tick = this.tick + ticks;
     if(this.tick > this.cycleDuration) {
         if(this.repeat)
@@ -389,7 +385,7 @@ Cycle.prototype.reset = function resetCycle() {
         sprite.yoffset = this.triplets[0][1];
     }
     return this;
-}
+};
 
 function Ticker(tickDuration, paint) {
 
@@ -413,7 +409,7 @@ Ticker.prototype.next = function() {
     this.lastTicksElapsed = ticksElapsed - this.currentTick;
     this.currentTick = ticksElapsed;
     return this.lastTicksElapsed;
-}
+};
 
 Ticker.prototype.run = function() {
     var t = this;
@@ -446,22 +442,23 @@ Ticker.prototype.run = function() {
     setTimeout(function(){t.run()}, _nextPaint);
 }
 
-/* let's have a singleton here */
+
 function _Input() {
+
+	var that = this;
 
     this.keyboard = {};
     this.keyboardChange = {};
-    var that = this;
     this.mousedown = false;
     this.keydown = true;
 
     this.keyPressed = function(name) {
-        return that.keyboardChange[name] !== undefined && that.keyboardChange[name] == true;
-    }
+        return that.keyboardChange[name] !== undefined && that.keyboardChange[name];
+    };
 
     this.keyReleased = function(name) {
-        return that.keyboardChange[name] !== undefined && that.keyboardChange[name] == false;
-    }
+        return that.keyboardChange[name] !== undefined && !that.keyboardChange[name];
+    };
 
     function updateKeyChange(name, val) {
         if(that.keyboard[name] != val) {
@@ -493,7 +490,7 @@ function _Input() {
         if(e.keyCode==13) {
             updateKeyChange('enter', val);
         }
-    };
+    }
 
     var addEvent = function(name, fct) {
         document.addEventListener(name, fct, false);
@@ -539,7 +536,7 @@ function _Input() {
     addEvent("keypress", function(e) {});
     // make sure that the keyboard is reseted when
     // the user leave the page
-    window.addEventListener("blur", function (e) {
+    global.addEventListener("blur", function (e) {
         that.keyboard = {}
         that.keydown = false;
         that.mousedown = false;
@@ -549,7 +546,7 @@ function _Input() {
 _Input.prototype.arrows = function arrows() {
     /* Return true if any arrow key is pressed */
     return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
-}
+};
 
 var inputSingleton = new _Input();
 function Input(){return inputSingleton};
@@ -557,6 +554,8 @@ function Input(){return inputSingleton};
 var layerZindex = 1;
 
 function Layer(name, options) {
+
+    var canvas, domElement;
 
     if(this.constructor !== arguments.callee)
         return new Layer(name, options);
@@ -580,29 +579,36 @@ function Layer(name, options) {
     else
         error('Layer '+ name + ' already exist.');
 
-    var sjs_dom = initDom();
+    domElement = document.getElementById(name);
 
     if(this.useCanvas) {
-        var canvas = document.createElement('canvas');
-        canvas.height = options.h || sjs.h;
-        canvas.width = options.w || sjs.w;
-        canvas.style.position = 'absolute';
-        canvas.style.zIndex = String(layerZindex);
-        canvas.style.top = '0px';
-        canvas.style.left = '0px';
-        canvas.id = name;
-        sjs_dom.appendChild(canvas);
-        this.dom = canvas;
-        this.ctx = canvas.getContext('2d');
+        if (domElement && domElement.nodeName.toLowerCase() != "canvas") {
+            error("Cannot use HTMLElement " + domElement.nodeName + " with canvas renderer.");
+        }
+        if (!domElement) {
+            domElement = document.createElement('canvas');
+            domElement.height = options.h || sjs.h;
+            domElement.width = options.w || sjs.w;
+            domElement.style.position = 'absolute';
+            domElement.style.zIndex = String(layerZindex);
+            domElement.style.top = '0px';
+            domElement.style.left = '0px';
+            domElement.id = name;
+            sjs.dom.appendChild(domElement);
+        }
+        this.dom = domElement;
+        this.ctx = domElement.getContext('2d');
     } else {
-        var div = document.createElement('div');
-        div.style.position = 'absolute';
-        div.style.top = '0px';
-        div.style.left = '0px';
-        div.style.zIndex = String(layerZindex);
-        div.id = name;
-        this.dom = div;
-        sjs_dom.appendChild(this.dom);
+        if (!domElement) {
+            domElement = document.createElement('div');
+            domElement.style.position = 'absolute';
+            domElement.style.top = '0px';
+            domElement.style.left = '0px';
+            domElement.style.zIndex = String(layerZindex);
+            domElement.id = name;
+            sjs.dom.appendChild(domElement);
+        }
+        this.dom = domElement;
     }
     layerZindex += 1;
 }
@@ -612,7 +618,7 @@ Layer.prototype.clear = function() {
 }
 
 function init() {
-    initDom();
+	initDom();
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
     var p = false;
     while (p = properties.shift()) {
@@ -636,7 +642,7 @@ function initDom() {
     return sjs.dom;
 }
 
-window.addEventListener("load", init, false);
-window.sjs = sjs;
+global.addEventListener("load", init, false);
+global.sjs = sjs;
 
-})();
+})(this);
