@@ -1,9 +1,32 @@
-/* This the library file for the Sprite Javascript framework -- sprite.js */
+/*
+Copyright (c) 2011 Batiste Bieler, https://github.com/batiste/sprite.js
 
-/* coding style:
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+"Software"), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
+/* Sprite.js coding guideline
  *
- * camelCase everywhere
- * private attributes start with an underline 
+ * CamelCase everywhere (I don't like it but it seems to the standard these days).
+ * Private attributes should start with an underline.
+ * Tabs have to be 4 spaces (python style).
+ * If you contribute don't forget to add your name in the AUTHORS file.
  */
 
 (function(){
@@ -45,10 +68,10 @@ sjs.__defineSetter__('w', function(value) {
 function error(msg) {alert(msg);}
 
 function Sprite(src, layer) {
-  
+
     if(this.constructor !== arguments.callee)
         return new Sprite(src, layer);
-    
+
     var sp = this;
     this._dirty = {};
     this.changed = false;
@@ -113,7 +136,7 @@ function Sprite(src, layer) {
         this.dom = d;
         layer.dom.appendChild(d);
     }
-    
+
     if(src)
         this.loadImg(src)
     return this;
@@ -369,12 +392,10 @@ Cycle.prototype.reset = function resetCycle() {
 }
 
 function Ticker(tickDuration, paint) {
-  
-    
-  
+
     if(this.constructor !== arguments.callee)
         return new Ticker(tickDuration, paint);
-  
+
     this.paint = paint;
     if(tickDuration === undefined)
         this.tickDuration = 25;
@@ -413,7 +434,7 @@ Ticker.prototype.run = function() {
         // http://skookum.com/blog/practical-canvas-test-charlottejs/
         // canvas.width = canvas.width
     }
- 
+
     this.paint(this);
     // reset the keyboard change
     inputSingleton.keyboardChange = {};
@@ -426,8 +447,6 @@ Ticker.prototype.run = function() {
 }
 
 /* let's have a singleton here */
-var inputSingleton = new _Input()
-function Input(){return inputSingleton};
 function _Input() {
 
     this.keyboard = {};
@@ -475,29 +494,29 @@ function _Input() {
             updateKeyChange('enter', val);
         }
     };
-    
+
     var addEvent = function(name, fct) {
         document.addEventListener(name, fct, false);
     }
-       
+
     addEvent("touchstart", function(event) {
         that.mousedown = true;
     });
-    
+
     addEvent("touchend", function(event) {
         that.mousedown = false;
     });
-    
+
     addEvent("touchmove", function(event) {});
 
     addEvent("mousedown", function(event) {
         that.mousedown = true;
     });
-    
+
     addEvent("mouseup", function(event) {
         that.mousedown = false;
     });
-    
+
     //document.onclick = function(event) {
         //that.click(event);
     //}
@@ -505,17 +524,17 @@ function _Input() {
         that.xmouse = event.clientX;
         that.ymouse = event.clientY;
     });
-    
+
     addEvent("keydown", function(e) {
         that.keydown = true;
         updateKeyboard(e, true);
     });
-    
+
     addEvent("keyup", function(e) {
         that.keydown = false;
         updateKeyboard(e, false);
     });
-    
+
     // can be used to avoid key jamming
     addEvent("keypress", function(e) {});
     // make sure that the keyboard is reseted when
@@ -527,10 +546,13 @@ function _Input() {
     }, false);
 }
 
-Input.prototype.arrows = function arrows() {
+_Input.prototype.arrows = function arrows() {
     /* Return true if any arrow key is pressed */
     return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
 }
+
+var inputSingleton = new _Input();
+function Input(){return inputSingleton};
 
 var layerZindex = 1;
 
@@ -538,15 +560,15 @@ function Layer(name, options) {
 
     if(this.constructor !== arguments.callee)
         return new Layer(name, options);
-  
+
     if(options === undefined)
         options = {useCanvas:sjs.useCanvas, autoClear:true}
-  
+
     if(options.autoClear === undefined)
         this.autoClear = true;
     else
         this.autoClear = options.autoClear;
-  
+
     if(options.useCanvas === undefined)
         this.useCanvas = sjs.useCanvas;
     else
@@ -559,7 +581,7 @@ function Layer(name, options) {
         error('Layer '+ name + ' already exist.');
 
     var sjs_dom = initDom();
-    
+
     if(this.useCanvas) {
         var canvas = document.createElement('canvas');
         canvas.height = options.h || sjs.h;
@@ -586,7 +608,7 @@ function Layer(name, options) {
 }
 
 Layer.prototype.clear = function() {
-    this.ctx.clearRect(0, 0, this.dom.width, this.dom.height); 
+    this.ctx.clearRect(0, 0, this.dom.width, this.dom.height);
 }
 
 function init() {
