@@ -54,7 +54,7 @@ window.onload = function() {
     function paint() {
 
         var start = new Date().getTime(),
-            xv = Math.sin(ticker.current_tick / 15) * 2,
+            xv = Math.sin(ticker.currentTick / 15) * 2,
             xscale = xv < 0 ? 1 : -1;
 
         cycle.next(ticker.lastTicksElapsed);
@@ -69,7 +69,7 @@ window.onload = function() {
             .rotate(0.02)
             .update();
 
-        if(ticker.current_tick % 30 == 0) {
+        if(ticker.currentTick % 30 == 0) {
             result.innerHTML = 'system load ' + ticker.load + '%';
         }
     };
