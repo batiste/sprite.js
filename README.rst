@@ -55,11 +55,11 @@ Example of a basic use::
 Performance and different ways to draw
 =======================================
 
-This library provides 2 rendering backends: HTML and canvas. 
+This library provides 2 rendering backends: HTML and canvas.
 
 By default the HTML backend is used. The HTML backend displays sprites using DOM elements when the canvas
 backend draw the sprites on the canvas. Each layer of the application can have a different backend.
-This enable you to mix the 2 technics when if needed.
+This enable you to mix the 2 technics if needed.
 
 Switching sprites.js to use the canvas backend is done by setting the 'useCanvas' flag before
 creating sprites::
@@ -75,10 +75,10 @@ Finaly, you can always overrides those defaults by using the useCanvas options w
     var background = Layer('background', {useCanvas:true});
 
 Tests show that the canvas backend can be somewhat slower on Firefox, Opera and Chrome.
-Especially with a high number of sprites and a large canvas. Clearing and
-redrawing the whole canvas can expensive. Canvas seems faster when there is a lot of transformations applied to the sprite.
+Especially with a high number of sprites and a large canvas. Clearing and redrawing the whole canvas can expensive if you have a lot of sprites.
+Canvas seems faster when there is a lot of transformations applied to the sprite.
 
-If you don't need to redraw the canvas every time, you can pass a special option to the layer::
+The canvas will be automaticaly cleared by the game ticker. If you don't need it you can set the autoClear to false when building a layer::
 
     var background = Layer('background', {useCanvas:true, autoClear:false});
 
@@ -133,8 +133,8 @@ To update the view after modifying the sprite, call "update"::
 
     Sprite.update()
 
-With a canvas backend, the canvas will be cleared before each game tick, so you will need to call update
-to draw the sprite on the canvas. If you don't want to do this you can set the autoClear options on the sprite's layer to false. 
+With a canvas backend, the surface will be automaticaly cleared before each game tick. You will need to call update
+to draw the sprite on the canvas again. If you don't want to do this you can set the layer autoClear attribute to false.
 
 Ticker object
 ==============
@@ -222,7 +222,7 @@ The layer object can take those options:
 
     var options = {
         useCanvas:true,   // force the use of the canvas on this layer, that enable you to mix HTML and canvas
-        autoClear:false   // disable the auto clearing of the canvas before every paint. 
+        autoClear:false   // disable the auto clearing of the canvas before every paint.
                           // It's recommanded to activate this on static background.
     }
 
