@@ -1,0 +1,91 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test 32 sprites in a cycle animation</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+</head>
+<body>
+<canvas id="test" width="480" height="320"></canvas>
+<p>32 animated sprites: <span id="result"></span> <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
+
+</body>
+<script src="sprite.js"></script>
+<script>
+
+window.onload = function() {
+
+    var sprites = [];
+    var oldNode = document.getElementById("test");
+    if(window.location.href.indexOf('canvas') != -1) {
+        sjs.useCanvas = true;
+        var newNode = document.createElement("canvas");
+        newNode.width = "320";
+        newNode.height = "320";
+        newNode.id = "test";
+        document.getElementById('canvas-mode').style.display = 'none';
+    } else {
+        var newNode = document.createElement("div");        
+        newNode.id = "test";        
+        document.getElementById('html-mode').style.display = 'none';
+    }
+    oldNode.parentNode.replaceChild(newNode, oldNode);
+    var testLayer = new sjs.Layer('test');
+
+
+    for(var i=0; i<32; i++) {
+        var sp = new sjs.Sprite('character.png', testLayer);
+        sp.h=55;
+        sp.w=30;
+        sp.yoffset=2;
+        sp.x=6 * i + 10;
+        sp.y=70 + ((i%4) * 60);
+        sprites.push(sp);
+    }
+
+    var logo = new sjs.Sprite(null, testLayer);
+    logo.x = 120;
+    logo.y = 170;
+    logo.loadImg('spritejs.png');
+
+    var cycle = new sjs.Cycle([[0, 2, 5],
+                               [30, 2, 5],
+                               [60, 2, 5],
+                               [90, 2, 5],
+                               [120, 2, 5],
+                               [150, 2, 5],
+                               [180, 2, 5]]);
+    cycle.sprites = sprites;
+
+    var sin_cycle = 0,
+        ms_to_render = 0,
+        average_ms = 0,
+        result = document.getElementById('result');
+
+    function paint() {
+
+        var start = new Date().getTime(),
+            xv = Math.sin(ticker.currentTick / 15) * 2,
+            xscale = xv < 0 ? 1 : -1;
+
+        cycle.next(ticker.lastTicksElapsed);
+        for(var i=0, sp; sp = sprites[i]; i++) {
+            sp.move(xv, 0)
+              .scale(xscale, 1)
+              .update();
+        }
+
+        logo.opacity = Math.abs(Math.sin(ticker.current_tick / 15));
+        logo.scale(xv)
+            .rotate(0.02)
+            .update();
+
+        if(ticker.currentTick % 30 == 0) {
+            result.innerHTML = 'system load ' + ticker.load + '%';
+        }
+    };
+    var ticker = new sjs.Ticker(35, paint);
+    ticker.run();
+
+};
+</script>
+</html>
