@@ -28,6 +28,10 @@ Example of a basic use::
     <script src="sprite.js"></script>
 
     <script>
+    // set the viewport size (default 480x320)
+    sjs.w = 640;
+    sjs.h = 480;
+
     // create the Sprite object;
     var sp = new sjs.Sprite('character.png');
 
