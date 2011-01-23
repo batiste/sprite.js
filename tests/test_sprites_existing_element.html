@@ -2,14 +2,24 @@
 <head>
 <title>Test 32 sprites in a cycle animation</title>
 <meta name = "viewport" content = "user-scalable=no, width=device-width">
-
+<style>
+	#test {
+		border: 1px solid green;
+	}
+	div#test {
+		width: 480px;
+		height: 320px;
+		overflow: hidden;
+		position: absolute;
+	}
+</style>
 </head>
 <body>
-<canvas id="test" width="480" height="320"></canvas>
 <p>32 animated sprites: <span id="result"></span> <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
+<canvas id="test" width="480" height="320"></canvas>
 
 </body>
-<script src="sprite.js"></script>
+<script src="../sprite.js"></script>
 <script>
 
 window.onload = function() {
@@ -19,7 +29,7 @@ window.onload = function() {
     if(window.location.href.indexOf('canvas') != -1) {
         sjs.useCanvas = true;
         var newNode = document.createElement("canvas");
-        newNode.width = "320";
+        newNode.width = "480";
         newNode.height = "320";
         newNode.id = "test";
         document.getElementById('canvas-mode').style.display = 'none';
