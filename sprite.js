@@ -278,11 +278,14 @@ Sprite.prototype.onload = function(callback) {
 };
 
 Sprite.prototype.loadImg = function (src, resetSize) {
+    // check if the image is already in the cache
     if(!spriteList[src]) {
+        // if not we create the image in the cache
         this.img = new Image();
         spriteList[src] = [this.img, false];
         var _loaded = false;
     } else {
+        // if it's already there, we set img object and check it's loaded
         this.img = spriteList[src][0];
         var _loaded = spriteList[src][1];
     }
