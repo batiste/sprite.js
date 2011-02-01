@@ -299,7 +299,6 @@ Sprite.prototype.loadImg = function (src, resetSize) {
             there.w = img.width;
         if(there.h === null || resetSize)
             there.h = img.height;
-        there.update();
         there.onload();
     }
     if(_loaded)
@@ -445,7 +444,7 @@ Ticker.prototype.run = function() {
 
 function _Input() {
 
-	var that = this;
+    var that = this;
 
     this.keyboard = {};
     this.keyboardChange = {};
