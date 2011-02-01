@@ -46,6 +46,35 @@ var sjs = {
 // a cache to load each sprite only one time
 var spriteList = {};
 
+sjs.loadImages = function loadImages(images, callback) {
+    /* function used to preload the sprite images */
+    var toLoad = 0;
+    for(var i=0; i<images.length; i++) {
+        if(!spriteList[images[i]]) {
+            toLoad += 1;
+        }
+    }
+
+    function _loadImg(src) {
+        var img = new Image();
+        spriteList[src] = [img, false];
+        img.addEventListener('load', function() {
+            spriteList[src][1] = true;
+            toLoad -= 1;
+            if(toLoad == 0)
+                callback();
+        }, false);
+        img.src = src;
+    }
+
+    for(var i=0; i<images.length; i++) {
+        var src = images[i];
+        if(!spriteList[src]) {
+            _loadImg(src);
+        }
+    }
+}
+
 sjs.__defineGetter__('h', function() {
     return this._h;
 });
@@ -305,7 +334,7 @@ Sprite.prototype.loadImg = function (src, resetSize) {
         there.onload();
     }
     if(_loaded)
-        imageReady()
+        imageReady();
     else {
         this.img.addEventListener('load', imageReady, false);
         this.img.src = src;

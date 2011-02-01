@@ -14,6 +14,8 @@
 
 window.onload = function() {
 
+    sjs.loadRessources(['character.png', 'spritejs.png'], function() {
+
     var sprites = [];
     if(window.location.href.indexOf('canvas') != -1) {
         sjs.use_canvas = true;
@@ -75,6 +77,8 @@ window.onload = function() {
     };
     var ticker = new sjs.Ticker(35, paint);
     ticker.run();
+
+    });
 
 };
 </script>
