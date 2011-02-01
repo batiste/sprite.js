@@ -32,26 +32,32 @@ Example of a basic use::
     sjs.w = 640;
     sjs.h = 480;
 
-    // create the Sprite object;
-    var sp = new sjs.Sprite('character.png');
+    // load the images that gonna be used in parallel. When all the images are
+    // ready, the callback function is called.
+    sjs.loadImages(['character.png'], function() {
 
-    // change the visible size of the sprite
-    sp.h=55;
-    sp.w=30;
-    // apply the latest visual changes to the sprite;
-    sp.update();
+        // create the Sprite object;
+        var sp = new sjs.Sprite('character.png');
 
-    // change the offset of the image in the sprite (this works the opposite way of a CSS background)
-    sp.xoffset=50;
-    sp.yoffset=50;
+        // change the visible size of the sprite
+        sp.h=55;
+        sp.w=30;
+        // apply the latest visual changes to the sprite;
+        sp.update();
 
-    // diverse transformations
-    sp.move(100, 100);
-    sp.rotate(3.14 / 4);
-    sp.scale(2);
-    sp.opacity = 0.8;
+        // change the offset of the image in the sprite (this works the opposite way of a CSS background)
+        sp.xoffset=50;
+        sp.yoffset=50;
 
-    sp.update();
+        // diverse transformations
+        sp.move(100, 100);
+        sp.rotate(3.14 / 4);
+        sp.scale(2);
+        sp.opacity = 0.8;
+
+        sp.update();
+
+    });
     </script>
 
 
