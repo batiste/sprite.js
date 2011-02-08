@@ -139,6 +139,9 @@ Sprites provide the following attributes and methods::
                                 // If the image is already loaded the function is called immediatly.
 
 
+    Sprite.remove // Remove the dom element if the HTML backend is used and facilite the garbage collection of the object.
+
+
     Sprite.canvasUpdate(layer)  // draw the sprite on a given layer, even if the sprite's layer use a HTML backend
 
 
