@@ -128,6 +128,10 @@ function Sprite(src, layer) {
     property('y', 0);
     property('x', 0);
 
+    //velocity
+    this.xv = 0;
+    this.yv = 0;
+
     // image
     this.img = null;
     this.imgNaturalWidth = null;
@@ -195,6 +199,12 @@ Sprite.prototype.move = function (x, y) {
     return this;
 };
 
+Sprite.prototype.velocityMove = function () {
+    this.x = this.x+this.xv;
+    this.y = this.y+this.yv;
+    return this;
+};
+
 Sprite.prototype.offset = function (x, y) {
     this.xoffset=x;
     this.yoffset=y;
@@ -259,8 +269,11 @@ Sprite.prototype.update = function updateDomProperties () {
     return this;
 };
 
-Sprite.prototype.canvasUpdate = function updateCanvas () {
-    var ctx = this.layer.ctx;
+Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
+    if(layer)
+        var ctx = layer.ctx;
+    else
+        var ctx = this.layer.ctx;
     ctx.save();
     ctx.translate(this.x + (this.w/2), this.y + (this.h/2));
     ctx.rotate(this.angle);
@@ -281,9 +294,13 @@ Sprite.prototype.canvasUpdate = function updateCanvas () {
                 var repeat_y = Math.floor(this.h / this.imgNaturalHeight);
                 while(repeat_y > 0) {
                     repeat_y = repeat_y-1;
-                    ctx.drawImage(this.img, this.xoffset, this.yoffset, this.imgNaturalWidth,
-                                this.imgNaturalHeight, repeat_w*this.imgNaturalWidth, repeat_y*this.imgNaturalHeight,
-                                this.imgNaturalWidth, this.imgNaturalHeight);
+                    ctx.drawImage(this.img, this.xoffset, this.yoffset,
+                        this.imgNaturalWidth,
+                        this.imgNaturalHeight,
+                        repeat_w * this.imgNaturalWidth,
+                        repeat_y * this.imgNaturalHeight,
+                        this.imgNaturalWidth,
+                        this.imgNaturalHeight);
                 }
 
             }
@@ -390,7 +407,7 @@ function Cycle(triplets) {
 }
 
 Cycle.prototype.next = function (ticks) {
-	ticks = ticks || 1; // default tick: 1
+    ticks = ticks || 1; // default tick: 1
     this.tick = this.tick + ticks;
     if(this.tick > this.cycleDuration) {
         if(this.repeat)
@@ -649,7 +666,7 @@ Layer.prototype.clear = function() {
 }
 
 function init() {
-	initDom();
+    initDom();
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
     var p = false;
     while (p = properties.shift()) {
