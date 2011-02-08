@@ -116,7 +116,7 @@ Sprites provide the following attributes and methods::
     Sprite.yscale
     Sprite.angle   // use radians
     Sprite.opacity // use float in the range 0-1
-    Sprite.color   // Background color of th sprite. Use the rgb/hexadecimal CSS notation.
+    Sprite.color   // Background color of the sprite. Use the rgb/hexadecimal CSS notation.
 
     Sprite(src)
     Sprite.rotate(radians)
@@ -139,12 +139,16 @@ Sprites provide the following attributes and methods::
                                 // If the image is already loaded the function is called immediatly.
 
 
+    Sprite.canvasUpdate(layer)  // draw the sprite on a given layer, even if the sprite's layer use a HTML backend
+
+
 To update the view after modifying the sprite, call "update"::
 
     Sprite.update()
 
 With a canvas backend, the surface will be automaticaly cleared before each game tick. You will need to call update
 to draw the sprite on the canvas again. If you don't want to do this you can set the layer autoClear attribute to false.
+
 
 Ticker object
 ==============
