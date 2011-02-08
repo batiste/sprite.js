@@ -235,14 +235,11 @@ You should then pass the layer as the second argument of the contructor of your 
 
     var sprite = new sjs.Sprite('bg.png', background);
 
-The layer object can take those options:
+The layer object can take those options::
 
     var options = {
-        useCanvas: true,
-        autoClear: false
-
+        useCanvas:true,   // force the use of the canvas on this layer, that enable you to mix HTML and canvas
+        autoClear:false   // disable the auto clearing of the canvas before every paint.
+                          // It's recommanded to activate this on static background.
     }
-
-    // useCanvas: force the use of the canvas on this layer, that enable you to mix HTML and canvas
-    // autoClear: disable the automatic clearing of the canvas before every paint call.
 
