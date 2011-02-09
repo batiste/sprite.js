@@ -435,10 +435,21 @@ Cycle.prototype.reset = function resetCycle() {
     return this;
 };
 
+// the way things works, I don't see the point of having more
+// than one of those.
+var tickerSingleton = false;
 function Ticker(tickDuration, paint) {
+    if(!tickerSingleton)
+        tickerSingleton = _Ticker(tickDuration, paint);
+    else
+        error("This framework doesn't support multiple tickers object.")
+    return tickerSingleton;
+};
+
+function _Ticker(tickDuration, paint) {
 
     if(this.constructor !== arguments.callee)
-        return new Ticker(tickDuration, paint);
+        return new _Ticker(tickDuration, paint);
 
     this.paint = paint;
     if(tickDuration === undefined)
@@ -452,14 +463,14 @@ function Ticker(tickDuration, paint) {
     this.currentTick = 0;
 }
 
-Ticker.prototype.next = function() {
+_Ticker.prototype.next = function() {
     var ticksElapsed = Math.round((this.now - this.start) / this.tickDuration);
     this.lastTicksElapsed = ticksElapsed - this.currentTick;
     this.currentTick = ticksElapsed;
     return this.lastTicksElapsed;
 };
 
-Ticker.prototype.run = function() {
+_Ticker.prototype.run = function() {
     var t = this;
     this.now = new Date().getTime();
     var ticksElapsed = this.next();
@@ -487,9 +498,25 @@ Ticker.prototype.run = function() {
     this.load = Math.round((this.timeToPaint / this.tickDuration) * 100);
     // We need some pause to let the browser catch up the update. Here at least 16 ms of pause
     var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 16);
-    setTimeout(function(){t.run()}, _nextPaint);
+    this.timeout = setTimeout(function(){t.run()}, _nextPaint);
 }
 
+_Ticker.prototype.pause = function() {
+    global.clearTimeout(this.timeout);
+    this.paused = true;
+}
+
+_Ticker.prototype.resume = function() {
+    this.start = new Date().getTime();
+    this.ticksElapsed = 0;
+    this.currentTick = 0;
+    this.paused = false;
+    this.run();
+}
+
+
+var inputSingleton = new _Input();
+function Input(){return inputSingleton};
 
 function _Input() {
 
@@ -588,6 +615,30 @@ function _Input() {
         that.keyboard = {}
         that.keydown = false;
         that.mousedown = false;
+        // create a semi transparent layer on the game
+        if(tickerSingleton && !tickerSingleton.paused) {
+            tickerSingleton.pause();
+            var div = document.createElement('div');
+            div.innerHTML = 'Game paused,<br>click to resume.';
+            var s = div.style;
+            s.width = sjs.w;
+            s.width = sjs.w;
+            s.height = sjs.h;
+            s.color = '#fff';
+            s.textAlign = 'center';
+            s.paddingTop = sjs.h/2;
+            s.zIndex = 1000;
+            s.position = 'absolute';
+            s.backgroundColor = '000';
+            s.opacity = 0.7;
+            var listener = function() {
+                sjs.dom.removeChild(div);
+                document.removeEventListener('click', listener, false);
+                tickerSingleton.resume();
+            }
+            document.addEventListener('click', listener, false);
+            sjs.dom.appendChild(div);
+        }
     }, false);
 }
 
@@ -595,9 +646,6 @@ _Input.prototype.arrows = function arrows() {
     /* Return true if any arrow key is pressed */
     return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
 };
-
-var inputSingleton = new _Input();
-function Input(){return inputSingleton};
 
 var layerZindex = 1;
 
