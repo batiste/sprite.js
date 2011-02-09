@@ -621,15 +621,15 @@ function _Input() {
             var div = document.createElement('div');
             div.innerHTML = 'Game paused,<br>click to resume.';
             var s = div.style;
+            s.width = sjs.w + 'px';
             s.width = sjs.w;
-            s.width = sjs.w;
-            s.height = sjs.h;
+            s.height = sjs.h + 'px';
             s.color = '#fff';
             s.textAlign = 'center';
-            s.paddingTop = sjs.h/2;
+            s.paddingTop = sjs.h/2  + 'px';
             s.zIndex = 1000;
             s.position = 'absolute';
-            s.backgroundColor = '000';
+            s.backgroundColor = '#000';
             s.opacity = 0.7;
             var listener = function() {
                 sjs.dom.removeChild(div);
