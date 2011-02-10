@@ -6,7 +6,7 @@
 </head>
 <body style="overflow:hidden">
 
-<p>This demo is gonna produce particles and stop when 50% percent load is reached.<br>
+<p>This demo is gonna produce particles and stop when 90% percent javascript load is reached.<br>
 <span id="nb"></span> particules, system load <span id="load"></span>% <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
 
 </body>
@@ -31,21 +31,21 @@ window.onload = function() {
 
     function paint() {
 
-        if(ticker.load <= 50) {
+        if(ticker.load <= 90) {
             particule = new sjs.Sprite('particule.png');
-            particule.x = window.innerWidth / 2;
-            particule.y = window.innerHeight / 3;
+            particule.x = sjs.w / 2;
+            particule.y = sjs.h / 3;
             particule.xv = (Math.random() - 0.5) * 2;
             particule.yv = (Math.random() - 1) * 2;
             particules.push(particule);
         }
-        if(ticker.load > 51) {
+        if(ticker.load > 91) {
             particules[0].remove();
             particules.splice(0, 1);
         }
         for(var i=0; i<particules.length; i++) {
             var particule = particules[i];
-            particule.yv += 0.003;
+            particule.yv += 0.001;
             particule.move(particule.xv, particule.yv);
             if(particule.y > window.innerHeight) {
                 particules.splice(i, 1);
