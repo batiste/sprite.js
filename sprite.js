@@ -75,22 +75,20 @@ sjs.loadImages = function loadImages(images, callback) {
     }
 }
 
-sjs.__defineGetter__('h', function() {
-    return this._h;
+Object.defineProperty(sjs, 'h', {
+    get:function() {return this._h},
+    set:function(value) {
+        this._h = value;
+        this.dom.style.height = value + 'px';
+    }
 });
 
-sjs.__defineSetter__('h', function(value) {
-    this._h = value;
-    this.dom.style.height = value + 'px';
-});
-
-sjs.__defineGetter__('w', function() {
-    return this._w;
-});
-
-sjs.__defineSetter__('w', function(value) {
-    this._w = value;
-    this.dom.style.width = value + 'px';
+Object.defineProperty(sjs, 'w', {
+    set:function() {return this._w},
+    set:function(value) {
+        this._w = value;
+        this.dom.style.width = value + 'px';
+    }
 });
 
 
@@ -111,15 +109,14 @@ function Sprite(src, layer) {
         else
             sp['_'+name] = defaultValue;
 
-        sp.__defineGetter__(name, function() {
-            return sp['_'+name];
-        });
-
-        sp.__defineSetter__(name, function(value) {
-            sp['_'+name] = value;
-            if(!sp.layer.useCanvas) {
-                sp._dirty[name] = true;
-                sp.changed = true;
+        Object.defineProperty(sp, name, {
+            get:function() {return sp['_'+name]},
+            set:function(value) {
+                sp['_'+name] = value;
+                if(!sp.layer.useCanvas) {
+                    sp._dirty[name] = true;
+                    sp.changed = true;
+                }
             }
         });
     }
