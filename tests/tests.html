@@ -67,18 +67,19 @@ window.onload = function() {
     sp3.size(10, 10);
     sp3.move(21, 10);
 
-    assertTrue(sp1.hasCollision(sp1), "hasCollision test1");
-    assertTrue(sp1.hasCollision(sp2), "hasCollision test2");
-    assertTrue(sp2.hasCollision(sp1), "hasCollision test3");
+    console.log(sp1)
+    assertTrue(sp1.collidesWith(sp1), "collidesWith test1");
+    assertTrue(sp1.collidesWith(sp2), "collidesWith test2");
+    assertTrue(sp2.collidesWith(sp1), "collidesWith test3");
 
-    assertFalse(sp1.hasCollision(sp3), "hasCollision test4");
-    assertTrue(sp2.hasCollision(sp3), "hasCollision test5");
+    assertFalse(sp1.collidesWith(sp3), "collidesWith test4");
+    assertTrue(sp2.collidesWith(sp3), "collidesWith test5");
 
     var sp1 = new sjs.Sprite('character.png');
     sp1.size(100, 200);
 
-    assertTrue(sp3.hasCollision(sp1), "hasCollision test5");
-    assertTrue(sp1.hasCollision(sp3), "hasCollision test6");
+    assertTrue(sp3.collidesWith(sp1), "collidesWith test5");
+    assertTrue(sp1.collidesWith(sp3), "collidesWith test6");
 
 };
 </script>

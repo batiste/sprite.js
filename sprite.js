@@ -43,8 +43,26 @@ var sjs = {
     dom:null
 };
 
+function overlay(x, y, w, h) {
+    var div = document.createElement('div');
+    var s = div.style;
+    s.top = x + 'px';
+    s.left = y + 'px';
+    s.width = w + 'px';
+    s.height = h + 'px';
+    s.color = '#fff';
+    s.zIndex = 100;
+    s.position = 'absolute';
+    s.backgroundColor = '#000';
+    s.opacity = 0.8;
+    return div;
+}
+
 // a cache to load each sprite only one time
 var spriteList = {};
+
+// the shameful error function
+function error(msg) {alert(msg);}
 
 sjs.loadImages = function loadImages(images, callback) {
     /* function used to preload the sprite images */
@@ -91,9 +109,6 @@ Object.defineProperty(sjs, 'w', {
     }
 });
 
-
-function error(msg) {alert(msg);}
-
 function Sprite(src, layer) {
 
     if(this.constructor !== arguments.callee)
@@ -103,7 +118,7 @@ function Sprite(src, layer) {
     this._dirty = {};
     this.changed = false;
 
-    function property(name, defaultValue) {
+    function property(name, defaultValue, type) {
         if(defaultValue === undefined)
             sp['_'+name] = 0;
         else
@@ -232,16 +247,17 @@ Sprite.prototype.update = function updateDomProperties () {
         return;
 
     var style = this.dom.style;
+    // using Math.round to round integers before changing seems to improve a bit performances
     if(this._dirty['w'])
-        style.width=this.w+'px';
+        style.width=Math.round(this.w)+'px';
     if(this._dirty['h'])
-        style.height=this.h+'px';
+        style.height=Math.round(this.h)+'px';
     if(this._dirty['y'])
-        style.top=this.y+'px';
+        style.top=Math.round(this.y)+'px';
     if(this._dirty['x'])
-        style.left=this.x+'px';
+        style.left=Math.round(this.x)+'px';
     if(this._dirty['xoffset'] || this._dirty['yoffset'])
-        style.backgroundPosition=-this.xoffset+'px '+-this.yoffset+'px';
+        style.backgroundPosition=-Math.round(this.xoffset)+'px '+-Math.round(this.yoffset)+'px';
 
     if(this._dirty['opacity'])
         style.opacity = this.opacity;
@@ -370,7 +386,7 @@ Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
        || this.isPointIn(sprite.x, sprite.y + sprite.h));
 };
 
-Sprite.prototype.collidesWith = function hasCollision(sprites) {
+Sprite.prototype.collidesWith = function collidesWith(sprites) {
     // detect arrays
     if(sprites.length !== undefined) {
         for(var i=0, sprite; sprite = sprites[i]; i++) {
@@ -615,19 +631,10 @@ function _Input() {
         // create a semi transparent layer on the game
         if(tickerSingleton && !tickerSingleton.paused) {
             tickerSingleton.pause();
-            var div = document.createElement('div');
+            var div = overlay(0, 0, sjs.w, sjs.h);
             div.innerHTML = 'Game paused,<br>click to resume.';
-            var s = div.style;
-            s.width = sjs.w + 'px';
-            s.width = sjs.w;
-            s.height = sjs.h + 'px';
-            s.color = '#fff';
-            s.textAlign = 'center';
-            s.paddingTop = sjs.h/2  + 'px';
-            s.zIndex = 1000;
-            s.position = 'absolute';
-            s.backgroundColor = '#000';
-            s.opacity = 0.7;
+            div.style.textAlign = 'center';
+            div.style.paddingTop = ((sjs.h/2) - 16)  + 'px';
             var listener = function() {
                 sjs.dom.removeChild(div);
                 document.removeEventListener('click', listener, false);
