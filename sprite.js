@@ -84,7 +84,7 @@ Object.defineProperty(sjs, 'h', {
 });
 
 Object.defineProperty(sjs, 'w', {
-    set:function() {return this._w},
+    get:function() {return this._w},
     set:function(value) {
         this._w = value;
         this.dom.style.width = value + 'px';
