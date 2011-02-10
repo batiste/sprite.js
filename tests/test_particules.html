@@ -35,13 +35,17 @@ window.onload = function() {
             particule = new sjs.Sprite('particule.png');
             particule.x = window.innerWidth / 2;
             particule.y = window.innerHeight / 3;
-            particule.xv = (Math.random() - 0.5) * 5;
-            particule.yv = (Math.random() - 1.5) * 5;
+            particule.xv = (Math.random() - 0.5) * 2;
+            particule.yv = (Math.random() - 1) * 2;
             particules.push(particule);
+        }
+        if(ticker.load > 51) {
+            particules[0].remove();
+            particules.splice(0, 1);
         }
         for(var i=0; i<particules.length; i++) {
             var particule = particules[i];
-            particule.yv += 0.03;
+            particule.yv += 0.003;
             particule.move(particule.xv, particule.yv);
             if(particule.y > window.innerHeight) {
                 particules.splice(i, 1);
@@ -57,7 +61,7 @@ window.onload = function() {
         }
 
     };
-    var ticker = new sjs.Ticker(25, paint);
+    var ticker = new sjs.Ticker(20, paint);
     ticker.run();
 
 };

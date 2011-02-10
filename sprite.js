@@ -31,6 +31,15 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(global, undefined){
 
+// fixing the bad boys that don't have defineProperty
+if(!Object.defineProperty) {
+    Object.defineProperty = function(obj, name, dict) {
+        obj.__defineGetter__(name, dict['get']);
+        obj.__defineSetter__(name, dict['set']);
+    }
+}
+defineProperty = Object.defineProperty
+
 var sjs = {
     Sprite: Sprite,
     Cycle: Cycle,
@@ -93,7 +102,7 @@ sjs.loadImages = function loadImages(images, callback) {
     }
 }
 
-Object.defineProperty(sjs, 'h', {
+defineProperty(sjs, 'h', {
     get:function() {return this._h},
     set:function(value) {
         this._h = value;
@@ -101,7 +110,7 @@ Object.defineProperty(sjs, 'h', {
     }
 });
 
-Object.defineProperty(sjs, 'w', {
+defineProperty(sjs, 'w', {
     get:function() {return this._w},
     set:function(value) {
         this._w = value;
@@ -124,7 +133,7 @@ function Sprite(src, layer) {
         else
             sp['_'+name] = defaultValue;
 
-        Object.defineProperty(sp, name, {
+        defineProperty(sp, name, {
             get:function() {return sp['_'+name]},
             set:function(value) {
                 sp['_'+name] = value;
@@ -249,13 +258,13 @@ Sprite.prototype.update = function updateDomProperties () {
     var style = this.dom.style;
     // using Math.round to round integers before changing seems to improve a bit performances
     if(this._dirty['w'])
-        style.width=Math.round(this.w)+'px';
+        style.width=(this.w | 0) +'px';
     if(this._dirty['h'])
-        style.height=Math.round(this.h)+'px';
+        style.height=(this.h  | 0)+'px';
     if(this._dirty['y'])
-        style.top=Math.round(this.y)+'px';
+        style.top=(this.y | 0)+'px';
     if(this._dirty['x'])
-        style.left=Math.round(this.x)+'px';
+        style.left=(this.x | 0)+'px';
     if(this._dirty['xoffset'] || this._dirty['yoffset'])
         style.backgroundPosition=-Math.round(this.xoffset)+'px '+-Math.round(this.yoffset)+'px';
 
@@ -288,11 +297,12 @@ Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
     else
         var ctx = this.layer.ctx;
     ctx.save();
-    ctx.translate(this.x + (this.w/2), this.y + (this.h/2));
+    ctx.translate(this.x + this.w/2 | 0, this.y + this.h/2 | 0);
     ctx.rotate(this.angle);
-    ctx.scale(this.xscale, this.yscale);
+    if(this.xscale != 1 || this.xscale != 1)
+        ctx.scale(this.xscale, this.yscale);
     ctx.globalAlpha = this.opacity;
-    ctx.translate(-(this.w/2), -(this.h/2));
+    ctx.translate(-this.w/2 | 0, -this.h/2 | 0);
     // handle background colors.
     if(this.color) {
         ctx.fillStyle = this.color;
