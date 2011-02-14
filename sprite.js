@@ -738,7 +738,7 @@ Layer.prototype.clear = function() {
 
 function init() {
     initDom();
-    var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform'];
+    var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform'];
     var p = false;
     while (p = properties.shift()) {
         if (typeof document.body.style[p] !== 'undefined') {
