@@ -99,11 +99,20 @@ Sprite object public methods and attributes
 
 Sprites provide the following attributes and methods::
 
+    Sprite(<src>, <layer>) // the Sprite object constructor. Both parameters are optionnal.
+
     Sprite.y
     Sprite.x
     Sprite.w // Controls the visible surface of the image. To have repeating sprites
              // set the width or height value bigger than the size of the image.
     Sprite.h
+
+    Sprite.xv  // horizontal velocity
+    Sprite.yv  // vertical velocity
+    Sprite.rv  // radial velocity
+
+    Sprite.applyVelocity // apply all the defined velocities to the current Sprite
+
     Sprite.xoffset // offset in the image to start painting in the view surface
     Sprite.yoffset
     Sprite.xscale
@@ -112,7 +121,6 @@ Sprites provide the following attributes and methods::
     Sprite.opacity // use float in the range 0-1
     Sprite.color   // Background color of the sprite. Use the rgb/hexadecimal CSS notation.
 
-    Sprite(src)
     Sprite.rotate(radians)
     Sprite.scale(x, y)   // if y is not defined, y take the same value as x
     Sprite.move(x, y)
@@ -166,6 +174,9 @@ To setup a ticker::
     }
     var ticker = new sjs.Ticker(35, paint); // we want a tick every 35ms
     ticker.run();
+
+    ticker.pause();
+    ticker.resume();
 
 lastTicksElapsed is the number of ticks elapsed during 2 runs of the paint
 function. If performances are good the value should be 1. If the number

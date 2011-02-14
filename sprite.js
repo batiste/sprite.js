@@ -152,6 +152,7 @@ function Sprite(src, layer) {
     //velocity
     this.xv = 0;
     this.yv = 0;
+    this.rv = 0;
 
     // image
     this.img = null;
@@ -220,9 +221,15 @@ Sprite.prototype.move = function (x, y) {
     return this;
 };
 
-Sprite.prototype.velocityMove = function () {
-    this.x = this.x+this.xv;
-    this.y = this.y+this.yv;
+Sprite.prototype.applyVelocity = function (ticks) {
+    if(ticks === undefined)
+        ticks = 1;
+    if(this.xv != 0)
+        this.x = this.x+this.xv*ticks;
+    if(this.yv != 0)
+        this.y = this.y+this.yv*ticks;
+    if(this.rv != 0)
+        this.angle = this.angle+this.rv*ticks;
     return this;
 };
 
