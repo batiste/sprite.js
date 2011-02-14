@@ -261,10 +261,12 @@ Sprite.prototype.update = function updateDomProperties () {
         style.width=(this.w | 0) +'px';
     if(this._dirty['h'])
         style.height=(this.h  | 0)+'px';
+    // translate and translate3d doesn't seems to offer any speedup
+    // in my tests.
     if(this._dirty['y'])
         style.top=(this.y | 0)+'px';
     if(this._dirty['x'])
-        style.left=(this.x | 0)+'px';
+       style.left=(this.x | 0)+'px';
     if(this._dirty['xoffset'] || this._dirty['yoffset'])
         style.backgroundPosition=-Math.round(this.xoffset)+'px '+-Math.round(this.yoffset)+'px';
 
