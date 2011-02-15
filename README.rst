@@ -97,51 +97,72 @@ Mobile performances can be very weak depending on the phone. Here is what we got
 Sprite object public methods and attributes
 ===========================================
 
-Sprites provide the following attributes and methods::
 
-    Sprite(<src>, <layer>) // the Sprite object constructor. Both parameters are optionnal.
 
-    Sprite.y
-    Sprite.x
-    Sprite.w // Controls the visible surface of the image. To have repeating sprites
+To create a sprite you should use the sjs.Sprite constructor helper::
+
+    var sprite = sjs.Sprite(<src>, <layer>)
+
+Both parameters are optionnal. If you want to set the layer but not any image::
+
+    var sprite = sjs.Sprite(false, <layer>)
+
+For performance reasons *there have been an API change* on the way the attributes can be set, please read the following.
+Sprites provide have following attributes *read only* attributes::
+
+    sprite.y
+    sprite.x
+    sprite.w // Controls the visible surface of the image. To have repeating sprites
              // set the width or height value bigger than the size of the image.
-    Sprite.h
+    sprite.h
 
-    Sprite.xv  // horizontal velocity
-    Sprite.yv  // vertical velocity
-    Sprite.rv  // radial velocity
+    sprite.xoffset // offset in the image to start painting in the view surface
+    sprite.yoffset
+    sprite.xscale
+    sprite.yscale
+    sprite.angle   // use radians
+    sprite.opacity // use float in the range 0-1
+    sprite.color   // Background color of the sprite. Use the rgb/hexadecimal CSS notation.
 
-    Sprite.applyVelocity // apply all the defined velocities to the current Sprite
+If you want to change any of those attributes use the getters:
 
-    Sprite.xoffset // offset in the image to start painting in the view surface
-    Sprite.yoffset
-    Sprite.xscale
-    Sprite.yscale
-    Sprite.angle   // use radians
-    Sprite.opacity // use float in the range 0-1
-    Sprite.color   // Background color of the sprite. Use the rgb/hexadecimal CSS notation.
+    sprite.setX(5);
+    sprite.setY(5);
+    sprite.setXOffset(10) // offset in the image to start painting in the view surface
+    sprite.setXScale(2)
 
-    Sprite.rotate(radians)
-    Sprite.scale(x, y)   // if y is not defined, y take the same value as x
-    Sprite.move(x, y)
-    Sprite.offset(x, y)
-    Sprite.size(w, h)    // set the width and height of the visible sprite
+Or one of the helper methods::
 
-    Sprite.loadImg(src, bool resetSize)    // change the image sprite. The size of the sprite will be rested by
-                                           // the new image if resetSize is true.
+    sprite.rotate(radians)
+    sprite.scale(x, y)   // if y is not defined, y take the same value as x
+    sprite.move(x, y)
+    sprite.offset(x, y)
+    sprite.size(w, h)    // set the width and height of the visible sprite
 
-    Sprite.isPointIn(x, y) // return true if the point (x,y) is within
+To appy some physic transformation on the sprites you can use those helpers::
+
+    sprite.xv              // horizontal velocity
+    sprite.yv              // vertical velocity
+    sprite.rv              // radial velocity
+    sprite.applyVelocity() // apply all the defined velocities to the current Sprite
+
+    sprite.isPointIn(x, y) // return true if the point (x,y) is within
                            // the sprite surface (angles don't affect this function)
 
-    Sprite.collidesWith(Sprite) // return true if the Sprite is in
+    sprite.collidesWith(Sprite) // return true if the Sprite is in
                                 // collision with the other Sprite (angles don't affect this function).
                                 // You can also pass an array of sprites to the method.
 
-    Sprite.onload(callback)     // call the function "callback" when the sprite's image is loaded.
+Other important methods::
+
+    sprite.onload(callback)     // call the function "callback" when the sprite's image is loaded.
                                 // If the image is already loaded the function is called immediatly.
 
 
-    Sprite.remove // Remove the dom element if the HTML backend is used and facilite the garbage collection of the object.
+    sprite.loadImg(src, bool resetSize)    // change the image sprite. The size of the sprite will be rested by
+                                           // the new image if resetSize is true.
+
+    sprite.remove // Remove the dom element if the HTML backend is used and facilite the garbage collection of the object.
 
 
     Sprite.canvasUpdate(layer)  // draw the sprite on a given layer, even if the sprite's layer use a HTML backend

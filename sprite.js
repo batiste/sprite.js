@@ -169,12 +169,12 @@ function Sprite(src, layer) {
 
     this.dom = null;
 
-    property('xscale', 1);
-    property('yscale', 1);
-    property('angle', 0);
+    this.xscale = 1;
+    this.yscale = 1;
+    this.angle = 0;
 
-    property('opacity', 1);
-    property('color', false);
+    this.opacity = 1;
+    this.color = false;
 
     if(layer === undefined) {
         // important to delay the creation so useCanvas
@@ -199,6 +199,7 @@ function Sprite(src, layer) {
 
 Sprite.prototype.constructor = Sprite;
 
+/* boilerplate setter functions */
 
 Sprite.prototype.setX = function setX(value) {
     this.x = value;
@@ -228,34 +229,63 @@ Sprite.prototype.setH = function setH(value) {
     return this;
 }
 
-Sprite.prototype.setXoffset = function setXoffset(value) {
+Sprite.prototype.setXOffset = function setXoffset(value) {
     this.xoffset = value;
     this._dirty['xoffset'] = true;
     this.changed = true;
     return this;
 }
 
-Sprite.prototype.setYoffset = function setYoffset(value) {
+Sprite.prototype.setYOffset = function setYoffset(value) {
     this.yoffset = value;
     this._dirty['yoffset'] = true;
     this.changed = true;
     return this;
 }
 
+Sprite.prototype.setAngle = function setAngle(value) {
+    this.angle = value;
+    this._dirty['angle'] = true;
+    this.changed = true;
+    return this;
+}
+
+Sprite.prototype.setColor = function setColor(value) {
+    this.color = value;
+    this._dirty['color'] = true;
+    this.changed = true;
+    return this;
+}
+
+Sprite.prototype.setXScale = function setXscale(value) {
+    this.xscale = value;
+    this._dirty['xscale'] = true;
+    this.changed = true;
+    return this;
+}
+
+Sprite.prototype.setYScale = function setYscale(value) {
+    this.yscale = value;
+    this._dirty['yscale'] = true;
+    this.changed = true;
+    return this;
+}
+
+/* end of boilerplate setters */
 
 Sprite.prototype.rotate = function (v) {
-    this.angle = this.angle + v;
+    this.setAngle(this.angle + v);
     return this;
 };
 
 Sprite.prototype.scale = function (x, y) {
     if(this.xscale != x) {
-        this.xscale = x;
+        this.setXScale(x);
     }
     if(y === undefined)
         y = x;
     if(this.yscale != y) {
-        this.yscale = y;
+        this.setYScale(y);
     }
     return this;
 };
@@ -274,13 +304,13 @@ Sprite.prototype.applyVelocity = function (ticks) {
     if(this.yv != 0)
         this.setY(this.y+this.yv*ticks);
     if(this.rv != 0)
-        this.angle = this.angle+this.rv*ticks;
+        this.setAngle(this.angle+this.rv*ticks);
     return this;
 };
 
 Sprite.prototype.offset = function (x, y) {
-    this.setXoffset(x);
-    this.setYoffset(y);
+    this.setXOffset(x);
+    this.setYOffset(y);
     return this;
 };
 
@@ -496,8 +526,8 @@ Cycle.prototype.next = function (ticks) {
     for(var i=0; i<this.changingTicks.length; i++) {
         if(this.tick == this.changingTicks[i]) {
             for(var j=0, sprite; sprite = this.sprites[j]; j++) {
-                sprite.setXoffset(this.triplets[i][0]);
-                sprite.setYoffset(this.triplets[i][1]);
+                sprite.setXOffset(this.triplets[i][0]);
+                sprite.setYOffset(this.triplets[i][1]);
             }
         }
     }
@@ -507,8 +537,8 @@ Cycle.prototype.next = function (ticks) {
 Cycle.prototype.reset = function resetCycle() {
     this.tick = 0;
     for(var j=0, sprite; sprite = this.sprites[j]; j++) {
-        sprite.setXoffset(this.triplets[0][0]);
-        sprite.setXoffset(this.triplets[0][1]);
+        sprite.setXOffset(this.triplets[0][0]);
+        sprite.setYOffset(this.triplets[0][1]);
     }
     return this;
 };
