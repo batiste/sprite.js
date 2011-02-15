@@ -134,8 +134,8 @@ function Sprite(src, layer) {
             sp['_'+name] = defaultValue;
 
         defineProperty(sp, name, {
-            get:function() {return sp['_'+name]},
-            set:function(value) {
+            get:function get() {return sp['_'+name]},
+            set:function set(value) {
                 sp['_'+name] = value;
                 if(!sp.layer.useCanvas) {
                     sp._dirty[name] = true;
@@ -146,8 +146,8 @@ function Sprite(src, layer) {
     }
 
     // positions
-    property('y', 0);
-    property('x', 0);
+    this.y = 0;
+    this.x = 0;
 
     //velocity
     this.xv = 0;
@@ -160,12 +160,12 @@ function Sprite(src, layer) {
     this.imgNaturalHeight = null;
 
     // width and height of the sprite view port
-    property('w', null);
-    property('h', null);
+    this.w = null;
+    this.h = null;
 
     // offsets of the image within the viewport
-    property('xoffset', 0);
-    property('yoffset', 0);
+    this.xoffset = 0;
+    this.yoffset = 0;
 
     this.dom = null;
 
@@ -184,6 +184,7 @@ function Sprite(src, layer) {
         layer = sjs.layers['default'];
     }
     this.layer = layer;
+    //this.layerIndex = layer.addSprite(this);
 
     if(!this.layer.useCanvas) {
         var d = document.createElement('div');
@@ -197,6 +198,50 @@ function Sprite(src, layer) {
 }
 
 Sprite.prototype.constructor = Sprite;
+
+
+Sprite.prototype.setX = function setX(value) {
+    this.x = value;
+    this._dirty['x'] = true;
+    this.changed = true;
+    return this;
+}
+
+Sprite.prototype.setY = function setX(value) {
+    this.y = value;
+    this._dirty['y'] = true;
+    this.changed = true;
+    return this;
+}
+
+Sprite.prototype.setW = function setW(value) {
+    this.w = value;
+    this._dirty['w'] = true;
+    this.changed = true;
+    return this;
+}
+
+Sprite.prototype.setH = function setH(value) {
+    this.h = value;
+    this._dirty['h'] = true;
+    this.changed = true;
+    return this;
+}
+
+Sprite.prototype.setXoffset = function setXoffset(value) {
+    this.xoffset = value;
+    this._dirty['xoffset'] = true;
+    this.changed = true;
+    return this;
+}
+
+Sprite.prototype.setYoffset = function setYoffset(value) {
+    this.yoffset = value;
+    this._dirty['yoffset'] = true;
+    this.changed = true;
+    return this;
+}
+
 
 Sprite.prototype.rotate = function (v) {
     this.angle = this.angle + v;
@@ -216,8 +261,8 @@ Sprite.prototype.scale = function (x, y) {
 };
 
 Sprite.prototype.move = function (x, y) {
-    this.x = this.x+x;
-    this.y = this.y+y;
+    this.setX(this.x+x);
+    this.setY(this.y+y);
     return this;
 };
 
@@ -225,23 +270,23 @@ Sprite.prototype.applyVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv != 0)
-        this.x = this.x+this.xv*ticks;
+        this.setX(this.x+this.xv*ticks);
     if(this.yv != 0)
-        this.y = this.y+this.yv*ticks;
+        this.setY(this.y+this.yv*ticks);
     if(this.rv != 0)
         this.angle = this.angle+this.rv*ticks;
     return this;
 };
 
 Sprite.prototype.offset = function (x, y) {
-    this.xoffset=x;
-    this.yoffset=y;
+    this.setXoffset(x);
+    this.setYoffset(y);
     return this;
 };
 
 Sprite.prototype.size = function (w, h) {
-    this.w=w;
-    this.h=h;
+    this.setW(w);
+    this.setH(h);
     return this;
 };
 
@@ -250,6 +295,7 @@ Sprite.prototype.remove = function remove() {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
     }
+    delete this.layer.sprites[this.layerIndex];
     this.layer = null;
     this.img = null;
 };
@@ -377,9 +423,9 @@ Sprite.prototype.loadImg = function (src, resetSize) {
         there.imgNaturalWidth = img.width;
         there.imgNaturalHeight = img.height;
         if(there.w === null || resetSize)
-            there.w = img.width;
+            there.setW(img.width);
         if(there.h === null || resetSize)
-            there.h = img.height;
+            there.setH(img.height);
         there.onload();
     }
     if(_loaded)
@@ -450,8 +496,8 @@ Cycle.prototype.next = function (ticks) {
     for(var i=0; i<this.changingTicks.length; i++) {
         if(this.tick == this.changingTicks[i]) {
             for(var j=0, sprite; sprite = this.sprites[j]; j++) {
-                sprite.xoffset = this.triplets[i][0];
-                sprite.yoffset = this.triplets[i][1];
+                sprite.setXoffset(this.triplets[i][0]);
+                sprite.setYoffset(this.triplets[i][1]);
             }
         }
     }
@@ -461,8 +507,8 @@ Cycle.prototype.next = function (ticks) {
 Cycle.prototype.reset = function resetCycle() {
     this.tick = 0;
     for(var j=0, sprite; sprite = this.sprites[j]; j++) {
-        sprite.xoffset = this.triplets[0][0];
-        sprite.yoffset = this.triplets[0][1];
+        sprite.setXoffset(this.triplets[0][0]);
+        sprite.setXoffset(this.triplets[0][1]);
     }
     return this;
 };
@@ -515,8 +561,24 @@ _Ticker.prototype.run = function() {
 
     for(var name in sjs.layers) {
         var layer = sjs.layers[name];
-        if(layer.useCanvas && layer.autoClear)
+        if(layer.useCanvas && layer.autoClear) {
+            // try a smarter way to clear
+            /*var xmin=0, ymin=0, xmax=0, ymax=0;
+            for(var index in layer.sprites) {
+                var sp = layer.sprites[index];
+                if(sp.x < xmin)
+                    xmin = sp.x
+                if(sp.y < ymin)
+                    ymin = sp.y
+                if(sp.x + sp.w > xmax)
+                    xmax = sp.x + sp.w
+                if(sp.y + sp.h > ymax)
+                    ymax = sp.y + sp.h
+            }
+            layer.ctx.clearRect(xmin, ymin, xmax - xmin, ymax - ymin);*/
             layer.clear();
+
+        }
         // trick to clear canvas, doesn't seems to do any better according to tests
         // http://skookum.com/blog/practical-canvas-test-charlottejs/
         // canvas.width = canvas.width
@@ -643,7 +705,7 @@ function _Input() {
     addEvent("keypress", function(e) {});
     // make sure that the keyboard is reseted when
     // the user leave the page
-    global.addEventListener("blur", function (e) {
+    /*global.addEventListener("blur", function (e) {
         that.keyboard = {}
         that.keydown = false;
         that.mousedown = false;
@@ -662,7 +724,7 @@ function _Input() {
             document.addEventListener('click', listener, false);
             sjs.dom.appendChild(div);
         }
-    }, false);
+    }, false);*/
 }
 
 _Input.prototype.arrows = function arrows() {
@@ -678,6 +740,8 @@ function Layer(name, options) {
 
     if(this.constructor !== arguments.callee)
         return new Layer(name, options);
+
+    this.sprites = {};
 
     if(options === undefined)
         options = {useCanvas:sjs.useCanvas, autoClear:true}
@@ -734,6 +798,12 @@ function Layer(name, options) {
 
 Layer.prototype.clear = function() {
     this.ctx.clearRect(0, 0, this.dom.width, this.dom.height);
+}
+
+Layer.prototype.addSprite = function addSprite(sprite) {
+    var index = Math.random() * 11;
+    this.sprites[index] = sprite;
+    return index
 }
 
 function init() {

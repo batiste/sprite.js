@@ -34,43 +34,39 @@ window.onload = function() {
     var mplateforms = [];
 
     var bottom = new sjs.Sprite('ground.png');
-    bottom.y = game_height - 20;
-    bottom.x = 0;
-    bottom.w = game_width;
+    bottom.move(0, game_height - 20);
+    bottom.setW(game_width);
 
     plateforms.push(bottom);
 
     var p = new sjs.Sprite('ground.png');
-    p.y = 400;
-    p.x = 120;
-    p.w = 50;
-    p.xv = 1;
+    p.move(150, 400);
+    p.setW(50);
+    p.xv = 1.2;
 
     plateforms.push(p);
     mplateforms.push(p);
 
+
     var p = new sjs.Sprite('ground.png');
-    p.y = 320;
-    p.x = 150;
-    p.w = 50;
+    p.move(150, 320);
+    p.setW(50);
     p.xv = 1.5;
 
     plateforms.push(p);
     mplateforms.push(p);
 
     var p = new sjs.Sprite('ground.png');
-    p.y = 250;
-    p.x = 15;
-    p.w = 50;
+    p.move(15, 250);
+    p.setW(50);
     p.xv = 0.5;
 
     plateforms.push(p);
     mplateforms.push(p);
 
     var p = new sjs.Sprite('ground.png');
-    p.y = 180;
-    p.x = 180;
-    p.w = 30;
+    p.move(180, 180)
+    p.setW(30);
     p.xv = 2;
 
     plateforms.push(p);
@@ -78,9 +74,8 @@ window.onload = function() {
 
 
     var p = new sjs.Sprite('ground.png');
-    p.y = 100;
-    p.x = 180;
-    p.w = 30;
+    p.move(180, 100);
+    p.setW(30);
     p.xv = 1.3;
 
     plateforms.push(p);
@@ -88,8 +83,7 @@ window.onload = function() {
 
 
     var player = new sjs.Sprite('character.png');
-    player.x = 20;
-    player.y = 400;
+    player.move(20, 390);
     player.size(23, 51);
 
     var input  = new sjs.Input();
@@ -116,7 +110,7 @@ window.onload = function() {
                 has_contact = p.isPointIn(x, y);
                 if(has_contact) {
                     if(p.xv)
-                        player.x =  player.x + p.xv;
+                        player.setX(player.x + p.xv);
                     break;
                 }
             }
@@ -156,9 +150,9 @@ window.onload = function() {
 
         player.move(xv, yv);
         if(player.x < 0)
-            player.x = 0;
+            player.setX(0);
         if(player.x > game_width - 20)
-            player.x = game_width - 20;
+            player.setX(game_width - 20);
         for(var i=0; i < plateforms.length; i++) {
             plateforms[i].update();
         }

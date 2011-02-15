@@ -31,10 +31,10 @@ window.onload = function() {
 
     function paint() {
 
-        if(ticker.load <= 90) {
+        if(ticker.load <= 80) {
             particule = new sjs.Sprite('particule.png');
-            particule.x = sjs.w / 2;
-            particule.y = sjs.h / 3;
+            particule.setX(sjs.w / 2);
+            particule.setY(sjs.h / 3);
             particule.xv = (Math.random() - 0.5) * 2;
             particule.yv = (Math.random() - 1) * 2;
             particules.push(particule);

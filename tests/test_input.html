@@ -16,20 +16,16 @@ window.onload = function() {
 
     var background =  new sjs.Layer('background');
     var ground = new sjs.Sprite('ground.png', background);
-    ground.w = window.innerWidth / 2;
-    ground.y = 160;
-    ground.x = 0;
+    ground.setW(window.innerWidth / 2);
+    ground.move(0, 160);
 
     var rock1 = new sjs.Sprite('rock.png', background);
-    rock1.y = 140;
-    rock1.x = 150;
+    rock1.move(150, 140);
     var rock2 = new sjs.Sprite('rock.png', background);
-    rock2.y = 140;
-    rock2.x = 350;
+    rock2.move(350, 140);
 
     var sprite = new sjs.Sprite('character.png');
-    sprite.x = 50;
-    sprite.y = 80;
+    sprite.move(50, 80);
     sprite.size(21, 51);
 
     var cycle = new sjs.Cycle([[4, 3, 2],
