@@ -108,23 +108,23 @@ Both parameters are optionnal. If you want to set the layer but not any image::
     var sprite = sjs.Sprite(false, <layer>)
 
 For performance reasons *there have been an API change* on the way the attributes can be set, please read the following.
-Sprites provide have following attributes *read only* attributes::
+Sprites have those *read only* attributes::
 
     sprite.y
     sprite.x
-    sprite.w // Controls the visible surface of the image. To have repeating sprites
-             // set the width or height value bigger than the size of the image.
+    sprite.w        // Controls the visible surface of the image. To have repeating sprites
+                    // set the width or height value bigger than the size of the image.
     sprite.h
 
-    sprite.xoffset // offset in the image to start painting in the view surface
+    sprite.xoffset  // offset in the image to start painting in the view surface
     sprite.yoffset
     sprite.xscale
     sprite.yscale
-    sprite.angle   // use radians
-    sprite.opacity // use float in the range 0-1
-    sprite.color   // Background color of the sprite. Use the rgb/hexadecimal CSS notation.
+    sprite.angle    // use radians
+    sprite.opacity  // use float in the range 0-1
+    sprite.color    // Background color of the sprite. Use the rgb/hexadecimal CSS notation.
 
-If you want to change any of those attributes use the getters:
+If you want to change any of those attributes use the following setters::
 
     sprite.setX(5);
     sprite.setY(5);
@@ -139,7 +139,7 @@ Or one of the helper methods::
     sprite.offset(x, y)
     sprite.size(w, h)    // set the width and height of the visible sprite
 
-To appy some physic transformation on the sprites you can use those helpers::
+To appy handle simple physic with the sprites you can use those helpers::
 
     sprite.xv              // horizontal velocity
     sprite.yv              // vertical velocity
