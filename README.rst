@@ -86,12 +86,16 @@ The canvas will be automaticaly cleared by the game ticker. If you don't need it
 
     var background = Layer('background', {useCanvas:true, autoClear:false});
 
-Mobile performances can be very weak depending on the phone. Here is what we got using the particules test::
+Performances on particle test can be quite different depending on the device and browser::
 
-    * Android emulator: 10 sprites
-    * HTC Hero: 10 sprites
-    * iPhone 3G: 20-25 sprites
-    * HTC Desire: 40-45 sprites
++------------------------+---------------+-------------+---------------+---------------------+
+| Browsers               | Chrome linux  | Opera linux | Firefox linux | HTC Desire (webkit) |
++========================+===============+=============+===============+=====================+
+| HTML backend           | 2000          | 60          | 500           | 120                 |
++------------------------+---------------+-------------+---------------+---------------------+
+| Canvas backend         | 1300          | 100         | 300           | 80                  |
++------------------------+---------------+-------------+---------------+---------------------+
+
 
 
 Sprite object public methods and attributes

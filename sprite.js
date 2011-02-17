@@ -47,7 +47,7 @@ var sjs = {
     Ticker: Ticker,
     Input: Input,
     Layer: Layer,
-    useCanvas: (window.location.href.indexOf('canvas') != -1),
+    useCanvas: (global.location.href.indexOf('canvas') != -1),
     layers: {},
     dom:null
 };
@@ -739,7 +739,7 @@ function _Input() {
     addEvent("keypress", function(e) {});
     // make sure that the keyboard is reseted when
     // the user leave the page
-    /*global.addEventListener("blur", function (e) {
+    global.addEventListener("blur", function (e) {
         that.keyboard = {}
         that.keydown = false;
         that.mousedown = false;
@@ -758,7 +758,7 @@ function _Input() {
             document.addEventListener('click', listener, false);
             sjs.dom.appendChild(div);
         }
-    }, false);*/
+    }, false);
 }
 
 _Input.prototype.arrows = function arrows() {
