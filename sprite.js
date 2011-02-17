@@ -481,6 +481,10 @@ Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
        || this.isPointIn(sprite.x, sprite.y + sprite.h));
 };
 
+Sprite.prototype.distance = function distance(x, y) {
+    return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) + Math.pow(this.y + this.h/2 - y, 2));
+}
+
 Sprite.prototype.collidesWith = function collidesWith(sprites) {
     // detect arrays
     if(sprites.length !== undefined) {

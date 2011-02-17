@@ -146,12 +146,14 @@ To appy handle simple physic with the sprites you can use those helpers::
     sprite.rv              // radial velocity
     sprite.applyVelocity() // apply all the defined velocities to the current Sprite
 
-    sprite.isPointIn(x, y) // return true if the point (x,y) is within
+    sprite.isPointIn(x, y) // return true if the point (x, y) is within
                            // the sprite surface (angles don't affect this function)
 
     sprite.collidesWith(Sprite) // return true if the Sprite is in
                                 // collision with the other Sprite (angles don't affect this function).
                                 // You can also pass an array of sprites to the method.
+
+    sprite.distance(x, y)       // return the distance between the sprite center and the point (x, y)
 
 Other important methods::
 
