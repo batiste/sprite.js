@@ -86,7 +86,7 @@ The canvas will be automaticaly cleared by the game ticker. If you don't need it
 
     var background = Layer('background', {useCanvas:true, autoClear:false});
 
-Performances on particle test can be quite different depending on the device and browser::
+Performances on particle test can be quite different depending on the device and browser:
 
 +------------------------+---------------+-------------+---------------+---------------------+
 | Browsers               | Chrome linux  | Opera linux | Firefox linux | HTC Desire (webkit) |
