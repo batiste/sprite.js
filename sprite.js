@@ -333,6 +333,8 @@ Sprite.prototype.remove = function remove() {
 Sprite.prototype.update = function updateDomProperties () {
     /* This is the CPU heavy function. */
     if(this.layer.useCanvas == true) {
+        if(this.layer.webGL)
+            return this.webGLUpdate();
         return this.canvasUpdate();
     }
     if(!this.changed)
@@ -420,6 +422,42 @@ Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
     ctx.restore();
     return this;
 };
+
+Sprite.prototype.webGLUpdate = function webGLUpdate () {
+    gl = this.layer.ctx;
+    var texture = gl.createTexture();
+    texture.image = this.img;
+
+
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.img);
+    //gl.texImage2D(gl.TEXTURE_2D, 0, this.img, true);
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+
+    gl.generateMipmap(gl.TEXTURE_2D);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+
+
+    /*var squareVertexPositionBuffer = gl.createBuffer();
+    console.log(squareVertexPositionBuffer)
+    squareVertexPositionBuffer.itemSize = 3;
+    squareVertexPositionBuffer.numItems = 4;
+    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+    vertices = [
+         1.0,  1.0,  0.0,
+        -1.0,  1.0,  0.0,
+         1.0, -1.0,  0.0,
+        -1.0, -1.0,  0.0
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);*/
+    return this;
+}
 
 Sprite.prototype.toString = function () {
     return String(this.x) + ',' + String(this.y);
@@ -790,6 +828,11 @@ function Layer(name, options) {
     else
         this.useCanvas = options.useCanvas;
 
+    if(options.webGL === undefined)
+        this.webGL = false;
+    else
+        this.webGL = options.webGL;
+
     this.name = name;
     if(sjs.layers[name] === undefined)
         sjs.layers[name] = this;
@@ -812,9 +855,16 @@ function Layer(name, options) {
             domElement.style.left = '0px';
             domElement.id = name;
             sjs.dom.appendChild(domElement);
+
         }
         this.dom = domElement;
-        this.ctx = domElement.getContext('2d');
+        if(this.webGL) {
+            this.ctx = domElement.getContext("webkit-3d");
+            this.ctx.viewportWidth = domElement.width;
+            this.ctx.viewportHeight = domElement.height;
+        } else {
+            this.ctx = domElement.getContext('2d');
+        }
     } else {
         if (!domElement) {
             domElement = document.createElement('div');
@@ -831,7 +881,7 @@ function Layer(name, options) {
 }
 
 Layer.prototype.clear = function() {
-    this.ctx.clearRect(0, 0, this.dom.width, this.dom.height);
+    //this.ctx.clearRect(0, 0, this.dom.width, this.dom.height);
 }
 
 Layer.prototype.addSprite = function addSprite(sprite) {

@@ -27,12 +27,13 @@ window.onload = function() {
 
     sjs.h = window.innerHeight;
     sjs.w = window.innerWidth;
+    var webgl = sjs.Layer('webgl', {useCanvas:true, webGL:true});
     var particules = [];
 
     function paint() {
 
         if(ticker.load <= 80) {
-            particule = new sjs.Sprite('particule.png');
+            particule = new sjs.Sprite('particule.png', webgl);
             particule.setX(sjs.w / 2);
             particule.setY(sjs.h / 3);
             particule.xv = (Math.random() - 0.5) * 2;
