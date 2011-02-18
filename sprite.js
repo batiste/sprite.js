@@ -423,39 +423,20 @@ Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
     return this;
 };
 
+function attributeSetFloats(gl, prog, attr_name, rsize, arr) {
+    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(arr),
+        gl.STATIC_DRAW);
+    var attr = gl.getAttribLocation(prog, attr_name);
+    gl.enableVertexAttribArray(attr);
+    gl.vertexAttribPointer(attr, rsize, gl.FLOAT, false, 0, 0);
+}
+
 Sprite.prototype.webGLUpdate = function webGLUpdate () {
     gl = this.layer.ctx;
-    var texture = gl.createTexture();
-    texture.image = this.img;
 
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.img);
-    //gl.texImage2D(gl.TEXTURE_2D, 0, this.img, true);
-
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
-
-    gl.generateMipmap(gl.TEXTURE_2D);
-
-    gl.bindTexture(gl.TEXTURE_2D, null);
-
-
-    /*var squareVertexPositionBuffer = gl.createBuffer();
-    console.log(squareVertexPositionBuffer)
-    squareVertexPositionBuffer.itemSize = 3;
-    squareVertexPositionBuffer.numItems = 4;
-    gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
-    vertices = [
-         1.0,  1.0,  0.0,
-        -1.0,  1.0,  0.0,
-         1.0, -1.0,  0.0,
-        -1.0, -1.0,  0.0
-    ];
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);*/
     return this;
 }
 
@@ -634,6 +615,9 @@ _Ticker.prototype.run = function() {
     for(var name in sjs.layers) {
         var layer = sjs.layers[name];
         if(layer.useCanvas && layer.autoClear) {
+            var gl = layer.ctx;
+            //gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+            gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
             // try a smarter way to clear
             /*var xmin=0, ymin=0, xmax=0, ymax=0;
             for(var index in layer.sprites) {
@@ -648,7 +632,7 @@ _Ticker.prototype.run = function() {
                     ymax = sp.y + sp.h
             }
             layer.ctx.clearRect(xmin, ymin, xmax - xmin, ymax - ymin);*/
-            layer.clear();
+            //layer.clear();
 
         }
         // trick to clear canvas, doesn't seems to do any better according to tests
@@ -806,6 +790,33 @@ _Input.prototype.arrows = function arrows() {
 
 var layerZindex = 1;
 
+function shaderProgram(gl) {
+    var prog = gl.createProgram();
+    var addshader = function(type, source) {
+        var s = gl.createShader((type == 'vertex') ?
+            gl.VERTEX_SHADER : gl.FRAGMENT_SHADER);
+        gl.shaderSource(s, source);
+        gl.compileShader(s);
+        if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) {
+            throw "Could not compile "+type+
+                " shader:\n\n"+gl.getShaderInfoLog(s);
+        }
+        gl.attachShader(prog, s);
+    };
+    addshader('vertex', "attribute vec3 pos;"+
+        "void main() {"+
+        "   gl_Position = vec4(pos, 2.0);"+
+        "}");
+    addshader('fragment', "void main() {"+
+        "   gl_FragColor = vec4(0.5, 0.5, 1.0, 1.0);"+
+        "}");
+    gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+        throw "Could not link the shader program!";
+    }
+    return prog;
+}
+
 function Layer(name, options) {
 
     var canvas, domElement;
@@ -860,8 +871,27 @@ function Layer(name, options) {
         this.dom = domElement;
         if(this.webGL) {
             this.ctx = domElement.getContext("webkit-3d");
-            this.ctx.viewportWidth = domElement.width;
-            this.ctx.viewportHeight = domElement.height;
+
+            var gl = this.ctx;
+            gl.viewportWidth = domElement.width;
+            gl.viewportHeight = domElement.height;
+
+            gl.clearColor(0.8, 0.8, 0.8, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+
+            this.prog = shaderProgram(gl);
+            gl.useProgram(this.prog);
+
+            attributeSetFloats(gl, this.prog, "pos", 3, [
+                -1, 0, 0,
+                0, 1, 0,
+                0, -1, 0,
+                1, 0, 0
+            ]);
+
+            //gl.enable(gl.DEPTH_TEST);
+            //gl.depthFunc(gl.LEQUAL);
+
         } else {
             this.ctx = domElement.getContext('2d');
         }
