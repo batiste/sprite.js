@@ -47,7 +47,7 @@ var sjs = {
     Ticker: Ticker,
     Input: Input,
     Layer: Layer,
-    useCanvas: (global.location.href.indexOf('canvas') != -1),
+    useCanvas: (window.location.href.indexOf('canvas') != -1),
     layers: {},
     dom:null
 };
@@ -308,6 +308,46 @@ Sprite.prototype.applyVelocity = function (ticks) {
     return this;
 };
 
+Sprite.prototype.reverseVelocity = function (ticks) {
+    if(ticks === undefined)
+        ticks = 1;
+    if(this.xv != 0)
+        this.setX(this.x-this.xv*ticks);
+    if(this.yv != 0)
+        this.setY(this.y-this.yv*ticks);
+    if(this.rv != 0)
+        this.setAngle(this.angle-this.rv*ticks);
+    return this;
+};
+
+Sprite.prototype.applyXVelocity = function (ticks) {
+    if(ticks === undefined)
+        ticks = 1;
+    if(this.xv != 0)
+        this.setX(this.x+this.xv*ticks);
+}
+
+Sprite.prototype.reverseXVelocity = function (ticks) {
+    if(ticks === undefined)
+        ticks = 1;
+    if(this.xv != 0)
+        this.setX(this.x-this.xv*ticks);
+}
+
+Sprite.prototype.applyYVelocity = function (ticks) {
+    if(ticks === undefined)
+        ticks = 1;
+    if(this.yv != 0)
+        this.setY(this.y+this.yv*ticks);
+}
+
+Sprite.prototype.reverseYVelocity = function (ticks) {
+    if(ticks === undefined)
+        ticks = 1;
+    if(this.yv != 0)
+        this.setY(this.y-this.yv*ticks);
+}
+
 Sprite.prototype.offset = function (x, y) {
     this.setXOffset(x);
     this.setYOffset(y);
@@ -470,19 +510,23 @@ Sprite.prototype.loadImg = function (src, resetSize) {
 
 Sprite.prototype.isPointIn = function pointIn(x, y) {
     // return true if the point is in the sprite surface
-    return (x >= this.x && x <= this.x+this.w
-        && y >= this.y && y <= this.y+this.h)
+    return (x >= this.x && x <= this.x+this.w - 1
+        && y >= this.y && y <= this.y+this.h - 1)
 };
 
 Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
     return (this.isPointIn(sprite.x, sprite.y)
-       || this.isPointIn(sprite.x+sprite.w, sprite.y)
-       || this.isPointIn(sprite.x+sprite.w, sprite.y)
-       || this.isPointIn(sprite.x, sprite.y + sprite.h));
+       || this.isPointIn(sprite.x + sprite.w - 1, sprite.y)
+       || this.isPointIn(sprite.x + sprite.w - 1, sprite.y + sprite.h - 1)
+       || this.isPointIn(sprite.x, sprite.y + sprite.h - 1));
 };
 
 Sprite.prototype.distance = function distance(x, y) {
     return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) + Math.pow(this.y + this.h/2 - y, 2));
+}
+
+Sprite.prototype.center = function center() {
+    return [this.x + this.w/2, this.y + this.h/2];
 }
 
 Sprite.prototype.collidesWith = function collidesWith(sprites) {
@@ -543,6 +587,14 @@ Cycle.prototype.reset = function resetCycle() {
     for(var j=0, sprite; sprite = this.sprites[j]; j++) {
         sprite.setXOffset(this.triplets[0][0]);
         sprite.setYOffset(this.triplets[0][1]);
+    }
+    return this;
+};
+
+Cycle.prototype.goto = function gotoCycle(n) {
+    for(var j=0, sprite; sprite = this.sprites[j]; j++) {
+        sprite.setXOffset(this.triplets[n][0]);
+        sprite.setYOffset(this.triplets[n][1]);
     }
     return this;
 };
@@ -739,7 +791,7 @@ function _Input() {
     addEvent("keypress", function(e) {});
     // make sure that the keyboard is reseted when
     // the user leave the page
-    global.addEventListener("blur", function (e) {
+    /*global.addEventListener("blur", function (e) {
         that.keyboard = {}
         that.keydown = false;
         that.mousedown = false;
@@ -758,7 +810,7 @@ function _Input() {
             document.addEventListener('click', listener, false);
             sjs.dom.appendChild(div);
         }
-    }, false);
+    }, false);*/
 }
 
 _Input.prototype.arrows = function arrows() {

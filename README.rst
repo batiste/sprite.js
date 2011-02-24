@@ -145,10 +145,16 @@ Or one of the helper methods::
 
 To appy handle simple physic with the sprites you can use those helpers::
 
-    sprite.xv              // horizontal velocity
-    sprite.yv              // vertical velocity
-    sprite.rv              // radial velocity
-    sprite.applyVelocity() // apply all the defined velocities to the current Sprite
+    sprite.xv                // horizontal velocity
+    sprite.yv                // vertical velocity
+    sprite.rv                // radial velocity
+    sprite.applyVelocity()   // apply all velocities on the current Sprite
+    sprite.reverseVelocity() // apply all the negative velocities on the current Sprite
+
+    sprite.applyXVelocity()    // apply the horizontal xv velocity
+    sprite.applyYVelocity()    // apply the vertical yv velocity
+    sprite.reverseXVelocity()  // apply the horizontal xv velocity negatively
+    sprite.reverseYVelocity()  // apply the vertical yv velocity negatively
 
     sprite.isPointIn(x, y) // return true if the point (x, y) is within
                            // the sprite surface (angles don't affect this function)
@@ -226,8 +232,9 @@ cycle applies to. this is a cycle with 3 position, each lasting 5 game ticks::
     var sprite = sjs.Sprite("walk.png")
     cycle.sprites = [sprite];
 
-    cycle.next() // apply the next cycle to the sprite
+    cycle.next()  // apply the next cycle to the sprite
     cycle.next(2) // apply the second next cycle to the sprite
+    cycle.goto(1) // go to the second cycle triplet
     cycle.reset() // reset the cycle to the original position
     cycle.repeat = false // if set to false, the animation will stop automaticaly after one run
 
