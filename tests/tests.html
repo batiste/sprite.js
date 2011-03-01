@@ -56,7 +56,7 @@ window.onload = function() {
     assertFalse(sp1.isPointIn(15, 21), "isPointIn test3");
 
     assertTrue(sp1.isPointIn(15, 15), "isPointIn test4");
-    assertTrue(sp1.isPointIn(15, 20), "isPointIn test5");
+    assertFalse(sp1.isPointIn(15, 20), "isPointIn test5");
 
     var sp2 = new sjs.Sprite('character.png');
     sp2.size(10, 10);

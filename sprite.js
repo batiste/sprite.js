@@ -514,7 +514,8 @@ Sprite.prototype.isPointIn = function pointIn(x, y) {
         && y >= this.y && y <= this.y+this.h - 1)
 };
 
-Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
+Sprite.prototype.collidesWith = function collidesWith(sprite) {
+    // Return true if the current sprite has any collision with the Array provided
     if(sprite.x > this.x) {
         var x_inter = sprite.x - this.x < this.w;
     } else {
@@ -532,6 +533,7 @@ Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
 };
 
 Sprite.prototype.distance = function distance(x, y) {
+    // Return the distance between this sprite and the point (x, y)
     return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) + Math.pow(this.y + this.h/2 - y, 2));
 }
 
@@ -539,22 +541,20 @@ Sprite.prototype.center = function center() {
     return [this.x + this.w/2, this.y + this.h/2];
 }
 
-Sprite.prototype.collidesWith = function collidesWith(sprites) {
-    // detect arrays
-    if(sprites.length !== undefined) {
-        for(var i=0, sprite; sprite = sprites[i]; i++) {
-            if(this.areVerticesIn(sprite)) {
-                return true;
-            }
+Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
+    // Return true if the current sprite has any collision with the Array provided
+    // a sprite cannot collides with itsels
+    for(var i=0, sprite; sprite = sprites[i]; i++) {
+        if(this!=sprite && this.collidesWith(sprite)) {
+            return true;
         }
-        return false;
     }
-    return this.areVerticesIn(sprites);
+    return false;
 };
 
 function Cycle(triplets) {
-    /* Cycle for the Sprite image.
-    A cycle is a list of triplet (x offset, y offset, game tick duration) */
+    // Cycle for the Sprite image.
+    // A cycle is a list of triplet (x offset, y offset, game tick duration)
     this.triplets = triplets;
     // total duration of the animation in ticks
     this.cycleDuration = 0;
