@@ -391,7 +391,7 @@ Sprite.prototype.update = function updateDomProperties () {
     if(this._dirty['x'])
        style.left=(this.x | 0)+'px';
     if(this._dirty['xoffset'] || this._dirty['yoffset'])
-        style.backgroundPosition=-Math.round(this.xoffset)+'px '+-Math.round(this.yoffset)+'px';
+        style.backgroundPosition=-(this.xoffset | 0)+'px '+-(this.yoffset | 0)+'px';
 
     if(this._dirty['opacity'])
         style.opacity = this.opacity;
@@ -515,10 +515,20 @@ Sprite.prototype.isPointIn = function pointIn(x, y) {
 };
 
 Sprite.prototype.areVerticesIn = function areVerticesIn(sprite) {
-    return (this.isPointIn(sprite.x, sprite.y)
-       || this.isPointIn(sprite.x + sprite.w - 1, sprite.y)
-       || this.isPointIn(sprite.x + sprite.w - 1, sprite.y + sprite.h - 1)
-       || this.isPointIn(sprite.x, sprite.y + sprite.h - 1));
+    if(sprite.x > this.x) {
+        var x_inter = sprite.x - this.x < this.w;
+    } else {
+        var x_inter = this.x - sprite.x < sprite.w;
+    }
+    if(x_inter == false)
+        return false;
+
+    if(sprite.y > this.y) {
+        var y_inter = sprite.y - this.y < this.h;
+    } else {
+        var y_inter = this.y - sprite.y < sprite.h;
+    }
+    return y_inter;
 };
 
 Sprite.prototype.distance = function distance(x, y) {
@@ -533,13 +543,13 @@ Sprite.prototype.collidesWith = function collidesWith(sprites) {
     // detect arrays
     if(sprites.length !== undefined) {
         for(var i=0, sprite; sprite = sprites[i]; i++) {
-            if(this.areVerticesIn(sprite) || sprite.areVerticesIn(this)) {
+            if(this.areVerticesIn(sprite)) {
                 return true;
             }
         }
         return false;
     }
-    return this.areVerticesIn(sprites) || sprites.areVerticesIn(this);
+    return this.areVerticesIn(sprites);
 };
 
 function Cycle(triplets) {
@@ -628,7 +638,7 @@ function _Ticker(tickDuration, paint) {
 }
 
 _Ticker.prototype.next = function() {
-    var ticksElapsed = Math.round((this.now - this.start) / this.tickDuration);
+    var ticksElapsed = ((this.now - this.start) / this.tickDuration) | 0;
     this.lastTicksElapsed = ticksElapsed - this.currentTick;
     this.currentTick = ticksElapsed;
     return this.lastTicksElapsed;
@@ -675,7 +685,8 @@ _Ticker.prototype.run = function() {
     inputSingleton.keyboardChange = {};
 
     this.timeToPaint = (new Date().getTime()) - this.now;
-    this.load = Math.round((this.timeToPaint / this.tickDuration) * 100);
+    // spread the load value on 2 frames so the value is more stable
+    this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) / 2 | 0;
     // We need some pause to let the browser catch up the update. Here at least 16 ms of pause
     var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 16);
     this.timeout = setTimeout(function(){t.run()}, _nextPaint);
