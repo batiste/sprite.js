@@ -62,7 +62,7 @@ window.onload = function() {
         }
 
 
-        if(sprite.collidesWith([rock1, rock2, ground])) {
+        if(sprite.collidesWithArray([rock1, rock2, ground])) {
             yv = 0;
             if(input.keyboard.up) {
                 yv = -5;
