@@ -1,0 +1,71 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test 32 sprites in a cycle animation</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+</head>
+<body>
+
+<p>120 falling crates: <span id="result"></span> <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
+
+</body>
+<script src="../sprite.js"></script>
+<script>
+
+window.onload = function() {
+sjs.loadImages(['crate.png'], function() {
+
+    if(window.location.href.indexOf('canvas') != -1) {
+        sjs.use_canvas = true;
+        document.getElementById('canvas-mode').style.display = 'none';
+    } else {
+        document.getElementById('html-mode').style.display = 'none';
+    }
+    result = document.getElementById('result');
+
+    sjs.w = 600;
+    sjs.h = 600;
+
+    var crates = [];
+
+    for(var i=0; i<120; i++) {
+        var sp = new sjs.Sprite('crate.png');
+        sp.move((i % 12) * 35, (i/12.0|0)* 50);
+        sp.update();
+        crates.push(sp);
+    }
+
+    function hasCollision(crate) {
+        if(crate.y > 600 - 32)
+            return true;
+        if(crate.collidesWithArray(crates))
+            return true;
+        return false;
+    }
+
+    var gravity = 0.5;
+
+    function paint() {
+        for(var i=0; i<crates.length; i++) {
+            var crate = crates[i];
+            crate.yv += gravity;
+            crate.applyYVelocity();
+            if(hasCollision(crate)) {
+                crate.reverseYVelocity();
+                crate.yv = 0;
+            }
+            crate.update()
+        }
+
+        if(ticker.currentTick % 30 == 0) {
+            result.innerHTML = 'system load ' + ticker.load + '%';
+        }
+    };
+    var ticker = new sjs.Ticker(35, paint);
+    ticker.run();
+
+});
+
+};
+</script>
+</html>
