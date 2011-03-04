@@ -6,12 +6,14 @@
 </head>
 <body style="overflow:hidden">
 
-<p>This demo is gonna produce particles and stop when 80% percent javascript load is reached.<br>
-<span id="nb"></span> particules, system load <span id="load"></span>% <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
+<p>This demo is gonna produce particles and stop when 70% percent javascript load is reached.<br>
+<span id="nb"></span> particles, system load <span id="load"></span>% <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
 
 </body>
 <script src="../sprite.js"></script>
 <script>
+
+
 
 window.onload = function() {
 
@@ -27,37 +29,46 @@ window.onload = function() {
 
     sjs.h = window.innerHeight;
     sjs.w = window.innerWidth;
-    var particules = [];
+
+    var particles = [];
+
+    function createParticle() {
+        particle = new sjs.Sprite('particule.png');
+        particle.setX(sjs.w / 2);
+        particle.setY(sjs.h / 3);
+        particle.xv = (Math.random() - 0.5) * 2;
+        particle.yv = (Math.random() - 1) * 2;
+        particles.push(particle);
+    }
 
     function paint() {
 
-        if(ticker.load <= 80) {
-            particule = new sjs.Sprite('particule.png');
-            particule.setX(sjs.w / 2);
-            particule.setY(sjs.h / 3);
-            particule.xv = (Math.random() - 0.5) * 2;
-            particule.yv = (Math.random() - 1) * 2;
-            particules.push(particule);
+        if(ticker.load < 70) {
+            createParticle();
+            createParticle();
+            createParticle();
+            createParticle();
+            createParticle();
         }
-        if(ticker.load > 91) {
-            particules[0].remove();
-            particules.splice(0, 1);
+        if(ticker.load > 80) {
+            particles[0].remove();
+            particles.splice(0, 1);
         }
-        for(var i=0; i<particules.length; i++) {
-            var particule = particules[i];
-            particule.yv += 0.001;
-            particule.move(particule.xv, particule.yv);
-            if(particule.y > window.innerHeight) {
-                particules.splice(i, 1);
+        for(var i=0; i<particles.length; i++) {
+            var particle = particles[i];
+            particle.yv += 0.003;
+            particle.move(particle.xv, particle.yv);
+            if(particle.y > window.innerHeight) {
+                particles.splice(i, 1);
                 i--;
-                particule.remove();
+                particle.remove();
             } else {
-                particule.update();
+                particle.update();
             }
         }
         if(ticker.currentTick % 30 == 0) {
             l.innerHTML = ticker.load;
-            nb.innerHTML = particules.length;
+            nb.innerHTML = particles.length;
         }
 
     };

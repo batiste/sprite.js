@@ -148,6 +148,10 @@ function Sprite(src, layer) {
     // positions
     this.y = 0;
     this.x = 0;
+    this._x_before = 0;
+    this._x_rounded = 0;
+    this._y_before = 0;
+    this._y_rounded = 0;
 
     //velocity
     this.xv = 0;
@@ -155,6 +159,7 @@ function Sprite(src, layer) {
     this.rv = 0;
 
     // image
+    this.src = null;
     this.img = null;
     this.imgNaturalWidth = null;
     this.imgNaturalHeight = null;
@@ -203,15 +208,27 @@ Sprite.prototype.constructor = Sprite;
 
 Sprite.prototype.setX = function setX(value) {
     this.x = value;
-    this._dirty['x'] = true;
+    value = value | 0;
+    this._x_rounded = value;
     this.changed = true;
+    if(this._x_before == value) {
+        this._dirty['x'] = false;
+    } else {
+        this._dirty['x'] = true;
+    }
     return this;
 }
 
 Sprite.prototype.setY = function setX(value) {
     this.y = value;
-    this._dirty['y'] = true;
+    value = value | 0;
+    this._y_rounded = value;
     this.changed = true;
+    if(this._y_before == value) {
+        this._dirty['y'] = false;
+    } else {
+        this._dirty['y'] = true;
+    }
     return this;
 }
 
@@ -371,7 +388,12 @@ Sprite.prototype.remove = function remove() {
 };
 
 Sprite.prototype.update = function updateDomProperties () {
-    /* This is the CPU heavy function. */
+    // This is the CPU heavy function.
+
+    // cache rounded positions, it's used to avoid unecessary update
+    this._x_before = this._x_rounded;
+    this._y_before = this._y_rounded;
+
     if(this.layer.useCanvas == true) {
         return this.canvasUpdate();
     }
@@ -387,9 +409,9 @@ Sprite.prototype.update = function updateDomProperties () {
     // translate and translate3d doesn't seems to offer any speedup
     // in my tests.
     if(this._dirty['y'])
-        style.top=(this.y | 0)+'px';
+        style.top=this._y_rounded+'px';
     if(this._dirty['x'])
-       style.left=(this.x | 0)+'px';
+       style.left=this._x_rounded+'px';
     if(this._dirty['xoffset'] || this._dirty['yoffset'])
         style.backgroundPosition=-(this.xoffset | 0)+'px '+-(this.yoffset | 0)+'px';
 
@@ -472,6 +494,9 @@ Sprite.prototype.onload = function(callback) {
 };
 
 Sprite.prototype.loadImg = function (src, resetSize) {
+    // the image exact source value will change accoring to the
+    // hostname, this is useful to retain the original source value here.
+    this.src = src;
     // check if the image is already in the cache
     if(!spriteList[src]) {
         // if not we create the image in the cache
@@ -517,17 +542,17 @@ Sprite.prototype.isPointIn = function pointIn(x, y) {
 Sprite.prototype.collidesWith = function collidesWith(sprite) {
     // Return true if the current sprite has any collision with the Array provided
     if(sprite.x > this.x) {
-        var x_inter = sprite.x - this.x < this.w;
+        var x_inter = sprite._x_rounded - this._x_rounded < this.w - 1;
     } else {
-        var x_inter = this.x - sprite.x < sprite.w;
+        var x_inter = this._x_rounded - sprite._x_rounded  < sprite.w;
     }
     if(x_inter == false)
         return false;
 
     if(sprite.y > this.y) {
-        var y_inter = sprite.y - this.y < this.h;
+        var y_inter = sprite._y_rounded - this._y_rounded < this.h;
     } else {
-        var y_inter = this.y - sprite.y < sprite.h;
+        var y_inter = this._y_rounded - sprite._y_rounded < sprite.h;
     }
     return y_inter;
 };
@@ -918,7 +943,7 @@ function initDom() {
     if(!sjs.dom) {
         var div = document.createElement('div');
         div.style.overflow = 'hidden';
-        div.style.position = 'absolute';
+        div.style.position = 'relative';
         div.id = 'sjs';
         document.body.appendChild(div);
         sjs.dom = div;
