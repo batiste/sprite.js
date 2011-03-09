@@ -138,10 +138,11 @@ If you want to change any of those attributes use the following setters::
 Or one of the helper methods::
 
     sprite.rotate(radians)
-    sprite.scale(x, y)   // if y is not defined, y take the same value as x
-    sprite.move(x, y)
+    sprite.scale(x, y)     // if y is not defined, y take the same value as x
+    sprite.move(x, y)      // move the sprite in the direction of the provided vector (x, y)
+    sprite.position(x, y)  // set the position of the sprite
     sprite.offset(x, y)
-    sprite.size(w, h)    // set the width and height of the visible sprite
+    sprite.size(w, h)      // set the width and height of the visible sprite
 
 To appy handle simple physic with the sprites you can use those helpers::
 
@@ -162,8 +163,8 @@ To appy handle simple physic with the sprites you can use those helpers::
     sprite.collidesWith(sprite) // return true if the sprite is in
                                 // collision with the other sprite (angles don't affect this function).
 
-    sprite.collidesWithArray([sprites]) // Same as collidesWith but you need to pass an array of sprite.
-                                        // The current sprite is filtered out of the test loop.
+    sprite.collidesWithArray([sprites]) // Search in  an array of sprite for a colliding sprite.
+                                        // If found, a sprite is returned.
 
     sprite.distance(x, y)       // return the distance between the sprite center and the point (x, y)
 

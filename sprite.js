@@ -274,6 +274,13 @@ Sprite.prototype.setColor = function setColor(value) {
     return this;
 }
 
+Sprite.prototype.setOpacity = function setOpacity(value) {
+    this.opacity = value;
+    this._dirty['opacity'] = true;
+    this.changed = true;
+    return this;
+}
+
 Sprite.prototype.setXScale = function setXscale(value) {
     this.xscale = value;
     this._dirty['xscale'] = true;
@@ -310,6 +317,12 @@ Sprite.prototype.scale = function (x, y) {
 Sprite.prototype.move = function (x, y) {
     this.setX(this.x+x);
     this.setY(this.y+y);
+    return this;
+};
+
+Sprite.prototype.position = function (x, y) {
+    this.setX(x);
+    this.setY(y);
     return this;
 };
 
@@ -571,7 +584,7 @@ Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
     // a sprite cannot collides with itsels
     for(var i=0, sprite; sprite = sprites[i]; i++) {
         if(this!=sprite && this.collidesWith(sprite)) {
-            return true;
+            return sprite;
         }
     }
     return false;
