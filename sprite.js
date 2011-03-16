@@ -49,14 +49,16 @@ var sjs = {
     Layer: Layer,
     useCanvas: (window.location.href.indexOf('canvas') != -1),
     layers: {},
-    dom:null
+    dom:null,
+    overlay:overlay,
+    reset:reset
 };
 
 function overlay(x, y, w, h) {
     var div = document.createElement('div');
     var s = div.style;
-    s.top = x + 'px';
-    s.left = y + 'px';
+    s.top = y + 'px';
+    s.left = x + 'px';
     s.width = w + 'px';
     s.height = h + 'px';
     s.color = '#fff';
@@ -65,6 +67,16 @@ function overlay(x, y, w, h) {
     s.backgroundColor = '#000';
     s.opacity = 0.8;
     return div;
+};
+
+function reset() {
+    for(l in this.layers) {
+        if(sjs.layers.hasOwnProperty(l)) {
+            sjs.dom.removeChild(sjs.layers[l].dom)
+            delete sjs.layers[l];
+        }
+    }
+    sjs.layers = {};
 }
 
 // a cache to load each sprite only one time
@@ -81,6 +93,8 @@ sjs.loadImages = function loadImages(images, callback) {
             toLoad += 1;
         }
     }
+    if(toLoad==0)
+        callback()
 
     function _loadImg(src) {
         var img = new Image();
@@ -157,6 +171,8 @@ function Sprite(src, layer) {
     this.xv = 0;
     this.yv = 0;
     this.rv = 0;
+
+    this.mass = 0;
 
     // image
     this.src = null;
@@ -651,10 +667,11 @@ Cycle.prototype.goto = function gotoCycle(n) {
 // than one of those.
 var tickerSingleton = false;
 function Ticker(tickDuration, paint) {
-    if(!tickerSingleton)
-        tickerSingleton = _Ticker(tickDuration, paint);
-    else
-        error("This framework doesn't support multiple tickers object.")
+    if(tickerSingleton) {
+        tickerSingleton.pause();
+        tickerSingleton.paint = function(){}
+    }
+    tickerSingleton = _Ticker(tickDuration, paint);
     return tickerSingleton;
 };
 
@@ -683,6 +700,8 @@ _Ticker.prototype.next = function() {
 };
 
 _Ticker.prototype.run = function() {
+    if(this.paused)
+        return
     var t = this;
     this.now = new Date().getTime();
     var ticksElapsed = this.next();
@@ -840,7 +859,7 @@ function _Input() {
     addEvent("keypress", function(e) {});
     // make sure that the keyboard is reseted when
     // the user leave the page
-    /*global.addEventListener("blur", function (e) {
+    global.addEventListener("blur", function (e) {
         that.keyboard = {}
         that.keydown = false;
         that.mousedown = false;
@@ -859,7 +878,7 @@ function _Input() {
             document.addEventListener('click', listener, false);
             sjs.dom.appendChild(div);
         }
-    }, false);*/
+    }, false);
 }
 
 _Input.prototype.arrows = function arrows() {
