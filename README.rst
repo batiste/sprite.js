@@ -86,9 +86,9 @@ Performances on particle test can be quite different depending on the device and
 Scene object
 ==============
 
-The scene object is where you all the Sprites are gonna be drawned. You always need to start by initialisasing a scene::
+The scene object is where all the Sprites will be drawned. You always need to start by creating a scene::
 
-    sjs.Scene({w:640, h:680});
+    var scene = sjs.Scene({w:640, h:680});
 
 A list of the different methods available on the Scene object::
 
