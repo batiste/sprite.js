@@ -14,17 +14,18 @@
 
 window.onload = function() {
 
-    var background =  new sjs.Layer('background');
-    var ground = new sjs.Sprite('ground.png', background);
+    var scene = sjs.Scene()
+    var background =  scene.Layer('background');
+    var ground = scene.Sprite('ground.png', background);
     ground.setW(window.innerWidth / 2);
     ground.move(0, 160);
 
-    var rock1 = new sjs.Sprite('rock.png', background);
+    var rock1 = scene.Sprite('rock.png', background);
     rock1.move(150, 140);
-    var rock2 = new sjs.Sprite('rock.png', background);
+    var rock2 = scene.Sprite('rock.png', background);
     rock2.move(350, 140);
 
-    var sprite = new sjs.Sprite('character.png');
+    var sprite = scene.Sprite('character.png');
     sprite.move(50, 80);
     sprite.size(21, 51);
 
@@ -88,7 +89,7 @@ window.onload = function() {
             result.innerHTML = 'system load ' + ticker.load + '%';
         }
     };
-    var ticker = new sjs.Ticker(35, paint);
+    var ticker = scene.Ticker(35, paint);
     ticker.run();
 
 };

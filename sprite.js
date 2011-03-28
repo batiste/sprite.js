@@ -21,7 +21,9 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/* Sprite.js coding guideline
+/* Sprite.js 0.8
+ *
+ * coding guideline
  *
  * CamelCase everywhere (I don't like it but it seems to the standard these days).
  * Private attributes should start with an underline.
@@ -41,19 +43,10 @@ if(!Object.defineProperty) {
 defineProperty = Object.defineProperty
 
 var sjs = {
-    Sprite: Sprite,
     Cycle: Cycle,
-    tproperty: false,
-    Ticker: Ticker,
     Input: Input,
-    Layer: Layer,
-    useCanvas: (window.location.href.indexOf('canvas') != -1),
-    layers: {},
-    dom:null,
-    overlay:overlay,
-    init:init,
-    reset:reset,
-    loadImages:loadImages
+    Scene: Scene,
+    overlay:overlay
 };
 
 function init_transform_property() {
@@ -66,20 +59,11 @@ function init_transform_property() {
     }
 }
 
-function init(w, h) {
-    if(!sjs.tproperty)
-        init_transform_property()
-    if(!sjs.dom) {
-        var div = document.createElement('div');
-        div.style.overflow = 'hidden';
-        div.style.position = 'relative';
-        div.id = 'sjs';
-        document.body.appendChild(div);
-        sjs.dom = div;
-        sjs.w = w || 480;
-        sjs.h = h || 320;
+function optionValue(options, name, default_value) {
+    if(options && options[name] !== undefined) {
+        return options[name];
     }
-    return sjs.dom;
+    return default_value
 }
 
 function overlay(x, y, w, h) {
@@ -97,29 +81,74 @@ function overlay(x, y, w, h) {
     return div;
 };
 
-function reset() {
+function Scene(options) {
+
+    if(this.constructor !== arguments.callee)
+        return new Scene(options);
+
+    if(!sjs.tproperty)
+        init_transform_property();
+
+    var div = document.createElement('div');
+    div.style.overflow = 'hidden';
+    div.style.position = 'relative';
+    div.id = 'sjs';
+    document.body.appendChild(div);
+    this.w = optionValue(options, 'w', 480);
+    this.h = optionValue(options, 'h', 320);
+    this.dom = div;
+    this.dom.style.width = this.w + 'px';
+    this.dom.style.height = this.h + 'px';
+    this.layers = {};
+    this.ticker = null;
+    this.useCanvas = optionValue(options, "useCanvas",
+        window.location.href.indexOf('canvas') != -1)
+
+    return this;
+}
+
+Scene.prototype.constructor = Scene;
+
+Scene.prototype.Sprite = function SceneSprite(src, layer) {
+    return new _Sprite(this, src, layer);
+}
+
+Scene.prototype.Layer = function SceneLayer(name, options) {
+    return Layer(this, name, options);
+}
+
+Scene.prototype.reset = function reset() {
     for(l in this.layers) {
-        if(sjs.layers.hasOwnProperty(l)) {
-            sjs.dom.removeChild(sjs.layers[l].dom)
-            delete sjs.layers[l];
+        if(this.layers.hasOwnProperty(l)) {
+            this.dom.removeChild(this.layers[l].dom)
+            delete this.layers[l];
         }
     }
     // remove remaining children
     while ( this.dom.childNodes.length >= 1 )
     {
-        sjs.dom.removeChild( sjs.dom.firstChild );
+        this.dom.removeChild( this.dom.firstChild );
     }
-    sjs.layers = {};
-    tickerSingleton.paint = function(){};
+    this.layers = {};
+    this.ticker = function(){};
 }
 
-// a cache to load each sprite only one time
+Scene.prototype.Ticker = function Ticker(tickDuration, paint) {
+    if(this.ticker) {
+        this.ticker.pause();
+        this.ticker.paint = function(){}
+    }
+    this.ticker = new _Ticker(this, tickDuration, paint);
+    return this.ticker;
+};
+
+// a global cache to load each sprite only one time
 var spriteList = {};
 
 // the shameful error function
 function error(msg) {alert(msg);}
 
-function loadImages(images, callback) {
+Scene.prototype.loadImages = function loadImages(images, callback) {
     /* function used to preload the sprite images */
     var toLoad = 0;
     for(var i=0; i<images.length; i++) {
@@ -137,7 +166,8 @@ function loadImages(images, callback) {
     div.style.paddingTop = (this.h / 2 - 16) + 'px';
 
     div.innerHTML = 'Loading';
-    sjs.dom.appendChild(div);
+    this.dom.appendChild(div);
+    var scene = this;
 
     function _loadImg(src) {
         spriteList[src].loading = true;
@@ -147,7 +177,7 @@ function loadImages(images, callback) {
             spriteList[src].loaded = true;
             toLoad -= 1;
             if(toLoad == 0) {
-                sjs.dom.removeChild(div);
+                scene.dom.removeChild(div);
                 callback();
             } else {
                 div.innerHTML = 'Loading ' + ((total - toLoad) / total * 100 | 0) + '%';
@@ -163,48 +193,12 @@ function loadImages(images, callback) {
     }
 }
 
-defineProperty(sjs, 'h', {
-    get:function() {return this._h},
-    set:function(value) {
-        this._h = value;
-        this.dom.style.height = value + 'px';
-    }
-});
+function _Sprite(scene, src, layer) {
 
-defineProperty(sjs, 'w', {
-    get:function() {return this._w},
-    set:function(value) {
-        this._w = value;
-        this.dom.style.width = value + 'px';
-    }
-});
-
-function Sprite(src, layer) {
-
-    if(this.constructor !== arguments.callee)
-        return new Sprite(src, layer);
-
+    this.scene = scene;
     var sp = this;
     this._dirty = {};
     this.changed = false;
-
-    function property(name, defaultValue, type) {
-        if(defaultValue === undefined)
-            sp['_'+name] = 0;
-        else
-            sp['_'+name] = defaultValue;
-
-        defineProperty(sp, name, {
-            get:function get() {return sp['_'+name]},
-            set:function set(value) {
-                sp['_'+name] = value;
-                if(!sp.layer.useCanvas) {
-                    sp._dirty[name] = true;
-                    sp.changed = true;
-                }
-            }
-        });
-    }
 
     // positions
     this.y = 0;
@@ -247,9 +241,9 @@ function Sprite(src, layer) {
     if(layer === undefined) {
         // important to delay the creation so useCanvas
         // can still be changed
-        if(sjs.layers['default'] === undefined)
-            sjs.layers["default"] = new Layer("default");
-        layer = sjs.layers['default'];
+        if(scene.layers['default'] === undefined)
+            scene.layers['default'] = scene.Layer(scene, "default");
+        layer = scene.layers['default'];
     }
     this.layer = layer;
     //this.layerIndex = layer.addSprite(this);
@@ -265,11 +259,11 @@ function Sprite(src, layer) {
     return this;
 }
 
-Sprite.prototype.constructor = Sprite;
+_Sprite.prototype.constructor = _Sprite;
 
 /* boilerplate setter functions */
 
-Sprite.prototype.setX = function setX(value) {
+_Sprite.prototype.setX = function setX(value) {
     this.x = value;
     value = value | 0;
     this._x_rounded = value;
@@ -282,7 +276,7 @@ Sprite.prototype.setX = function setX(value) {
     return this;
 }
 
-Sprite.prototype.setY = function setX(value) {
+_Sprite.prototype.setY = function setX(value) {
     this.y = value;
     value = value | 0;
     this._y_rounded = value;
@@ -295,63 +289,63 @@ Sprite.prototype.setY = function setX(value) {
     return this;
 }
 
-Sprite.prototype.setW = function setW(value) {
+_Sprite.prototype.setW = function setW(value) {
     this.w = value;
     this._dirty['w'] = true;
     this.changed = true;
     return this;
 }
 
-Sprite.prototype.setH = function setH(value) {
+_Sprite.prototype.setH = function setH(value) {
     this.h = value;
     this._dirty['h'] = true;
     this.changed = true;
     return this;
 }
 
-Sprite.prototype.setXOffset = function setXoffset(value) {
+_Sprite.prototype.setXOffset = function setXoffset(value) {
     this.xoffset = value;
     this._dirty['xoffset'] = true;
     this.changed = true;
     return this;
 }
 
-Sprite.prototype.setYOffset = function setYoffset(value) {
+_Sprite.prototype.setYOffset = function setYoffset(value) {
     this.yoffset = value;
     this._dirty['yoffset'] = true;
     this.changed = true;
     return this;
 }
 
-Sprite.prototype.setAngle = function setAngle(value) {
+_Sprite.prototype.setAngle = function setAngle(value) {
     this.angle = value;
     this._dirty['angle'] = true;
     this.changed = true;
     return this;
 }
 
-Sprite.prototype.setColor = function setColor(value) {
+_Sprite.prototype.setColor = function setColor(value) {
     this.color = value;
     this._dirty['color'] = true;
     this.changed = true;
     return this;
 }
 
-Sprite.prototype.setOpacity = function setOpacity(value) {
+_Sprite.prototype.setOpacity = function setOpacity(value) {
     this.opacity = value;
     this._dirty['opacity'] = true;
     this.changed = true;
     return this;
 }
 
-Sprite.prototype.setXScale = function setXscale(value) {
+_Sprite.prototype.setXScale = function setXscale(value) {
     this.xscale = value;
     this._dirty['xscale'] = true;
     this.changed = true;
     return this;
 }
 
-Sprite.prototype.setYScale = function setYscale(value) {
+_Sprite.prototype.setYScale = function setYscale(value) {
     this.yscale = value;
     this._dirty['yscale'] = true;
     this.changed = true;
@@ -360,12 +354,12 @@ Sprite.prototype.setYScale = function setYscale(value) {
 
 /* end of boilerplate setters */
 
-Sprite.prototype.rotate = function (v) {
+_Sprite.prototype.rotate = function (v) {
     this.setAngle(this.angle + v);
     return this;
 };
 
-Sprite.prototype.scale = function (x, y) {
+_Sprite.prototype.scale = function (x, y) {
     if(this.xscale != x) {
         this.setXScale(x);
     }
@@ -377,19 +371,19 @@ Sprite.prototype.scale = function (x, y) {
     return this;
 };
 
-Sprite.prototype.move = function (x, y) {
+_Sprite.prototype.move = function (x, y) {
     this.setX(this.x+x);
     this.setY(this.y+y);
     return this;
 };
 
-Sprite.prototype.position = function (x, y) {
+_Sprite.prototype.position = function (x, y) {
     this.setX(x);
     this.setY(y);
     return this;
 };
 
-Sprite.prototype.applyVelocity = function (ticks) {
+_Sprite.prototype.applyVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv != 0)
@@ -401,7 +395,7 @@ Sprite.prototype.applyVelocity = function (ticks) {
     return this;
 };
 
-Sprite.prototype.reverseVelocity = function (ticks) {
+_Sprite.prototype.reverseVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv != 0)
@@ -413,47 +407,47 @@ Sprite.prototype.reverseVelocity = function (ticks) {
     return this;
 };
 
-Sprite.prototype.applyXVelocity = function (ticks) {
+_Sprite.prototype.applyXVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv != 0)
         this.setX(this.x+this.xv*ticks);
 }
 
-Sprite.prototype.reverseXVelocity = function (ticks) {
+_Sprite.prototype.reverseXVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv != 0)
         this.setX(this.x-this.xv*ticks);
 }
 
-Sprite.prototype.applyYVelocity = function (ticks) {
+_Sprite.prototype.applyYVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.yv != 0)
         this.setY(this.y+this.yv*ticks);
 }
 
-Sprite.prototype.reverseYVelocity = function (ticks) {
+_Sprite.prototype.reverseYVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.yv != 0)
         this.setY(this.y-this.yv*ticks);
 }
 
-Sprite.prototype.offset = function (x, y) {
+_Sprite.prototype.offset = function (x, y) {
     this.setXOffset(x);
     this.setYOffset(y);
     return this;
 };
 
-Sprite.prototype.size = function (w, h) {
+_Sprite.prototype.size = function (w, h) {
     this.setW(w);
     this.setH(h);
     return this;
 };
 
-Sprite.prototype.remove = function remove() {
+_Sprite.prototype.remove = function remove() {
     if(this.layer.useCanvas == false) {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
@@ -463,7 +457,7 @@ Sprite.prototype.remove = function remove() {
     this.img = null;
 };
 
-Sprite.prototype.update = function updateDomProperties () {
+_Sprite.prototype.update = function updateDomProperties () {
     // This is the CPU heavy function.
 
     // cache rounded positions, it's used to avoid unecessary update
@@ -514,7 +508,7 @@ Sprite.prototype.update = function updateDomProperties () {
     return this;
 };
 
-Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
+_Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
     if(layer)
         var ctx = layer.ctx;
     else
@@ -559,17 +553,17 @@ Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
     return this;
 };
 
-Sprite.prototype.toString = function () {
+_Sprite.prototype.toString = function () {
     return String(this.x) + ',' + String(this.y);
 };
 
-Sprite.prototype.onload = function(callback) {
+_Sprite.prototype.onload = function(callback) {
     if(this.imgLoaded && this._callback) {
         this._callback = callback;
     }
 };
 
-Sprite.prototype.loadImg = function (src, resetSize) {
+_Sprite.prototype.loadImg = function (src, resetSize) {
     // the image exact source value will change accoring to the
     // hostname, this is useful to retain the original source value here.
     this.src = src;
@@ -609,13 +603,13 @@ Sprite.prototype.loadImg = function (src, resetSize) {
 };
 
 
-Sprite.prototype.isPointIn = function pointIn(x, y) {
+_Sprite.prototype.isPointIn = function pointIn(x, y) {
     // return true if the point is in the sprite surface
     return (x >= this.x && x <= this.x+this.w - 1
         && y >= this.y && y <= this.y+this.h - 1)
 };
 
-Sprite.prototype.collidesWith = function collidesWith(sprite) {
+_Sprite.prototype.collidesWith = function collidesWith(sprite) {
     // Return true if the current sprite has any collision with the Array provided
     if(sprite.x > this.x) {
         var x_inter = sprite._x_rounded - this._x_rounded < this.w - 1;
@@ -633,16 +627,16 @@ Sprite.prototype.collidesWith = function collidesWith(sprite) {
     return y_inter;
 };
 
-Sprite.prototype.distance = function distance(x, y) {
+_Sprite.prototype.distance = function distance(x, y) {
     // Return the distance between this sprite and the point (x, y)
     return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) + Math.pow(this.y + this.h/2 - y, 2));
 }
 
-Sprite.prototype.center = function center() {
+_Sprite.prototype.center = function center() {
     return [this.x + this.w/2, this.y + this.h/2];
 }
 
-Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
+_Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
     // Return true if the current sprite has any collision with the Array provided
     // a sprite cannot collides with itsels
     for(var i=0, sprite; sprite = sprites[i]; i++) {
@@ -714,19 +708,9 @@ Cycle.prototype.goto = function gotoCycle(n) {
     return this;
 };
 
-// the way things works, I don't see the point of having more
-// than one of those.
-var tickerSingleton = false;
-function Ticker(tickDuration, paint) {
-    if(tickerSingleton) {
-        tickerSingleton.pause();
-        tickerSingleton.paint = function(){}
-    }
-    tickerSingleton = _Ticker(tickDuration, paint);
-    return tickerSingleton;
-};
+function _Ticker(scene, tickDuration, paint) {
 
-function _Ticker(tickDuration, paint) {
+    this.scene = scene;
 
     if(this.constructor !== arguments.callee)
         return new _Ticker(tickDuration, paint);
@@ -763,8 +747,8 @@ _Ticker.prototype.run = function() {
         return;
     }
 
-    for(var name in sjs.layers) {
-        var layer = sjs.layers[name];
+    for(var name in this.scene.layers) {
+        var layer = this.scene.layers[name];
         if(layer.useCanvas && layer.autoClear) {
             // try a smarter way to clear
             /*var xmin=0, ymin=0, xmax=0, ymax=0;
@@ -915,24 +899,24 @@ function _Input() {
         that.keydown = false;
         that.mousedown = false;
         // create a semi transparent layer on the game
-        if(tickerSingleton && !tickerSingleton.paused) {
+        /*if(tickerSingleton && !tickerSingleton.paused) {
             tickerSingleton.pause();
-            var div = overlay(0, 0, sjs.w, sjs.h);
+            var div = overlay(0, 0, this.scene.w, this.scene.h);
             div.innerHTML = '<h1>Paused</h1><p>Click or press any key to resume.</p>';
             div.style.textAlign = 'center';
-            div.style.paddingTop = ((sjs.h/2) - 32)  + 'px';
+            div.style.paddingTop = ((this.scene.h/2) - 32)  + 'px';
             var listener = function(e) {
                 e.stopPropagation();
                 e.preventDefault();
-                sjs.dom.removeChild(div);
+                this.scene.dom.removeChild(div);
                 document.removeEventListener('click', listener, false);
                 document.removeEventListener('keyup', listener, false);
                 tickerSingleton.resume();
             }
             document.addEventListener('click', listener, false);
             document.addEventListener('keyup', listener, false);
-            sjs.dom.appendChild(div);
-        }
+            this.scene.dom.appendChild(div);
+        }*/
     }, false);
 }
 
@@ -943,17 +927,18 @@ _Input.prototype.arrows = function arrows() {
 
 var layerZindex = 1;
 
-function Layer(name, options) {
+function Layer(scene, name, options) {
 
     var canvas, domElement;
 
     if(this.constructor !== arguments.callee)
-        return new Layer(name, options);
+        return new Layer(scene, name, options);
 
     this.sprites = {};
+    this.scene = scene;
 
     if(options === undefined)
-        options = {useCanvas:sjs.useCanvas, autoClear:true}
+        options = {useCanvas:scene.useCanvas, autoClear:true}
 
     if(options.autoClear === undefined)
         this.autoClear = true;
@@ -961,13 +946,13 @@ function Layer(name, options) {
         this.autoClear = options.autoClear;
 
     if(options.useCanvas === undefined)
-        this.useCanvas = sjs.useCanvas;
+        this.useCanvas = this.scene.useCanvas;
     else
         this.useCanvas = options.useCanvas;
 
     this.name = name;
-    if(sjs.layers[name] === undefined)
-        sjs.layers[name] = this;
+    if(this.scene.layers[name] === undefined)
+        this.scene.layers[name] = this;
     else
         error('Layer '+ name + ' already exist.');
 
@@ -979,14 +964,14 @@ function Layer(name, options) {
         }
         if (!domElement) {
             domElement = document.createElement('canvas');
-            domElement.height = options.h || sjs.h;
-            domElement.width = options.w || sjs.w;
+            domElement.height = options.h || scene.h;
+            domElement.width = options.w || scene.w;
             domElement.style.position = 'absolute';
             domElement.style.zIndex = String(layerZindex);
             domElement.style.top = '0px';
             domElement.style.left = '0px';
             domElement.id = name;
-            sjs.dom.appendChild(domElement);
+            scene.dom.appendChild(domElement);
         }
         this.dom = domElement;
         this.ctx = domElement.getContext('2d');
@@ -998,7 +983,7 @@ function Layer(name, options) {
             domElement.style.left = '0px';
             domElement.style.zIndex = String(layerZindex);
             domElement.id = name;
-            sjs.dom.appendChild(domElement);
+            scene.dom.appendChild(domElement);
         }
         this.dom = domElement;
     }

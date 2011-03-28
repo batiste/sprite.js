@@ -47,7 +47,9 @@ window.onload = function() {
         }
     }
 
-    var sp1 = new sjs.Sprite('character.png');
+    var scene = sjs.Scene();
+
+    var sp1 = scene.Sprite('character.png');
     sp1.size(10, 10);
     sp1.move(10, 10);
 
@@ -58,11 +60,11 @@ window.onload = function() {
     assertTrue(sp1.isPointIn(15, 15), "isPointIn test4");
     assertFalse(sp1.isPointIn(15, 20), "isPointIn test5");
 
-    var sp2 = new sjs.Sprite('character.png');
+    var sp2 = scene.Sprite('character.png');
     sp2.size(10, 10);
     sp2.move(15, 10);
 
-     var sp3 = new sjs.Sprite('character.png');
+     var sp3 = scene.Sprite('character.png');
     sp3.size(10, 10);
     sp3.move(21, 10);
 
@@ -73,13 +75,13 @@ window.onload = function() {
     assertFalse(sp1.collidesWith(sp3), "collidesWith test4");
     assertTrue(sp2.collidesWith(sp3), "collidesWith test5");
 
-    var sp1 = new sjs.Sprite('character.png');
+    var sp1 = scene.Sprite('character.png');
     sp1.size(100, 200);
 
     assertTrue(sp3.collidesWith(sp1), "collidesWith test5");
     assertTrue(sp1.collidesWith(sp3), "collidesWith test6");
 
-    var sp1 = new sjs.Sprite('character.png');
+    var sp1 = scene.Sprite('character.png');
     sp1.size(10, 10);
     sp1.move(10, 10);
     assertEqual(sp1.distance(15, 15), 0,  "distance test1");

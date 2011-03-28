@@ -14,29 +14,30 @@
 
 window.onload = function() {
 
-    sjs.loadImages(['character.png', 'spritejs.png'], function() {
+    var scene = sjs.Scene();
+
+    scene.loadImages(['character.png', 'spritejs.png'], function() {
 
     var sprites = [];
     if(window.location.href.indexOf('canvas') != -1) {
-        sjs.use_canvas = true;
         document.getElementById('canvas-mode').style.display = 'none';
     } else {
         document.getElementById('html-mode').style.display = 'none';
     }
 
     for(var i=0; i<32; i++) {
-        var sp = new sjs.Sprite('character.png');
+        var sp = scene.Sprite('character.png');
         sp.size(30, 55);
         sp.setYOffset(2);
         sp.move(6 * i + 10, 70 + ((i%4) * 60));
         sprites.push(sp);
     }
 
-    var logo = new sjs.Sprite();
+    var logo = scene.Sprite();
     logo.move(120, 170);
     logo.loadImg('spritejs.png');
 
-    var cycle = new sjs.Cycle([[0, 2, 5],
+    var cycle = sjs.Cycle([[0, 2, 5],
                                [30, 2, 5],
                                [60, 2, 5],
                                [90, 2, 5],
@@ -72,7 +73,7 @@ window.onload = function() {
             result.innerHTML = 'system load ' + ticker.load + '%';
         }
     };
-    var ticker = new sjs.Ticker(35, paint);
+    var ticker = scene.Ticker(35, paint);
     ticker.run();
 
     });

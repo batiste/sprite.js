@@ -13,23 +13,21 @@
 <script>
 
 window.onload = function() {
-sjs.loadImages(['crate.png'], function() {
+var scene = sjs.Scene({w:600, h:600});
+
+scene.loadImages(['crate.png'], function() {
 
     if(window.location.href.indexOf('canvas') != -1) {
-        sjs.use_canvas = true;
         document.getElementById('canvas-mode').style.display = 'none';
     } else {
         document.getElementById('html-mode').style.display = 'none';
     }
     result = document.getElementById('result');
 
-    sjs.w = 600;
-    sjs.h = 600;
-
     var crates = [];
 
     for(var i=0; i<120; i++) {
-        var sp = new sjs.Sprite('crate.png');
+        var sp = scene.Sprite('crate.png');
         sp.move((i % 12) * 35, (i/12.0|0)* 50);
         sp.update();
         crates.push(sp);
@@ -61,7 +59,7 @@ sjs.loadImages(['crate.png'], function() {
             result.innerHTML = 'system load ' + ticker.load + '%';
         }
     };
-    var ticker = new sjs.Ticker(35, paint);
+    var ticker = scene.Ticker(35, paint);
     ticker.run();
 
 });
