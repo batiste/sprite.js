@@ -51,8 +51,36 @@ var sjs = {
     layers: {},
     dom:null,
     overlay:overlay,
-    reset:reset
+    init:init,
+    reset:reset,
+    loadImages:loadImages
 };
+
+function init_transform_property() {
+    var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform'];
+    var p = false;
+    while (p = properties.shift()) {
+        if (typeof document.body.style[p] !== 'undefined') {
+            sjs.tproperty = p;
+        }
+    }
+}
+
+function init(w, h) {
+    if(!sjs.tproperty)
+        init_transform_property()
+    if(!sjs.dom) {
+        var div = document.createElement('div');
+        div.style.overflow = 'hidden';
+        div.style.position = 'relative';
+        div.id = 'sjs';
+        document.body.appendChild(div);
+        sjs.dom = div;
+        sjs.w = w || 480;
+        sjs.h = h || 320;
+    }
+    return sjs.dom;
+}
 
 function overlay(x, y, w, h) {
     var div = document.createElement('div');
@@ -65,7 +93,7 @@ function overlay(x, y, w, h) {
     s.zIndex = 100;
     s.position = 'absolute';
     s.backgroundColor = '#000';
-    s.opacity = 0.8;
+    s.opacity = 0.7;
     return div;
 };
 
@@ -76,7 +104,13 @@ function reset() {
             delete sjs.layers[l];
         }
     }
+    // remove remaining children
+    while ( this.dom.childNodes.length >= 1 )
+    {
+        sjs.dom.removeChild( sjs.dom.firstChild );
+    }
     sjs.layers = {};
+    tickerSingleton.paint = function(){};
 }
 
 // a cache to load each sprite only one time
@@ -85,32 +119,45 @@ var spriteList = {};
 // the shameful error function
 function error(msg) {alert(msg);}
 
-sjs.loadImages = function loadImages(images, callback) {
+function loadImages(images, callback) {
     /* function used to preload the sprite images */
     var toLoad = 0;
     for(var i=0; i<images.length; i++) {
         if(!spriteList[images[i]]) {
             toLoad += 1;
+            spriteList[images[i]] = {src:images[i], loaded:false, loading:false};
         }
     }
-    if(toLoad==0)
-        callback()
+    if(toLoad == 0)
+        return callback();
+
+    var total = toLoad;
+    var div = sjs.overlay(0, 0, this.w, this.h);
+    div.style.textAlign = 'center';
+    div.style.paddingTop = (this.h / 2 - 16) + 'px';
+
+    div.innerHTML = 'Loading';
+    sjs.dom.appendChild(div);
 
     function _loadImg(src) {
+        spriteList[src].loading = true;
         var img = new Image();
-        spriteList[src] = [img, false];
+        spriteList[src].img = img;
         img.addEventListener('load', function() {
-            spriteList[src][1] = true;
+            spriteList[src].loaded = true;
             toLoad -= 1;
-            if(toLoad == 0)
+            if(toLoad == 0) {
+                sjs.dom.removeChild(div);
                 callback();
+            } else {
+                div.innerHTML = 'Loading ' + ((total - toLoad) / total * 100 | 0) + '%';
+            }
         }, false);
         img.src = src;
     }
 
-    for(var i=0; i<images.length; i++) {
-        var src = images[i];
-        if(!spriteList[src]) {
+    for(src in spriteList) {
+        if(!spriteList[src].loading) {
             _loadImg(src);
         }
     }
@@ -530,16 +577,16 @@ Sprite.prototype.loadImg = function (src, resetSize) {
     if(!spriteList[src]) {
         // if not we create the image in the cache
         this.img = new Image();
-        spriteList[src] = [this.img, false];
+        spriteList[src] = {src:src, img:this.img, loaded:false, loading:true};
         var _loaded = false;
     } else {
-        // if it's already there, we set img object and check it's loaded
-        this.img = spriteList[src][0];
-        var _loaded = spriteList[src][1];
+        // if it's already there, we set img object and check if it's loaded
+        this.img = spriteList[src].img;
+        var _loaded = spriteList[src].loaded;
     }
     var there = this;
     function imageReady(e) {
-        spriteList[src][1] = true;
+        spriteList[src].loaded = true;
         there.imgLoaded = true;
         var img = there.img;
         if(!there.layer.useCanvas)
@@ -607,6 +654,10 @@ Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
 };
 
 function Cycle(triplets) {
+
+    if(this.constructor !== arguments.callee)
+        return new Cycle(triplets);
+
     // Cycle for the Sprite image.
     // A cycle is a list of triplet (x offset, y offset, game tick duration)
     this.triplets = triplets;
@@ -867,15 +918,19 @@ function _Input() {
         if(tickerSingleton && !tickerSingleton.paused) {
             tickerSingleton.pause();
             var div = overlay(0, 0, sjs.w, sjs.h);
-            div.innerHTML = 'Game paused,<br>click to resume.';
+            div.innerHTML = '<h1>Paused</h1><p>Click or press any key to resume.</p>';
             div.style.textAlign = 'center';
-            div.style.paddingTop = ((sjs.h/2) - 16)  + 'px';
-            var listener = function() {
+            div.style.paddingTop = ((sjs.h/2) - 32)  + 'px';
+            var listener = function(e) {
+                e.stopPropagation();
+                e.preventDefault();
                 sjs.dom.removeChild(div);
                 document.removeEventListener('click', listener, false);
+                document.removeEventListener('keyup', listener, false);
                 tickerSingleton.resume();
             }
             document.addEventListener('click', listener, false);
+            document.addEventListener('keyup', listener, false);
             sjs.dom.appendChild(div);
         }
     }, false);
@@ -960,32 +1015,6 @@ Layer.prototype.addSprite = function addSprite(sprite) {
     return index
 }
 
-function init() {
-    initDom();
-    var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform'];
-    var p = false;
-    while (p = properties.shift()) {
-        if (typeof document.body.style[p] !== 'undefined') {
-            sjs.tproperty = p;
-        }
-    }
-}
-
-function initDom() {
-    if(!sjs.dom) {
-        var div = document.createElement('div');
-        div.style.overflow = 'hidden';
-        div.style.position = 'relative';
-        div.id = 'sjs';
-        document.body.appendChild(div);
-        sjs.dom = div;
-        sjs.w = 480;
-        sjs.h = 320;
-    }
-    return sjs.dom;
-}
-
-global.addEventListener("load", init, false);
 global.sjs = sjs;
 
 })(this);
