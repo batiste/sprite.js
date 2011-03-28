@@ -23,15 +23,14 @@ Example of a basic use::
 
     <script>
     // set the viewport size (default 480x320)
-    sjs.w = 640;
-    sjs.h = 480;
+    var scene = sjs.Scene({w:640, h:480});
 
     // load the images that gonna be used in parallel. When all the images are
     // ready, the callback function is called.
-    sjs.loadImages(['character.png'], function() {
+    scene.loadImages(['character.png'], function() {
 
         // create the Sprite object;
-        var sp = new sjs.Sprite('character.png');
+        var sp = scene.Sprite('character.png');
 
         // change the visible size of the sprite
         sp.h=55;
@@ -65,26 +64,13 @@ By default the HTML backend is used. The HTML backend displays sprites using DOM
 backend draw the sprites on the canvas. Each layer of the application can have a different backend.
 This enable you to mix the 2 technics if needed.
 
-Switching sprites.js to use the canvas backend is done by setting the 'useCanvas' flag before
-creating sprites::
+To use canvas with a layer you need to specify it in the options::
 
-    sjs.useCanvas = true;
-
-You can also add a canvas GET parameter in the URL of any sprite.js application::
-
-    index.html?canvas=1
-
-Finaly, you can always overrides those defaults by using the useCanvas options when you create a layer.
-
-    var background = Layer('background', {useCanvas:true});
-
-Tests show that the canvas backend can be somewhat slower on Firefox, Opera and Chrome.
-Especially with a high number of sprites and a large canvas. Clearing and redrawing the whole canvas can expensive if you have a lot of sprites.
-Canvas seems faster when there is a lot of transformations applied to the sprite.
+    var background = scene.Layer('background', {useCanvas:true});
 
 The canvas will be automaticaly cleared by the game ticker. If you don't need it you can set the autoClear to false when building a layer::
 
-    var background = Layer('background', {useCanvas:true, autoClear:false});
+    var background = scene.Layer('background', {useCanvas:true, autoClear:false});
 
 Performances on particle test can be quite different depending on the device and browser and plateform:
 
@@ -97,27 +83,45 @@ Performances on particle test can be quite different depending on the device and
 +------------------------+---------------+-------------+---------------+---------------------+-------+
 
 
+Scene object
+==============
+
+The scene object is where you all the Sprites are gonna be drawned. You always need to start by initialisasing a scene::
+
+    sjs.Scene({w:640, h:680});
+
+A list of the different methods available on the Scene object::
+
+    scene.loadImages(Arrar(<src>), callback)       // load the array of image source. When all is loaded, the callback is called.
+
+    scene.Layer(<name>, <options>)                 // build a Layer object, see next Layer section
+
+    scene.Sprite(<src>, <layer>)                   // build a Sprite object, see Sprite section
+
+    scene.Ticker(<tickDuration>, <paint function>) // build a Ticker object for this scene or reset the previous one
+
+    scene.reset()                                  // Delete all layer present in this scene, delete ticker.
+
 
 Sprite object public methods and attributes
 ===========================================
 
 
+To create a sprite you should use the scene.Sprite constructor::
 
-To create a sprite you should use the sjs.Sprite constructor helper::
-
-    var sprite = sjs.Sprite(<src>, <layer>)
+    var sprite = scene.Sprite(<src>, <layer>)
 
 Both parameters are optionnal. If you want to set the layer but not any image::
 
-    var sprite = sjs.Sprite(false, <layer>)
+    var sprite = scene.Sprite(false, <layer>)
 
 For performance reasons *there have been an API change* on the way the attributes can be set, please read the following.
-Sprites have those *read only* attributes::
+Sprites have those *READ ONLY* attributes::
 
     sprite.y
     sprite.x
-    sprite.w        // Controls the visible surface of the image. To have repeating sprites
-                    // set the width or height value bigger than the size of the image.
+    sprite.w        // Controls the visible surface of the image. To have a repeating sprite background
+                    // you can set the width or height value bigger than the size of the image.
     sprite.h
 
     sprite.xoffset  // offset in the image to start painting in the view surface
@@ -132,8 +136,8 @@ If you want to change any of those attributes use the following setters::
 
     sprite.setX(5);
     sprite.setY(5);
-    sprite.setXOffset(10) // offset in the image to start painting in the view surface
-    sprite.setXScale(2)
+    sprite.setXOffset(10); // offset in the image to start painting in the view surface
+    sprite.setXScale(2);
 
 Or one of the helper methods::
 
@@ -170,8 +174,7 @@ To appy handle simple physic with the sprites you can use those helpers::
 
 Other important methods::
 
-    sprite.onload(callback)     // call the function "callback" when the sprite's image is loaded.
-                                // If the image is already loaded the function is called immediatly.
+    sprite.onload(callback)     // DEPRECATED
 
 
     sprite.loadImg(src, bool resetSize)    // change the image sprite. The size of the sprite will be rested by
@@ -208,7 +211,7 @@ To setup a ticker::
         // do your stuff
 
     }
-    var ticker = new sjs.Ticker(35, paint); // we want a tick every 35ms
+    var ticker = scene.Ticker(35, paint); // we want a tick every 35ms
     ticker.run();
 
     ticker.pause();
@@ -229,10 +232,10 @@ A cycle object handles sprite animations. A cycle is defined by list of
 tuples: (x offset, y offset, game tick duration), and the sprites the
 cycle applies to. this is a cycle with 3 position, each lasting 5 game ticks::
 
-    var cycle = new sjs.Cycle([[0, 2, 5],
+    var cycle = scene.Cycle([[0, 2, 5],
                               [30, 2, 5],
                               [60, 2, 5]);
-    var sprite = sjs.Sprite("walk.png")
+    var sprite = scene.Sprite("walk.png")
     cycle.sprites = [sprite];
 
     cycle.next()  // apply the next cycle to the sprite
@@ -248,7 +251,7 @@ Input object
 The input object deals with user input. There are a number of flags for keys
 that will be true if the key is pressed::
 
-    var input  = new sjs.Input();
+    var input  = scene.Input();
     if(input.keyboard.right) {
         sprite.move(5, 0);
     }
@@ -271,11 +274,11 @@ Layer object
 If you need to separate you sprites into logical layers, you can use the Layer
 object::
 
-    var background = new sjs.Layer('background', options);
+    var background = scene.Layer('background', options);
 
 You should then pass the layer as the second argument of the contructor of your sprites::
 
-    var sprite = new sjs.Sprite('bg.png', background);
+    var sprite = scene.Sprite('bg.png', background);
 
 The layer object can take those options::
 

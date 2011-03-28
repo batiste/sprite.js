@@ -23,7 +23,7 @@ window.onload = function() {
 
     var game_height = 478;
     var game_width = 318;
-    var scene = new sjs.Scene({w:game_width, h:game_height});
+    var scene = sjs.Scene({w:game_width, h:game_height});
 
     var plateforms = [];
     var mplateforms = [];
@@ -82,9 +82,9 @@ window.onload = function() {
     player.size(23, 51);
     player.setYOffset(3);
 
-    var input  = new sjs.Input();
+    var input  = scene.Input();
 
-    var cycle = new sjs.Cycle([[3, 3, 1],
+    var cycle = scene.Cycle([[3, 3, 1],
                                [33, 3, 1],
                                [63, 3, 2],
                                [93, 3, 2],

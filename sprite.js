@@ -117,6 +117,15 @@ Scene.prototype.Layer = function SceneLayer(name, options) {
     return Layer(this, name, options);
 }
 
+// just for convenience
+Scene.prototype.Cycle = function SceneCycle(triplets) {
+    return new Cycle(triplets);
+}
+
+Scene.prototype.Input = function SceneInput() {
+    return Input();
+}
+
 Scene.prototype.reset = function reset() {
     for(l in this.layers) {
         if(this.layers.hasOwnProperty(l)) {
@@ -798,8 +807,12 @@ _Ticker.prototype.resume = function() {
 }
 
 
-var inputSingleton = new _Input();
-function Input(){return inputSingleton};
+var inputSingleton = false;
+function Input(){
+    if(!inputSingleton)
+        inputSingleton = new _Input();
+    return inputSingleton
+};
 
 function _Input() {
 
