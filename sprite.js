@@ -81,6 +81,8 @@ function overlay(x, y, w, h) {
     return div;
 };
 
+var nb_scene = 0;
+
 function Scene(options) {
 
     if(this.constructor !== arguments.callee)
@@ -92,7 +94,10 @@ function Scene(options) {
     var div = document.createElement('div');
     div.style.overflow = 'hidden';
     div.style.position = 'relative';
-    div.id = 'sjs';
+    div.className = 'sjs';
+    div.id = 'sjs' + nb_scene;
+    this.id = nb_scene;
+    nb_scene = nb_scene + 1;
     document.body.appendChild(div);
     this.w = optionValue(options, 'w', 480);
     this.h = optionValue(options, 'h', 320);
@@ -251,17 +256,18 @@ function _Sprite(scene, src, layer) {
         // important to delay the creation so useCanvas
         // can still be changed
         if(scene.layers['default'] === undefined)
-            scene.layers['default'] = scene.Layer(scene, "default");
+            scene.layers['default'] = scene.Layer("default");
         layer = scene.layers['default'];
     }
     this.layer = layer;
+    console.log(layer.dom)
     //this.layerIndex = layer.addSprite(this);
 
     if(!this.layer.useCanvas) {
         var d = document.createElement('div');
         d.style.position = 'absolute';
         this.dom = d;
-        layer.dom.appendChild(d);
+        this.layer.dom.appendChild(d);
     }
     if(src)
         this.loadImg(src);
@@ -983,7 +989,7 @@ function Layer(scene, name, options) {
             domElement.style.zIndex = String(layerZindex);
             domElement.style.top = '0px';
             domElement.style.left = '0px';
-            domElement.id = name;
+            domElement.id = 'sjs'+scene.id+'-'+name;
             scene.dom.appendChild(domElement);
         }
         this.dom = domElement;
@@ -995,7 +1001,7 @@ function Layer(scene, name, options) {
             domElement.style.top = '0px';
             domElement.style.left = '0px';
             domElement.style.zIndex = String(layerZindex);
-            domElement.id = name;
+            domElement.id = 'sjs'+scene.id+'-'+name;
             scene.dom.appendChild(domElement);
         }
         this.dom = domElement;
