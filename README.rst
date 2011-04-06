@@ -1,6 +1,6 @@
-===========
-sprite.js
-===========
+=================
+sprite.js v0.9.0
+=================
 
 The sprite.js framework lets you create animations and games
 using sprites in an efficient way. The goal is to have common
