@@ -260,7 +260,6 @@ function _Sprite(scene, src, layer) {
         layer = scene.layers['default'];
     }
     this.layer = layer;
-    console.log(layer.dom)
     //this.layerIndex = layer.addSprite(this);
 
     if(!this.layer.useCanvas) {
@@ -490,7 +489,7 @@ _Sprite.prototype.update = function updateDomProperties () {
     if(this._dirty['w'])
         style.width=(this.w | 0) +'px';
     if(this._dirty['h'])
-        style.height=(this.h  | 0)+'px';
+        style.height=(this.h | 0)+'px';
     // translate and translate3d doesn't seems to offer any speedup
     // in my tests.
     if(this._dirty['y'])
