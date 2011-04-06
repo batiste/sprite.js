@@ -102,9 +102,9 @@ A list of the different methods available on the Scene object::
 
     scene.reset()                                  // Delete all layer present in this scene, delete ticker.
 
-    scene.Cycle(<triplets>)                         // alisa for sjs.Cycle, look at Cycle section
+    scene.Cycle(<triplets>)                        // alias for sjs.Cycle, look at Cycle section
 
-    scene.Input()                         // alisa for sjs.Input, look at Input section
+    scene.Input()                                  // alias for sjs.Input, look at Input section
 
 
 Sprite object public methods and attributes
