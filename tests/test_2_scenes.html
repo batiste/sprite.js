@@ -1,0 +1,88 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test 32 sprites in a cycle animation</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+</head>
+<body>
+
+<p>2 scene in the same page : <span id="result"></span> <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
+<style>
+.sjs {
+    float:left;
+    border:3px #bbb solid;
+    margin:10px;
+}
+</style>
+</body>
+<script src="../sprite.js"></script>
+<script>
+
+window.onload = function() {
+var scene1 = sjs.Scene({w:300, h:300});
+var scene2 = sjs.Scene({w:300, h:300});
+
+scene1.loadImages(['crate.png'], function() {
+
+    if(window.location.href.indexOf('canvas') != -1) {
+        document.getElementById('canvas-mode').style.display = 'none';
+    } else {
+        document.getElementById('html-mode').style.display = 'none';
+    }
+    result = document.getElementById('result');
+
+    var crates1 = [];
+    var crates2 = [];
+
+    for(var i=0; i<24; i++) {
+        var sp = scene1.Sprite('crate.png');
+        sp.move((i % 12) * 35, (i/12.0|0)* 50);
+        sp.update();
+        crates1.push(sp);
+    }
+
+    for(var i=0; i<32; i++) {
+        var sp = scene2.Sprite('crate.png');
+        sp.move((i % 12) * 35, (i/12.0|0)* 50);
+        sp.update();
+        crates2.push(sp);
+    }
+
+
+    var gravity = 0.5;
+
+    function build_paint(crates) {
+        return function p() {
+
+            function hasCollision(crate) {
+                if(crate.y > 300 - 32)
+                    return true;
+                if(crate.collidesWithArray(crates))
+                    return true;
+                return false;
+            }
+
+            for(var i=0; i<crates.length; i++) {
+                var crate = crates[i];
+                crate.yv += gravity;
+                crate.applyYVelocity();
+                if(hasCollision(crate)) {
+                    crate.reverseYVelocity();
+                    crate.yv = 0;
+                }
+                crate.update()
+            }
+        };
+    }
+
+    var ticker = scene1.Ticker(35, build_paint(crates1));
+    ticker.run();
+
+    var ticker = scene2.Ticker(40, build_paint(crates2));
+    ticker.run();
+
+});
+
+};
+</script>
+</html>
