@@ -279,27 +279,13 @@ _Sprite.prototype.constructor = _Sprite;
 
 _Sprite.prototype.setX = function setX(value) {
     this.x = value;
-    value = value | 0;
-    this._x_rounded = value;
     this.changed = true;
-    if(this._x_before == value) {
-        this._dirty['x'] = false;
-    } else {
-        this._dirty['x'] = true;
-    }
     return this;
 }
 
 _Sprite.prototype.setY = function setX(value) {
     this.y = value;
-    value = value | 0;
-    this._y_rounded = value;
     this.changed = true;
-    if(this._y_before == value) {
-        this._dirty['y'] = false;
-    } else {
-        this._dirty['y'] = true;
-    }
     return this;
 }
 
@@ -386,14 +372,14 @@ _Sprite.prototype.scale = function (x, y) {
 };
 
 _Sprite.prototype.move = function (x, y) {
-    this.setX(this.x+x);
-    this.setY(this.y+y);
+    this.x = this.x+x;
+    this.y = this.y+y;
     return this;
 };
 
 _Sprite.prototype.position = function (x, y) {
-    this.setX(x);
-    this.setY(y);
+    this.x = x;
+    this.y = y;
     return this;
 };
 
@@ -474,28 +460,33 @@ _Sprite.prototype.remove = function remove() {
 _Sprite.prototype.update = function updateDomProperties () {
     // This is the CPU heavy function.
 
-    // cache rounded positions, it's used to avoid unecessary update
-    this._x_before = this._x_rounded;
-    this._y_before = this._y_rounded;
-
     if(this.layer.useCanvas == true) {
         return this.canvasUpdate();
     }
-    if(!this.changed)
-        return;
+
+    this._x_rounded = this.x | 0;
+    this._y_rounded = this.y | 0;
 
     var style = this.dom.style;
     // using Math.round to round integers before changing seems to improve a bit performances
+    if(this._x_before != this._x_rounded)
+       style.left=(this.x | 0)+'px';
+    if(this._y_before != this._y_rounded)
+        style.top=(this.y | 0)+'px';
+
+    // cache rounded positions, it's used to avoid unecessary update
+    this._x_before = this._x_rounded
+    this._y_before = this._y_rounded;
+
+    if(!this.changed)
+        return this;
+
     if(this._dirty['w'])
         style.width=(this.w | 0) +'px';
     if(this._dirty['h'])
         style.height=(this.h | 0)+'px';
     // translate and translate3d doesn't seems to offer any speedup
     // in my tests.
-    if(this._dirty['y'])
-        style.top=this._y_rounded+'px';
-    if(this._dirty['x'])
-       style.left=this._x_rounded+'px';
     if(this._dirty['xoffset'] || this._dirty['yoffset'])
         style.backgroundPosition=-(this.xoffset | 0)+'px '+-(this.yoffset | 0)+'px';
 

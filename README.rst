@@ -119,11 +119,14 @@ Both parameters are optionnal. If you want to set the layer but not any image::
 
     var sprite = scene.Sprite(false, <layer>)
 
-For performance reasons *there have been an API change* on the way the attributes can be set, please read the following.
-Sprites have those *READ ONLY* attributes::
+The following attribute can be written directly::
 
     sprite.y
     sprite.x
+
+For performance reasons *there have been an API change* on the way the attributes can be set, please read the following.
+Sprites have those *READ ONLY* attributes::
+
     sprite.w        // Controls the visible surface of the image. To have a repeating sprite background
                     // you can set the width or height value bigger than the size of the image.
     sprite.h
@@ -138,8 +141,8 @@ Sprites have those *READ ONLY* attributes::
 
 If you want to change any of those attributes use the following setters::
 
-    sprite.setX(5);
-    sprite.setY(5);
+    sprite.setW(32);
+    sprite.setH(32);
     sprite.setXOffset(10); // offset in the image to start painting in the view surface
     sprite.setXScale(2);
 
