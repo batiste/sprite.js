@@ -139,12 +139,19 @@ are *READ ONLY* attributes::
 
 If you want to change any of those attributes use the following setters::
 
+    sprite.setX(10);
+    sprite.setY(12);
     sprite.setW(32);
     sprite.setH(32);
     sprite.setXOffset(10); // offset in the image to start painting in the view surface
+    sprite.setYOffset(5);
     sprite.setXScale(2);
+    sprite.setYScale(3);
+    sprite.setAngle(Math.PI / 2);
+    sprite.setColor('#333');
+    sprite.setOpacity(0.5);
 
-Or one of the helper methods::
+Or one of those helper methods::
 
     sprite.rotate(radians)
     sprite.scale(x, y)     // if y is not defined, y take the same value as x
