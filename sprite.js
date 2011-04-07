@@ -144,7 +144,8 @@ Scene.prototype.reset = function reset() {
         this.dom.removeChild( this.dom.firstChild );
     }
     this.layers = {};
-    this.ticker = function(){};
+    if(this.ticker)
+        this.ticker.pause();
 }
 
 Scene.prototype.Ticker = function Ticker(tickDuration, paint) {
@@ -279,12 +280,15 @@ _Sprite.prototype.constructor = _Sprite;
 
 _Sprite.prototype.setX = function setX(value) {
     this.x = value;
+    // this secessary for the physic
+    this._x_rounded = value | 0;
     this.changed = true;
     return this;
 }
 
-_Sprite.prototype.setY = function setX(value) {
+_Sprite.prototype.setY = function setY(value) {
     this.y = value;
+    this._y_rounded = value | 0;
     this.changed = true;
     return this;
 }
@@ -372,14 +376,14 @@ _Sprite.prototype.scale = function (x, y) {
 };
 
 _Sprite.prototype.move = function (x, y) {
-    this.x = this.x+x;
-    this.y = this.y+y;
+    this.setX(this.x+x);
+    this.setY(this.y+y);
     return this;
 };
 
 _Sprite.prototype.position = function (x, y) {
-    this.x = x;
-    this.y = y;
+    this.setX(x);
+    this.setY(y);
     return this;
 };
 
@@ -463,9 +467,6 @@ _Sprite.prototype.update = function updateDomProperties () {
     if(this.layer.useCanvas == true) {
         return this.canvasUpdate();
     }
-
-    this._x_rounded = this.x | 0;
-    this._y_rounded = this.y | 0;
 
     var style = this.dom.style;
     // using Math.round to round integers before changing seems to improve a bit performances
@@ -643,7 +644,7 @@ _Sprite.prototype.center = function center() {
 
 _Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
     // Return true if the current sprite has any collision with the Array provided
-    // a sprite cannot collides with itsels
+    // a sprite cannot collides with itself
     for(var i=0, sprite; sprite = sprites[i]; i++) {
         if(this!=sprite && this.collidesWith(sprite)) {
             return sprite;
@@ -676,7 +677,7 @@ function Cycle(triplets) {
     this.tick = 0;
 }
 
-Cycle.prototype.next = function (ticks) {
+Cycle.prototype.next = function (ticks, update) {
     ticks = ticks || 1; // default tick: 1
     this.tick = this.tick + ticks;
     if(this.tick > this.cycleDuration) {
@@ -690,6 +691,8 @@ Cycle.prototype.next = function (ticks) {
             for(var j=0, sprite; sprite = this.sprites[j]; j++) {
                 sprite.setXOffset(this.triplets[i][0]);
                 sprite.setYOffset(this.triplets[i][1]);
+                if(update)
+                    sprite.update();
             }
         }
     }
