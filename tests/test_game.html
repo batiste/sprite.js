@@ -6,9 +6,9 @@
 body {
     margin:0 auto;
 }
-#sjs {
-background:#f1f4fe;
-border:1px #333 solid;
+.sjs {
+    background:#f1f4fe;
+    border:1px #333 solid;
 }
 </style>
 </head>
@@ -91,7 +91,7 @@ window.onload = function() {
                                [123, 3, 2],
                                [153, 3, 2],
                                [183, 3, 2]]);
-    cycle.sprites = [player];
+    cycle.addSprite(player);
 
     var xv = 0, yv = 0;
 

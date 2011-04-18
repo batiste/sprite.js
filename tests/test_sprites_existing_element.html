@@ -3,15 +3,13 @@
 <title>Test 32 sprites in a cycle animation</title>
 <meta name = "viewport" content = "user-scalable=no, width=device-width">
 <style>
-	#test {
-		border: 1px solid green;
-	}
-	div#test {
-		width: 480px;
-		height: 320px;
-		overflow: hidden;
-		position: absolute;
-	}
+#test {
+    border: 1px solid green;
+}
+div#test {
+    width: 480px;
+    height: 320px;
+}
 </style>
 </head>
 <body>
@@ -24,7 +22,7 @@
 
 window.onload = function() {
 
-    var scene = sjs.Scene();
+    var scene = sjs.Scene({w:482, h:322});
 
     var sprites = [];
     var oldNode = document.getElementById("test");
@@ -63,7 +61,7 @@ window.onload = function() {
                                [120, 2, 5],
                                [150, 2, 5],
                                [180, 2, 5]]);
-    cycle.sprites = sprites;
+    cycle.addSprites(sprites);
 
     var sin_cycle = 0,
         ms_to_render = 0,

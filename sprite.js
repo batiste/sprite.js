@@ -245,6 +245,7 @@ function _Sprite(scene, src, layer) {
     this.yoffset = 0;
 
     this.dom = null;
+    this.cycle = null;
 
     this.xscale = 1;
     this.yscale = 1;
@@ -452,6 +453,8 @@ _Sprite.prototype.size = function (w, h) {
 };
 
 _Sprite.prototype.remove = function remove() {
+    if(this.cycle)
+        this.cycle.removeSprite(this);
     if(this.layer.useCanvas == false) {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
@@ -633,9 +636,12 @@ _Sprite.prototype.collidesWith = function collidesWith(sprite) {
     return y_inter;
 };
 
-_Sprite.prototype.distance = function distance(x, y) {
-    // Return the distance between this sprite and the point (x, y)
-    return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) + Math.pow(this.y + this.h/2 - y, 2));
+_Sprite.prototype.distance = function distancePoint(x, y) {
+    // Return the distance between this sprite and the point (x, y) or a Sprite
+    if(x instanceof Number)
+        return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) + Math.pow(this.y + this.h/2 - y, 2));
+    else
+        return Math.sqrt(Math.pow(this.x + this.w/2 - x.x + x.w / 2, 2) + Math.pow(this.y + this.h/2 - x.y + x.h/2, 2));
 }
 
 _Sprite.prototype.center = function center() {
@@ -671,10 +677,32 @@ function Cycle(triplets) {
         this.changingTicks.push(this.cycleDuration);
     }
     this.changingTicks.pop()
+    // suppose to be private
     this.sprites = [];
     // if set to false, the animation will stop automaticaly after one run
     this.repeat = true;
     this.tick = 0;
+}
+
+Cycle.prototype.addSprite = function addSprite(sprite) {
+    this.sprites.push(sprite);
+    sprite.cycle = this;
+}
+
+Cycle.prototype.addSprites = function addSprites(sprites) {
+    this.sprites = this.sprites.concat(sprites);
+    for(var j=0, sp; sp = sprites[j]; j++) {
+        sp.cycle = this;
+    }
+}
+
+Cycle.prototype.removeSprite = function removeSprite(sprite) {
+    for(var j=0, sp; sp = this.sprites[j]; j++) {
+        if(sprite == sp) {
+            sp.cycle = null;
+            this.sprites.splice(j, 1);
+        }
+    }
 }
 
 Cycle.prototype.next = function (ticks, update) {
@@ -976,29 +1004,25 @@ function Layer(scene, name, options) {
         }
         if (!domElement) {
             domElement = document.createElement('canvas');
-            domElement.height = options.h || scene.h;
-            domElement.width = options.w || scene.w;
-            domElement.style.position = 'absolute';
-            domElement.style.zIndex = String(layerZindex);
-            domElement.style.top = '0px';
-            domElement.style.left = '0px';
-            domElement.id = 'sjs'+scene.id+'-'+name;
-            scene.dom.appendChild(domElement);
         }
-        this.dom = domElement;
         this.ctx = domElement.getContext('2d');
     } else {
         if (!domElement) {
             domElement = document.createElement('div');
-            domElement.style.position = 'absolute';
-            domElement.style.top = '0px';
-            domElement.style.left = '0px';
-            domElement.style.zIndex = String(layerZindex);
-            domElement.id = 'sjs'+scene.id+'-'+name;
-            scene.dom.appendChild(domElement);
         }
-        this.dom = domElement;
     }
+
+    scene.dom.appendChild(domElement);
+    domElement.id = domElement.id || 'sjs'+scene.id+'-'+name;
+    domElement.style.zIndex = String(layerZindex);
+    domElement.style.backgroundColor = options.color || domElement.style.backgroundColor;
+    domElement.style.position = 'absolute';
+    domElement.height = options.h || domElement.height || domElement.style.height ||scene.h;
+    domElement.width = options.w || domElement.width || domElement.style.width || scene.w;
+    domElement.style.top = domElement.style.top || '0px';
+    domElement.style.left =  domElement.style.left || '0px';
+
+    this.dom = domElement;
     layerZindex += 1;
 }
 
@@ -1010,6 +1034,10 @@ Layer.prototype.addSprite = function addSprite(sprite) {
     var index = Math.random() * 11;
     this.sprites[index] = sprite;
     return index
+}
+
+Layer.prototype.setColor = function setColor(color) {
+    this.dom.style.backgroundColor = color;
 }
 
 global.sjs = sjs;

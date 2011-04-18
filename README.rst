@@ -248,11 +248,14 @@ cycle applies to. this is a cycle with 3 position, each lasting 5 game ticks::
                               [30, 2, 5],
                               [60, 2, 5]);
     var sprite = scene.Sprite("walk.png")
-    cycle.sprites = [sprite];
+    cycle.addSprite(sprite);
+
+    var sprites = [sprite1, sprite2]
+    cycle.addSprites(sprites);
 
     cycle.next()  // apply the next cycle to the sprite
     cycle.next(2) // apply the second next cycle to the sprite
-    cycle.goto(1) // go to the second cycle triplet
+    cycle.goto(1) // go to the second game tick in the triplet
     cycle.reset() // reset the cycle to the original position
     cycle.repeat = false // if set to false, the animation will stop automaticaly after one run
 
