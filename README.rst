@@ -182,6 +182,7 @@ To appy handle simple physic with the sprites you can use those helpers::
     sprite.collidesWithArray([sprites]) // Search in  an array of sprite for a colliding sprite.
                                         // If found, a sprite is returned.
 
+    sprite.distance(sprite)     // return the distance between 2 sprite center
     sprite.distance(x, y)       // return the distance between the sprite center and the point (x, y)
 
 Other important methods::
@@ -251,7 +252,9 @@ cycle applies to. this is a cycle with 3 position, each lasting 5 game ticks::
     cycle.addSprite(sprite);
 
     var sprites = [sprite1, sprite2]
-    cycle.addSprites(sprites);
+    cycle.addSprites(sprites);  // add an Array of sprites to the cycle
+
+    cycle.removeSprite(sprite); // remove the sprite from the cycle
 
     cycle.next()  // apply the next cycle to the sprite
     cycle.next(2) // apply the second next cycle to the sprite
