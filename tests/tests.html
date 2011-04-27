@@ -84,9 +84,16 @@ window.onload = function() {
     var sp1 = scene.Sprite('character.png');
     sp1.size(10, 10);
     sp1.move(10, 10);
-    assertEqual(sp1.distance(15, 15), 0,  "distance test1");
-    assertEqual(sp1.distance(20, 15), 5,  "distance test2");
-    assertEqual(sp1.distance(15, 20), 5,  "distance test3");
+
+    var sp2 = scene.Sprite('character.png');
+    sp2.size(10, 10);
+    sp2.move(15, 10);
+
+    assertEqual(sp1.distance(sp2), 5,  "distance 2 sprites");
+
+    assertEqual(sp1.distance(15, 15), 0,  "distance test2");
+    assertEqual(sp1.distance(20, 15), 5,  "distance test3");
+    assertEqual(sp1.distance(15, 20), 5,  "distance test4");
     assertEqual(sp1.distance(20, 20), Math.sqrt(5*5+5*5),  "distance test4");
 };
 </script>

@@ -638,10 +638,13 @@ _Sprite.prototype.collidesWith = function collidesWith(sprite) {
 
 _Sprite.prototype.distance = function distancePoint(x, y) {
     // Return the distance between this sprite and the point (x, y) or a Sprite
-    if(x instanceof Number)
-        return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) + Math.pow(this.y + this.h/2 - y, 2));
-    else
-        return Math.sqrt(Math.pow(this.x + this.w/2 - x.x + x.w / 2, 2) + Math.pow(this.y + this.h/2 - x.y + x.h/2, 2));
+    if(typeof x == "number") {
+        return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) +
+            Math.pow(this.y + this.h/2 - y, 2));
+    } else {
+        return Math.sqrt(Math.pow(this.x + (this.w / 2) - (x.x + (x.w / 2)), 2) +
+            Math.pow(this.y + (this.h / 2) - (x.y + (x.h / 2)), 2));
+    }
 }
 
 _Sprite.prototype.center = function center() {
