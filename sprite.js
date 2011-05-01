@@ -861,6 +861,12 @@ function _Input() {
         return that.keyboardChange[name] !== undefined && !that.keyboardChange[name];
     };
 
+    this.anyKeyEvent = function () {
+        var anyKeyEvent = that.keyboardChange['*any'];
+        that.keyboardChange['*any'] = 0;
+        return anyKeyEvent;
+    };
+
     function updateKeyChange(name, val) {
         if(that.keyboard[name] != val) {
             that.keyboard[name] = val;
@@ -891,6 +897,8 @@ function _Input() {
         if(e.keyCode==13) {
             updateKeyChange('enter', val);
         }
+        // For the anyKeyEvent() handler
+        that.keyboardChange['*any'] = val;
     }
 
     var addEvent = function(name, fct) {
@@ -1046,3 +1054,4 @@ Layer.prototype.setColor = function setColor(color) {
 global.sjs = sjs;
 
 })(this);
+
