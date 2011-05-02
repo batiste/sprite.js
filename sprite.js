@@ -46,7 +46,8 @@ var sjs = {
     Cycle: Cycle,
     Input: Input,
     Scene: Scene,
-    overlay:overlay
+    overlay:overlay,
+    scenes:[]
 };
 
 function init_transform_property() {
@@ -109,6 +110,7 @@ function Scene(options) {
     this.useCanvas = optionValue(options, "useCanvas",
         window.location.href.indexOf('canvas') != -1)
 
+    sjs.scenes.push(this);
     return this;
 }
 
@@ -851,7 +853,7 @@ function _Input() {
     this.keyboard = {};
     this.keyboardChange = {};
     this.mousedown = false;
-    this.keydown = true;
+    this.keydown = false;
 
     this.keyPressed = function(name) {
         return that.keyboardChange[name] !== undefined && that.keyboardChange[name];
@@ -937,36 +939,45 @@ function _Input() {
     addEvent("keypress", function(e) {});
     // make sure that the keyboard is reseted when
     // the user leave the page
-    global.addEventListener("blur", function (e) {
-        that.keyboard = {}
-        that.keydown = false;
-        that.mousedown = false;
-        // create a semi transparent layer on the game
-        /*if(tickerSingleton && !tickerSingleton.paused) {
-            tickerSingleton.pause();
-            var div = overlay(0, 0, this.scene.w, this.scene.h);
-            div.innerHTML = '<h1>Paused</h1><p>Click or press any key to resume.</p>';
-            div.style.textAlign = 'center';
-            div.style.paddingTop = ((this.scene.h/2) - 32)  + 'px';
-            var listener = function(e) {
-                e.stopPropagation();
-                e.preventDefault();
-                this.scene.dom.removeChild(div);
-                document.removeEventListener('click', listener, false);
-                document.removeEventListener('keyup', listener, false);
-                tickerSingleton.resume();
-            }
-            document.addEventListener('click', listener, false);
-            document.addEventListener('keyup', listener, false);
-            this.scene.dom.appendChild(div);
-        }*/
-    }, false);
 }
 
 _Input.prototype.arrows = function arrows() {
     /* Return true if any arrow key is pressed */
     return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
 };
+
+// Add an automatic pause to all the scenes when the user
+// quit the current window.
+global.addEventListener("blur", function (e) {
+    for(var i=0; i < sjs.scenes.length; i++) {
+        var scene = sjs.scenes[i];
+        var anon = function(scene) {
+            inputSingleton.keyboard = {}
+            inputSingleton.keydown = false;
+            inputSingleton.mousedown = false;
+            // create a semi transparent layer on the game
+            if(scene.ticker && !scene.ticker.paused) {
+                scene.ticker.pause();
+                var div = overlay(0, 0, scene.w, scene.h);
+                div.innerHTML = '<h1>Paused</h1><p>Click or press any key to resume.</p>';
+                div.style.textAlign = 'center';
+                div.style.paddingTop = ((scene.h/2) - 32)  + 'px';
+                var listener = function(e) {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    scene.dom.removeChild(div);
+                    document.removeEventListener('click', listener, false);
+                    document.removeEventListener('keyup', listener, false);
+                    scene.ticker.resume();
+                }
+                document.addEventListener('click', listener, false);
+                document.addEventListener('keyup', listener, false);
+                scene.dom.appendChild(div);
+            }
+        }
+        anon(scene);
+    }
+}, false);
 
 var layerZindex = 1;
 

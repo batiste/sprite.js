@@ -274,17 +274,27 @@ that will be true if the key is pressed::
         sprite.move(5, 0);
     }
 
-    // arrows is true if any directionnal keyboard arrows are pressed
-    if(input.arrows())
-        cycle.next();
-    else
-        cycle.reset();
+Input.keyboard is a memory of which key is down and up.
 
-    // input.keyboard is a memory of which key is down and up. If you need to know which key
-    // has just been pressed or released you can use those functions
+    input.arrows() // arrows return true if any directionnal keyboard arrows are pressed
+    input.keydown  // this is true if any key is pressed
+
+List of the flags in the keyboard object::
+
+    keyboard.up
+    keyboard.right
+    keyboard.up
+    keyboard.down
+    keyboard.enter
+    keyboard.space
+    keyboard.ctrl
+
+If you need to know which key has just been pressed or released during the last game tick you can use those functions::
 
     input.keyPressed('up')
     input.keyReleased('up')
+
+
 
 Layer object
 =============
