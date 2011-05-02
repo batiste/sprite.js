@@ -1,5 +1,5 @@
 =================
-sprite.js v0.9.0
+sprite.js v0.9.1
 =================
 
 The sprite.js framework lets you create animations and games
@@ -119,8 +119,8 @@ Both parameters are optionnal. If you want to set the layer but not any image::
 
     var sprite = scene.Sprite(false, <layer>)
 
-For technichal and performance reasons most Sprite's attributes needs to changed by using a setters. The following
-are *READ ONLY* attributes::
+For technichal and performance reasons Sprite's attributes needs to changed using a setters method. The following
+attributes are *READ ONLY*::
 
     sprite.x        // position of the sprite from the left corner of the scene
     sprite.y        // position of the sprite from the top corner of the scene
@@ -160,7 +160,7 @@ Or one of those helper methods::
     sprite.offset(x, y)
     sprite.size(w, h)      // set the width and height of the visible sprite
 
-To appy handle simple physic with the sprites you can use those helpers::
+Sprites comes with a bunch of methods to help you to implement a physic effects::
 
     sprite.xv                // horizontal velocity
     sprite.yv                // vertical velocity
@@ -187,16 +187,13 @@ To appy handle simple physic with the sprites you can use those helpers::
 
 Other important methods::
 
-    sprite.onload(callback)     // DEPRECATED
-
-
     sprite.loadImg(src, bool resetSize)    // change the image sprite. The size of the sprite will be rested by
                                            // the new image if resetSize is true.
 
     sprite.remove // Remove the dom element if the HTML backend is used and facilite the garbage collection of the object.
 
 
-    Sprite.canvasUpdate(layer)  // draw the sprite on a given layer, even if the sprite's layer use a HTML backend
+    sprite.canvasUpdate(layer)  // draw the sprite on a given Canvas layer. This doesn't work with an HTML layer.
 
 
 To update the view after modifying the sprite, call "update"::
