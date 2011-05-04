@@ -711,8 +711,6 @@ Cycle.prototype.removeSprite = function removeSprite(sprite) {
 }
 
 Cycle.prototype.next = function (ticks, update) {
-    ticks = ticks || 1; // default tick: 1
-    this.tick = this.tick + ticks;
     if(this.tick > this.cycleDuration) {
         if(this.repeat)
             this.tick = 0;
@@ -729,6 +727,8 @@ Cycle.prototype.next = function (ticks, update) {
             }
         }
     }
+    ticks = ticks || 1; // default tick: 1
+    this.tick = this.tick + ticks;
     return this;
 };
 
