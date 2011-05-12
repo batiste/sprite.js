@@ -822,6 +822,8 @@ _Ticker.prototype.run = function() {
     this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) / 2 | 0;
     // We need some pause to let the browser catch up the update. Here at least 16 ms of pause
     var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 16);
+
+    //window.webkitRequestAnimationFrame(function(){t.run()});
     this.timeout = setTimeout(function(){t.run()}, _nextPaint);
 }
 
@@ -1011,19 +1013,31 @@ function Layer(scene, name, options) {
         error('Layer '+ name + ' already exist.');
 
     domElement = document.getElementById(name);
+    if(!domElement)
+        var needToCreate = true;
+    else
+        var needToCreate = false;
 
     if(this.useCanvas) {
         if (domElement && domElement.nodeName.toLowerCase() != "canvas") {
             error("Cannot use HTMLElement " + domElement.nodeName + " with canvas renderer.");
         }
-        if (!domElement) {
+        if (needToCreate) {
             domElement = document.createElement('canvas');
         }
         this.ctx = domElement.getContext('2d');
     } else {
-        if (!domElement) {
+        if (needToCreate) {
             domElement = document.createElement('div');
         }
+    }
+
+    if(!needToCreate) {
+        var domH = domElement.height || domElement.style.height;
+        var domW = domElement.width || domElement.style.width;
+    } else {
+        var domH = false;
+        var domW = false;
     }
 
     scene.dom.appendChild(domElement);
@@ -1031,8 +1045,8 @@ function Layer(scene, name, options) {
     domElement.style.zIndex = String(layerZindex);
     domElement.style.backgroundColor = options.color || domElement.style.backgroundColor;
     domElement.style.position = 'absolute';
-    domElement.height = options.h || domElement.height || domElement.style.height ||scene.h;
-    domElement.width = options.w || domElement.width || domElement.style.width || scene.w;
+    domElement.height = options.h || domH || scene.h;
+    domElement.width = options.w || domW || scene.w;
     domElement.style.top = domElement.style.top || '0px';
     domElement.style.left =  domElement.style.left || '0px';
 
