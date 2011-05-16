@@ -106,6 +106,7 @@ function Scene(options) {
     this.dom.style.width = this.w + 'px';
     this.dom.style.height = this.h + 'px';
     this.layers = {};
+    this.Layer("default");
     this.ticker = null;
     this.useCanvas = optionValue(options, "useCanvas",
         window.location.href.indexOf('canvas') != -1)
@@ -257,10 +258,6 @@ function _Sprite(scene, src, layer) {
     this.color = false;
 
     if(layer === undefined) {
-        // important to delay the creation so useCanvas
-        // can still be changed
-        if(scene.layers['default'] === undefined)
-            scene.layers['default'] = scene.Layer("default");
         layer = scene.layers['default'];
     }
     this.layer = layer;
@@ -575,7 +572,7 @@ _Sprite.prototype.onload = function(callback) {
 };
 
 _Sprite.prototype.loadImg = function (src, resetSize) {
-    // the image exact source value will change accoring to the
+    // the image exact source value will change according to the
     // hostname, this is useful to retain the original source value here.
     this.src = src;
     // check if the image is already in the cache
@@ -590,6 +587,7 @@ _Sprite.prototype.loadImg = function (src, resetSize) {
         var _loaded = spriteList[src].loaded;
     }
     var there = this;
+    // actions to perform when the image is loaded
     function imageReady(e) {
         spriteList[src].loaded = true;
         there.imgLoaded = true;
@@ -615,13 +613,13 @@ _Sprite.prototype.loadImg = function (src, resetSize) {
 
 
 _Sprite.prototype.isPointIn = function pointIn(x, y) {
-    // return true if the point is in the sprite surface
+    // return true if the point is within the sprite surface
     return (x >= this.x && x <= this.x+this.w - 1
         && y >= this.y && y <= this.y+this.h - 1)
 };
 
 _Sprite.prototype.collidesWith = function collidesWith(sprite) {
-    // Return true if the current sprite has any collision with the Array provided
+    // Return true if the current sprite has any collision with the Sprite provided
     if(sprite.x > this.x) {
         var x_inter = sprite._x_rounded - this._x_rounded < this.w - 1;
     } else {
