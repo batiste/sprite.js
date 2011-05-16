@@ -685,11 +685,19 @@ function Cycle(triplets) {
     // if set to false, the animation will stop automaticaly after one run
     this.repeat = true;
     this.tick = 0;
+    this.done = false;
 }
 
 Cycle.prototype.addSprite = function addSprite(sprite) {
     this.sprites.push(sprite);
     sprite.cycle = this;
+}
+
+Cycle.prototype.update = function update() {
+    var sprites = this.sprites;
+    for(var i=0, sp; sp = sprites[i]; i++) {
+        sp.update();
+    }
 }
 
 Cycle.prototype.addSprites = function addSprites(sprites) {
@@ -712,8 +720,10 @@ Cycle.prototype.next = function (ticks, update) {
     if(this.tick > this.cycleDuration) {
         if(this.repeat)
             this.tick = 0;
-        else
+        else {
+            this.done = true;
             return this;
+        }
     }
     for(var i=0; i<this.changingTicks.length; i++) {
         if(this.tick == this.changingTicks[i]) {
@@ -732,6 +742,7 @@ Cycle.prototype.next = function (ticks, update) {
 
 Cycle.prototype.reset = function resetCycle() {
     this.tick = 0;
+    this.done = false;
     for(var j=0, sprite; sprite = this.sprites[j]; j++) {
         sprite.setXOffset(this.triplets[0][0]);
         sprite.setYOffset(this.triplets[0][1]);
@@ -1069,3 +1080,4 @@ Layer.prototype.setColor = function setColor(color) {
 global.sjs = sjs;
 
 })(this);
+
