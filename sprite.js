@@ -106,11 +106,12 @@ function Scene(options) {
     this.dom.style.width = this.w + 'px';
     this.dom.style.height = this.h + 'px';
     this.layers = {};
-    this.Layer("default");
     this.ticker = null;
     this.useCanvas = optionValue(options, "useCanvas",
         window.location.href.indexOf('canvas') != -1)
 
+    // needs to be done after this.useCanvas
+    this.Layer("default");
     sjs.scenes.push(this);
     return this;
 }
@@ -454,7 +455,7 @@ _Sprite.prototype.size = function (w, h) {
 _Sprite.prototype.remove = function remove() {
     if(this.cycle)
         this.cycle.removeSprite(this);
-    if(this.layer.useCanvas == false) {
+    if(!this.layer.useCanvas) {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
     }
@@ -661,6 +662,19 @@ _Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
     }
     return false;
 };
+
+_Sprite.prototype.explode = function explode(layer) {
+    if(!layer)
+        layer = this.layer;
+    var s1 = layer.scene.Sprite(this.src, layer);
+    s1.setW(this.w / 2 | 0);
+    s1.position(this.x, this.y);
+    var s2 = layer.scene.Sprite(this.src, layer);
+    s2.setW(this.w / 2 | 0);
+    s2.position(this.x + this.w / 2 | 0, this.y);
+    s2.setXOffset(this.w / 2 | 0);
+    return [s1, s2];
+}
 
 function Cycle(triplets) {
 

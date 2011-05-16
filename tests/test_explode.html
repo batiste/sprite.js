@@ -1,0 +1,105 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test Exploding crates animation</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+</head>
+<body>
+
+<p>Exploding crates: <span id="result"></span> <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
+
+</body>
+<script src="../sprite.js"></script>
+<script>
+
+window.onload = function() {
+
+if(window.location.href.indexOf('canvas') != -1) {
+    document.getElementById('canvas-mode').style.display = 'none';
+} else {
+    document.getElementById('html-mode').style.display = 'none';
+}
+var result = document.getElementById('result');
+
+var scene = sjs.Scene({w:600, h:600});
+
+scene.loadImages(['crate.png'], function() {
+
+    var crate = scene.Sprite('crate.png');
+
+    function hasCollision(crate) {
+        if(crate.y > 600 - 32)
+            return true;
+        return false;
+    }
+
+    function deleteFromList(list, toDelete) {
+        for(var i=0, el; el = list[i]; i++) {
+            if(el==toDelete) {
+                list.splice(i, 1);
+            }
+        }
+    }
+
+    var gravity = 0.5;
+
+    //var parts = crate.explode();
+    var crates = [];
+    var parts = [];
+
+    function paint() {
+
+        if(ticker.currentTick % 12 == 0) {
+            var crate = scene.Sprite('crate.png');
+            crate.position(50 + Math.random() * 500 | 0, 50)
+            crates.push(crate);
+        }
+
+        for(var i=0; i<crates.length; i++) {
+            var crate = crates[i];
+            crate.yv += gravity;
+            crate.applyVelocity();
+            if(hasCollision(crate)) {
+                crate.reverseYVelocity();
+                crate.yv = 0;
+                var p = crate.explode();
+                p[0].xv = -6 + Math.random() * 2;
+                p[0].rv = -0.2;
+                p[0].yv = -10;
+                p[1].xv = 4 + Math.random() * 2;
+                p[1].yv = -10;
+                p[1].rv = 0.2;
+                parts.push.apply(parts, p);
+                crate.remove();
+                deleteFromList(crates, crate);
+                i--;
+                continue;
+            } else {
+                crate.update();
+            }
+        }
+
+        for(var i=0; i<parts.length; i++) {
+            var part = parts[i];
+            part.yv += gravity;
+            part.applyVelocity();
+            if(hasCollision(part)) {
+                deleteFromList(parts, part);
+                part.remove();
+                i--;
+                continue;
+            } else {
+                part.update();
+            }
+        }
+    };
+
+
+    var ticker = scene.Ticker(30, paint);
+    ticker.run();
+
+});
+
+};
+</script>
+</html>
