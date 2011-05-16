@@ -254,11 +254,15 @@ cycle applies to. this is a cycle with 3 position, each lasting 5 game ticks::
     cycle.removeSprite(sprite); // remove the sprite from the cycle
 
     cycle.next()  // apply the next cycle to the sprite
+    cycle.next(1, true) // apply the next cycle *and* call update() on the sprites
     cycle.next(2) // apply the second next cycle to the sprite
     cycle.goto(1) // go to the second game tick in the triplet
     cycle.reset() // reset the cycle to the original position
     cycle.repeat = false // if set to false, the animation will stop automaticaly after one run
+    cycle.done    // can be used to check if the cycle has completed
+                  // stays false if cycle is set to repeat = true
 
+    cycle.update() // calls update() on all the sprites in the cycle
 
 Input object
 =============
