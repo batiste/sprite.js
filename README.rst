@@ -185,6 +185,12 @@ Sprites comes with a bunch of methods to help you to implement a physic effects:
     sprite.distance(sprite)     // return the distance between 2 sprite center
     sprite.distance(x, y)       // return the distance between the sprite center and the point (x, y)
 
+There is also 2 methods that can help to create special effects::
+
+    sprite.explode2(<layer>)        // return 2 new sprites that the vertical separation of the sprite
+
+    sprite.explode4(x, y, <layer>)  // return 4 new sprites that are the separation from the center (x, y)
+
 Other important methods::
 
     sprite.loadImg(src, bool resetSize)    // change the image sprite. The size of the sprite will be rested by

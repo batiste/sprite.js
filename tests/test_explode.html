@@ -33,6 +33,12 @@ scene.loadImages(['crate.png'], function() {
         return false;
     }
 
+    var bg = scene.Sprite();
+    bg.position(0, 600-32);
+    bg.size(600, 20);
+    bg.setColor('#999');
+    bg.update();
+
     function deleteFromList(list, toDelete) {
         for(var i=0, el; el = list[i]; i++) {
             if(el==toDelete) {
@@ -48,6 +54,8 @@ scene.loadImages(['crate.png'], function() {
     var parts = [];
 
     function paint() {
+
+        bg.update();
 
         if(ticker.currentTick % 12 == 0) {
             var crate = scene.Sprite('crate.png');

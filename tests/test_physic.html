@@ -24,17 +24,23 @@ scene.loadImages(['crate.png'], function() {
     }
     result = document.getElementById('result');
 
+    var bg = scene.Sprite(false);
+    bg.position(0, 600-32);
+    bg.size(600, 20);
+    bg.setColor('#999');
+    bg.update();
+
     var crates = [];
 
     for(var i=0; i<120; i++) {
         var sp = scene.Sprite('crate.png');
-        sp.move((i % 12) * 35, (i/12.0|0)* 50);
+        sp.move(32 + (i % 12) * 35, (i/12.0|0)* 50);
         sp.update();
         crates.push(sp);
     }
 
     function hasCollision(crate) {
-        if(crate.y > 600 - 32)
+        if(crate.y + 32 > 600 - 32)
             return true;
         if(crate.collidesWithArray(crates))
             return true;
@@ -44,6 +50,9 @@ scene.loadImages(['crate.png'], function() {
     var gravity = 0.5;
 
     function paint() {
+
+        bg.update();
+
         for(var i=0; i<crates.length; i++) {
             var crate = crates[i];
             crate.yv += gravity;
