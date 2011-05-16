@@ -28,7 +28,7 @@ scene.loadImages(['crate.png'], function() {
     var crate = scene.Sprite('crate.png');
 
     function hasCollision(crate) {
-        if(crate.y > 600 - 32)
+        if(crate.y + crate.h > 600 - 32)
             return true;
         return false;
     }
@@ -62,14 +62,18 @@ scene.loadImages(['crate.png'], function() {
             if(hasCollision(crate)) {
                 crate.reverseYVelocity();
                 crate.yv = 0;
-                var p = crate.explode();
-                p[0].xv = -6 + Math.random() * 2;
-                p[0].rv = -0.2;
-                p[0].yv = -10;
-                p[1].xv = 4 + Math.random() * 2;
-                p[1].yv = -10;
-                p[1].rv = 0.2;
-                parts.push.apply(parts, p);
+                if(Math.random() > 0.3)
+                    var _parts = crate.explode4(16, 16);
+                else
+                    var _parts = crate.explode2();
+                for(var j=0; j<_parts.length; j++) {
+                    var p = _parts[j];
+                    p.xv = 5 * (Math.random() - 0.5)
+                    p.yv = -6 -5 * Math.random();
+                    p.rv = Math.random() / 2;
+                    p.applyVelocity();
+                }
+                parts.push.apply(parts, _parts);
                 crate.remove();
                 deleteFromList(crates, crate);
                 i--;

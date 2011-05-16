@@ -663,7 +663,7 @@ _Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
     return false;
 };
 
-_Sprite.prototype.explode = function explode(layer) {
+_Sprite.prototype.explode2 = function explode(layer) {
     if(!layer)
         layer = this.layer;
     var s1 = layer.scene.Sprite(this.src, layer);
@@ -674,6 +674,34 @@ _Sprite.prototype.explode = function explode(layer) {
     s2.position(this.x + this.w / 2 | 0, this.y);
     s2.setXOffset(this.w / 2 | 0);
     return [s1, s2];
+}
+
+_Sprite.prototype.explode4 = function explode(x, y, layer) {
+    x = x | 0;
+    y = y | 0;
+    if(!layer)
+        layer = this.layer;
+    // top left sprite, going counterclockwise
+    var s1 = layer.scene.Sprite(this.src, layer);
+    s1.size(x, y);
+    s1.position(this.x, this.y);
+
+    var s2 = layer.scene.Sprite(this.src, layer);
+    s2.size(this.w - x, y);
+    s2.position(this.x + x, this.y);
+    s2.offset(x, 0);
+
+    var s3 = layer.scene.Sprite(this.src, layer);
+    s3.size(this.w - x, this.h - y);
+    s3.position(this.x + x, this.y + y);
+    s3.offset(x, y);
+
+    var s4 = layer.scene.Sprite(this.src, layer);
+    s4.size(x, this.h - y);
+    s4.position(this.x, this.y + y);
+    s4.offset(0, y);
+
+    return [s1, s2, s3, s4];
 }
 
 function Cycle(triplets) {
