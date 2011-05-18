@@ -115,7 +115,7 @@ Both parameters are optionnal. If you want to set the layer but not any image::
 
     var sprite = scene.Sprite(false, <layer>)
 
-For technichal and performance reasons Sprite's attributes needs to changed using a setters method. The following
+For technichal and performance reasons Sprite's attributes needs to be changed using a setters method. The following
 attributes are *READ ONLY*::
 
     sprite.x        // position of the sprite from the left corner of the scene
@@ -127,7 +127,7 @@ attributes are *READ ONLY*::
 
     sprite.xoffset  // offset in the image to start painting in the view surface
     sprite.yoffset
-    sprite.xscale
+    sprite.xscale   // vertical and horizontal scaling
     sprite.yscale
     sprite.angle    // use radians
     sprite.opacity  // use float in the range 0-1
@@ -150,11 +150,11 @@ If you want to change any of those attributes use the following setters::
 Or one of those helper methods::
 
     sprite.rotate(radians)
-    sprite.scale(x, y)     // if y is not defined, y take the same value as x
-    sprite.move(x, y)      // move the sprite in the direction of the provided vector (x, y)
-    sprite.position(x, y)  // set the position of the sprite
+    sprite.scale(x, y)      // if y is not defined, y take the same value as x
+    sprite.move(x, y)       // move the sprite in the direction of the provided vector (x, y)
+    sprite.position(x, y)   // set the position of the sprite
     sprite.offset(x, y)
-    sprite.size(w, h)      // set the width and height of the visible sprite
+    sprite.size(w, h)       // set the width and height of the visible sprite
 
 Sprites comes with a bunch of methods to help you to implement a physic effects::
 
@@ -250,7 +250,7 @@ To setup a ticker::
     function paint() {
 
         myCycles.next(ticker.lastTicksElapsed);
-        // do your stuff
+        // do your animation and physic here
 
     }
     var ticker = scene.Ticker(35, paint); // we want a tick every 35ms
@@ -270,31 +270,31 @@ rendered.
 Cycle object
 ============
 
-A cycle object handles sprite animations. A cycle is defined by list of
-tuples: (x offset, y offset, game tick duration), and the sprites the
+A cycle object handles sprite animations by moving the offsets of the sprite.
+A cycle is defined by list of tuples: (x offset, y offset, game tick duration), and the sprites the
 cycle applies to. this is a cycle with 3 position, each lasting 5 game ticks::
 
     var cycle = scene.Cycle([[0, 2, 5],
                               [30, 2, 5],
                               [60, 2, 5]);
-    var sprite = scene.Sprite("walk.png")
+    var sprite = scene.Sprite("walk.png");
     cycle.addSprite(sprite);
 
-    var sprites = [sprite1, sprite2]
+    var sprites = [sprite1, sprite2];
     cycle.addSprites(sprites);  // add an Array of sprites to the cycle
 
     cycle.removeSprite(sprite); // remove the sprite from the cycle
 
-    cycle.next()  // apply the next cycle to the sprite
-    cycle.next(1, true) // apply the next cycle *and* call update() on the sprites
-    cycle.next(2) // apply the second next cycle to the sprite
-    cycle.goto(1) // go to the second game tick in the triplet
-    cycle.reset() // reset the cycle to the original position
+    cycle.next()         // apply the next cycle to the sprite
+    cycle.next(1, true)  // apply the next cycle *and* call update() on the sprites
+    cycle.next(2)        // apply the second next cycle to the sprite
+    cycle.goto(1)        // go to the second game tick in the triplet
+    cycle.reset()        // reset the cycle to the original position
     cycle.repeat = false // if set to false, the animation will stop automaticaly after one run
-    cycle.done    // can be used to check if the cycle has completed
-                  // stays false if cycle is set to repeat = true
+    cycle.done           // can be used to check if the cycle has completed
+                         // stays false if cycle is set to repeat = true
 
-    cycle.update() // calls update() on all the sprites in the cycle
+    cycle.update()       // calls update() on all the sprites in the cycle
 
 Input object
 =============
