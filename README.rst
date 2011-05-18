@@ -1,5 +1,5 @@
 =================
-sprite.js v0.9.1
+sprite.js v1.0.0
 =================
 
 The sprite.js framework lets you create animations and games
@@ -8,9 +8,7 @@ framework for Desktop and mobile browsers.
 
 sprite.js has been tested on Chromium, Firefox, Android emulator, Opera and IE9.
 
-For an example of the what the framework offers, have a look at test_sprites.html.
-
-You can see the tests demos online here:
+For an example of the what the framework offers, have a look at the test files:
 
 http://batiste.dosimple.ch/sprite.js/tests/
 
@@ -22,10 +20,10 @@ Example of a basic use::
     <script src="sprite.js"></script>
 
     <script>
-    // set the viewport size (default 480x320)
+    // set the Scene object
     var scene = sjs.Scene({w:640, h:480});
 
-    // load the images that gonna be used in parallel. When all the images are
+    // load the images in parallel. When all the images are
     // ready, the callback function is called.
     scene.loadImages(['character.png'], function() {
 
@@ -39,8 +37,7 @@ Example of a basic use::
         sp.update();
 
         // change the offset of the image in the sprite (this works the opposite way of a CSS background)
-        sp.xoffset=50;
-        sp.yoffset=50;
+        sp.offset(50, 50);
 
         // diverse transformations
         sp.move(100, 100);
@@ -49,7 +46,6 @@ Example of a basic use::
         sp.opacity = 0.8;
 
         sp.update();
-
     });
     </script>
 
@@ -185,11 +181,13 @@ Sprites comes with a bunch of methods to help you to implement a physic effects:
     sprite.distance(sprite)     // return the distance between 2 sprite center
     sprite.distance(x, y)       // return the distance between the sprite center and the point (x, y)
 
-There is also 2 methods that can help to create special effects::
+There is also 2 methods that can help to create special effects. You can use explode2 to separate the current sprite in 2 parts::
 
-    sprite.explode2(<layer>)        // return 2 new sprites that the vertical separation of the sprite
+    // return 2 new sprites split the sprite in half according to the position. Default value for position is half the size of the sprite.
+    [sprite1, sprite2] = sprite.explode2(<position>, <bool horizontal>, <layer>)
 
-    sprite.explode4(x, y, <layer>)  // return 4 new sprites that are the separation from the center (x, y)
+     // return 4 new sprites that are the split from the center (x, y). Default value for the center is the center of the sprite.
+    [sprite1, sprite2, sprite3, sprite4] = sprite.explode4(<x>, <y>, <layer>)
 
 Other important methods::
 
@@ -208,6 +206,31 @@ To update the view after modifying the sprite, call "update"::
 
 With a canvas backend, the surface will be automaticaly cleared before each game tick. You will need to call update
 to draw the sprite on the canvas again. If you don't want to do this you can set the layer autoClear attribute to false.
+
+SpriteList object
+==================
+
+SpriteList is a convenience list type object that enable you to delete and add sprites without having to care
+about indexes and for loop syntax::
+
+    var sprite_list = sjs.SpriteList(<array of sprites>)
+
+    sprite_list.add(sprite || array of sprite)  // add to the list
+    sprite_list.remove(sprite)                  // delete from the list
+    sprite_list.iterate()                       // iterate on the entire list then stops
+
+Example of use::
+
+    var crates = sjs.SpriteList([crate1, crate2]);
+
+    var crate;
+    while(crate = crates.iterate()) {
+        crate.applyVelocity();
+        if(crate.y > 200) {
+            crates.remove(crate);
+            crate.remove();
+        }
+    }
 
 
 Ticker object

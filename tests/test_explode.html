@@ -25,8 +25,6 @@ var scene = sjs.Scene({w:600, h:600});
 
 scene.loadImages(['crate.png'], function() {
 
-    var crate = scene.Sprite('crate.png');
-
     function hasCollision(crate) {
         if(crate.y + crate.h > 600 - 32)
             return true;
@@ -39,41 +37,38 @@ scene.loadImages(['crate.png'], function() {
     bg.setColor('#999');
     bg.update();
 
-    function deleteFromList(list, toDelete) {
-        for(var i=0, el; el = list[i]; i++) {
-            if(el==toDelete) {
-                list.splice(i, 1);
-            }
-        }
-    }
-
     var gravity = 0.5;
 
     //var parts = crate.explode();
-    var crates = [];
-    var parts = [];
+    var crates = sjs.SpriteList();
+    var parts = sjs.SpriteList();
 
     function paint() {
 
         bg.update();
 
-        if(ticker.currentTick % 12 == 0) {
+        if(ticker.currentTick % 6 == 0) {
             var crate = scene.Sprite('crate.png');
             crate.position(50 + Math.random() * 500 | 0, 50)
-            crates.push(crate);
+            crates.add(crate);
         }
 
-        for(var i=0; i<crates.length; i++) {
-            var crate = crates[i];
+        var crate;
+        while(crate = crates.iterate()) {
             crate.yv += gravity;
             crate.applyVelocity();
             if(hasCollision(crate)) {
                 crate.reverseYVelocity();
                 crate.yv = 0;
-                if(Math.random() > 0.3)
-                    var _parts = crate.explode4(16, 16);
-                else
-                    var _parts = crate.explode2();
+                if(Math.random() > 0.5) {
+                    var x = 4 + Math.random() * 24 | 0;
+                    var y = 4 + Math.random() * 24 | 0;
+                    var _parts = crate.explode4(x, y);
+                } else {
+                    var horizontal = Math.random() > 0.5;
+                    var position = 4 + Math.random() * 24 | 0;
+                    var _parts = crate.explode2(position, horizontal);
+                }
                 for(var j=0; j<_parts.length; j++) {
                     var p = _parts[j];
                     p.xv = 5 * (Math.random() - 0.5)
@@ -81,25 +76,21 @@ scene.loadImages(['crate.png'], function() {
                     p.rv = Math.random() / 2;
                     p.applyVelocity();
                 }
-                parts.push.apply(parts, _parts);
+                parts.add(_parts);
                 crate.remove();
-                deleteFromList(crates, crate);
-                i--;
-                continue;
+                crates.remove(crate);
             } else {
                 crate.update();
             }
         }
 
-        for(var i=0; i<parts.length; i++) {
-            var part = parts[i];
+        var part;
+        while(part = parts.iterate()) {
             part.yv += gravity;
             part.applyVelocity();
             if(hasCollision(part)) {
-                deleteFromList(parts, part);
+                parts.remove(part);
                 part.remove();
-                i--;
-                continue;
             } else {
                 part.update();
             }

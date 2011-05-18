@@ -21,7 +21,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/* Sprite.js v0.9.1
+/* Sprite.js v1.0.0
  *
  * coding guideline
  *
@@ -46,6 +46,7 @@ var sjs = {
     Cycle: Cycle,
     Input: Input,
     Scene: Scene,
+    SpriteList:SpriteList,
     overlay:overlay,
     scenes:[]
 };
@@ -663,20 +664,39 @@ _Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
     return false;
 };
 
-_Sprite.prototype.explode2 = function explode(layer) {
+_Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
     if(!layer)
         layer = this.layer;
+    if(v == undefined) {
+        if(horizontal)
+            v = this.w / 2;
+        else
+            v = this.h / 2;
+    }
+    v = v | 0;
     var s1 = layer.scene.Sprite(this.src, layer);
-    s1.setW(this.w / 2 | 0);
-    s1.position(this.x, this.y);
     var s2 = layer.scene.Sprite(this.src, layer);
-    s2.setW(this.w / 2 | 0);
-    s2.position(this.x + this.w / 2 | 0, this.y);
-    s2.setXOffset(this.w / 2 | 0);
+    if(horizontal) {
+        s1.size(this.w, v);
+        s1.position(this.x, this.y);
+        s2.size(this.w, this.h - v);
+        s2.position(this.x, this.y + v);
+        s2.setYOffset(v);
+    } else {
+        s1.size(v, this.h);
+        s1.position(this.x, this.y);
+        s2.size(this.w - v, this.h);
+        s2.position(this.x + v, this.y);
+        s2.setXOffset(v);
+    }
     return [s1, s2];
 }
 
 _Sprite.prototype.explode4 = function explode(x, y, layer) {
+    if(x == undefined)
+        x = this.w / 2;
+    if(y == undefined)
+        y = this.h / 2;
     x = x | 0;
     y = y | 0;
     if(!layer)
@@ -1117,6 +1137,41 @@ Layer.prototype.addSprite = function addSprite(sprite) {
 
 Layer.prototype.setColor = function setColor(color) {
     this.dom.style.backgroundColor = color;
+}
+
+function SpriteList(list) {
+    if(this.constructor !== arguments.callee)
+        return new SpriteList(list);
+    this.list = list || [];
+    this.index = -1;
+}
+
+SpriteList.prototype.add = function add(sprite) {
+    if(sprite.length)
+        this.list.push.apply(this.list, sprite);
+    else
+        this.list.push(sprite)
+}
+
+SpriteList.prototype.remove = function remove(sprite) {
+    for(var i=0, el; el = this.list[i]; i++) {
+        if(el==sprite) {
+            this.list.splice(i, 1);
+            // delete during the iteration is possible
+            if(this.index > -1)
+                this.index = this.index - 1;
+            return true;
+        }
+    }
+}
+
+SpriteList.prototype.iterate = function iterate() {
+    this.index += 1;
+    if(this.index >= this.list.length) {
+        this.index = -1;
+        return false;
+    }
+    return this.list[this.index];
 }
 
 global.sjs = sjs;
