@@ -13,8 +13,6 @@
 <script src="../sprite.js"></script>
 <script>
 
-
-
 window.onload = function() {
 
     var l = document.getElementById('load');
@@ -27,7 +25,7 @@ window.onload = function() {
         document.getElementById('html-mode').style.display = 'none';
     }
 
-    var particles = [];
+    var particles = sjs.SpriteList();
 
     function createParticle() {
         particle = scene.Sprite('particule.png');
@@ -35,7 +33,7 @@ window.onload = function() {
         particle.setY(scene.h / 3);
         particle.xv = (Math.random() - 0.5) * 2;
         particle.yv = (Math.random() - 1) * 2;
-        particles.push(particle);
+        particles.add(particle);
     }
 
     function paint() {
@@ -47,17 +45,13 @@ window.onload = function() {
             createParticle();
             createParticle();
         }
-        if(ticker.load > 80) {
-            particles[0].remove();
-            particles.splice(0, 1);
-        }
-        for(var i=0; i<particles.length; i++) {
-            var particle = particles[i];
+
+        var particle;
+        while(particle = particles.iterate()) {
             particle.yv += 0.003;
             particle.move(particle.xv, particle.yv);
             if(particle.y > window.innerHeight) {
-                particles.splice(i, 1);
-                i--;
+                particles.remove(particle)
                 particle.remove();
             } else {
                 particle.update();
@@ -65,7 +59,7 @@ window.onload = function() {
         }
         if(ticker.currentTick % 30 == 0) {
             l.innerHTML = ticker.load;
-            nb.innerHTML = particles.length;
+            nb.innerHTML = particles.list.length;
         }
 
     };

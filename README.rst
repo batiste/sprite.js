@@ -218,6 +218,7 @@ about indexes and for loop syntax::
     sprite_list.add(sprite || array of sprite)  // add to the list
     sprite_list.remove(sprite)                  // delete from the list
     sprite_list.iterate()                       // iterate on the entire list then stops
+    sprite_list.list                            // the Array object that is manipulated
 
 Example of use::
 
@@ -227,7 +228,9 @@ Example of use::
     while(crate = crates.iterate()) {
         crate.applyVelocity();
         if(crate.y > 200) {
+            // remove it from the list
             crates.remove(crate);
+            // remove it from the DOM
             crate.remove();
         }
     }
