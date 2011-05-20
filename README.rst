@@ -183,15 +183,17 @@ Sprites comes with a bunch of methods to help you to implement a physic effects:
 
 There is also 2 methods that can help to create special effects. You can use explode2 to separate the current sprite in 2 parts::
 
-    // return 2 new sprites split the sprite in half according to the position. Default value for position is half the size of the sprite.
+    // Return 2 new sprites split the sprite in half according to the position. 
+    // Default value for position is half the size of the sprite.
     [sprite1, sprite2] = sprite.explode2(<position>, <bool horizontal>, <layer>)
 
-     // return 4 new sprites that are the split from the center (x, y). Default value for the center is the center of the sprite.
+    // Return 4 new sprites that are the split from the center (x, y). 
+    // Default value for the center is the center of the sprite.
     [sprite1, sprite2, sprite3, sprite4] = sprite.explode4(<x>, <y>, <layer>)
 
 Other important methods::
 
-    sprite.loadImg(src, bool resetSize)    // change the image sprite. The size of the sprite will be rested by
+    sprite.loadImg(src, <bool resetSize>)    // change the image sprite. The size of the sprite will be reseted by
                                            // the new image if resetSize is true.
 
     sprite.remove // Remove the dom element if the HTML backend is used and facilite the garbage collection of the object.
@@ -200,7 +202,7 @@ Other important methods::
     sprite.canvasUpdate(layer)  // draw the sprite on a given Canvas layer. This doesn't work with an HTML layer.
 
 
-To update the view after modifying the sprite, call "update"::
+To update any visual changes to the view you should call the "update" method::
 
     Sprite.update()
 
@@ -218,7 +220,7 @@ about indexes and for loop syntax::
     sprite_list.add(sprite || array of sprite)  // add to the list
     sprite_list.remove(sprite)                  // delete from the list
     sprite_list.iterate()                       // iterate on the entire list then stops
-    sprite_list.list                            // the Array object that is manipulated
+    sprite_list.length                          // length of the list
 
 Example of use::
 
@@ -322,7 +324,7 @@ You also have access to those helpers on the input object::
     input.arrows() // arrows return true if any directionnal keyboard arrows are pressed
     input.keydown  // this is true if any key is down
 
-If you need to know which key has just been pressed or released during the last game tick you can use those functions::
+If you need to know which key has just been pressed or released during the last game tick you can use those methods::
 
     input.keyPressed('up')
     input.keyReleased('up')

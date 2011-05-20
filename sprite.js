@@ -33,15 +33,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(global, undefined){
 
-// fixing the bad boys that don't have defineProperty
-if(!Object.defineProperty) {
-    Object.defineProperty = function(obj, name, dict) {
-        obj.__defineGetter__(name, dict['get']);
-        obj.__defineSetter__(name, dict['set']);
-    }
-}
-defineProperty = Object.defineProperty
-
 var sjs = {
     Cycle: Cycle,
     Input: Input,
@@ -144,8 +135,7 @@ Scene.prototype.reset = function reset() {
         }
     }
     // remove remaining children
-    while ( this.dom.childNodes.length >= 1 )
-    {
+    while ( this.dom.childNodes.length >= 1 ) {
         this.dom.removeChild( this.dom.firstChild );
     }
     this.layers = {};
@@ -1143,6 +1133,7 @@ function SpriteList(list) {
     if(this.constructor !== arguments.callee)
         return new SpriteList(list);
     this.list = list || [];
+    this.length = this.list.length;
     this.index = -1;
 }
 
@@ -1150,7 +1141,8 @@ SpriteList.prototype.add = function add(sprite) {
     if(sprite.length)
         this.list.push.apply(this.list, sprite);
     else
-        this.list.push(sprite)
+        this.list.push(sprite);
+    this.length = this.list.length;
 }
 
 SpriteList.prototype.remove = function remove(sprite) {
@@ -1160,6 +1152,7 @@ SpriteList.prototype.remove = function remove(sprite) {
             // delete during the iteration is possible
             if(this.index > -1)
                 this.index = this.index - 1;
+            this.length = this.list.length;
             return true;
         }
     }
