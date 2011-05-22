@@ -206,7 +206,6 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
 function _Sprite(scene, src, layer) {
 
     this.scene = scene;
-    var sp = this;
     this._dirty = {};
     this.changed = false;
 
@@ -450,7 +449,7 @@ _Sprite.prototype.remove = function remove() {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
     }
-    delete this.layer.sprites[this.layerIndex];
+    //delete this.layer.sprites[this.layerIndex];
     this.layer = null;
     this.img = null;
 };
@@ -516,7 +515,7 @@ _Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
     ctx.save();
     ctx.translate(this.x + this.w/2 | 0, this.y + this.h/2 | 0);
     ctx.rotate(this.angle);
-    if(this.xscale != 1 || this.xscale != 1)
+    if(this.xscale != 1 || this.yscale != 1)
         ctx.scale(this.xscale, this.yscale);
     ctx.globalAlpha = this.opacity;
     ctx.translate(-this.w/2 | 0, -this.h/2 | 0);
@@ -1046,8 +1045,6 @@ var layerZindex = 1;
 
 function Layer(scene, name, options) {
 
-    var canvas, domElement;
-
     if(this.constructor !== arguments.callee)
         return new Layer(scene, name, options);
 
@@ -1073,7 +1070,7 @@ function Layer(scene, name, options) {
     else
         error('Layer '+ name + ' already exist.');
 
-    domElement = document.getElementById(name);
+    var domElement = document.getElementById(name);
     if(!domElement)
         var needToCreate = true;
     else
