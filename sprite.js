@@ -644,6 +644,23 @@ _Sprite.prototype.collidesWith = function collidesWith(sprite) {
     return y_inter;
 };
 
+_Sprite.prototype.points = function collidesWith(sprite) {
+    // Return true if the current sprite has any collision with the Sprite provided
+    var distance = Math.sqrt(this.w / 2 * this.w / 2 + this.h / 2 * this.h / 2);
+    // starting up left
+    var angle = Math.atan2(-this.w, -this.h);
+    var points = [];
+    for(var i=0; i < 4; i++) {
+        points.push([
+            distance * Math.cos(this.angle + angle) + this.x + this.w/2 | 0, 
+            distance * Math.sin(this.angle + angle) + this.y + this.h/2 | 0
+        ]);
+        angle += Math.PI / 2.0;
+    }
+
+    return points;
+};
+
 _Sprite.prototype.distance = function distancePoint(x, y) {
     // Return the distance between this sprite and the point (x, y) or a Sprite
     if(typeof x == "number") {

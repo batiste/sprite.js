@@ -119,6 +119,25 @@ window.onload = function() {
 
     assertEqual(sp1.toto, undefined,  "Test init undefined");
     assertEqual(sp1.layer, fakelayer,  "Test init layer");
+
+    var sp1 = scene.Sprite('character.png', {position:[-5, -5], size:[10, 10], });
+
+    assertEqual(JSON.stringify(sp1.points()), 
+      JSON.stringify([[-5, -5], [5, -5], [5, 5], [-5, 5]]),  "Test points function 1");
+
+    sp1.angle = Math.PI / 2.0;
+    
+    assertEqual(JSON.stringify(sp1.points()), 
+      JSON.stringify([[5, -5], [5, 5], [-5, 5], [-5, -5]]),  "Test points function 2");
+
+    sp1.angle += Math.PI / 4.0;
+
+    var pts = sp1.points();
+
+    assertEqual(Math.sqrt(50) | 0, pts[0][0], "Test point value");
+
+    assertEqual(JSON.stringify(sp1.points()), 
+      JSON.stringify([[7, 0], [0, 7], [-7, 0], [0, -7]]),  "Test points function 3");
 };
 </script>
 </html>
