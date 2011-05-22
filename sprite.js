@@ -247,12 +247,29 @@ function _Sprite(scene, src, layer) {
 
     this.opacity = 1;
     this.color = false;
+    
+    // if it doesn't seems to kouak like a Layer object
+    if(layer) {
+        if(layer.sprites) {
+            this.layer = layer;
+        } else {
+            // we can receive things like this
+            // {x:10, y:10, w:10, h:50, size:[20, 30]}
+            this.layer = scene.layers['default'];
+            var properties = layer;
 
-    if(layer === undefined) {
-        layer = scene.layers['default'];
+            for(p in properties) {
+                var value = properties[p];
+                var target = this[p];
+                if(typeof target == "function")
+                    this[p].apply(this, value);
+                else if(target !== undefined)
+                    this[p] = value;
+            }
+        }
+    } else {
+        this.layer = scene.layers['default']; 
     }
-    this.layer = layer;
-    //this.layerIndex = layer.addSprite(this);
 
     if(!this.layer.useCanvas) {
         var d = document.createElement('div');

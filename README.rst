@@ -111,9 +111,13 @@ To create a sprite you should use the scene.Sprite constructor::
 
     var sprite = scene.Sprite(<src>, <layer>)
 
-Both parameters are optionnal. If you want to set the layer but not any image::
+Both parameters are optionnal. If the layer is not specified, the default layer will be used. If you want to set the layer but not any image::
 
     var sprite = scene.Sprite(false, <layer>)
+
+You can also init any Sprite properties by passing an options object instead of the Layer object, eg::
+
+        var sprite = scene.Sprite("mysprite.png", {layer:layer, x:10, size:[20, 20], y:15})
 
 For technichal and performance reasons Sprite's attributes needs to be changed using a setters method. The following
 attributes are *READ ONLY*::

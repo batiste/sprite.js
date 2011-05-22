@@ -40,7 +40,7 @@ window.onload = function() {
     }
     function assertEqual(value1, value2, text) {
         text = getText(text)
-        if(value1 == value2) {
+        if(value1 === value2) {
             result.value += text + ': pass\n';
         } else {
             result.value += text + ': fail ('+value1+' not equal to '+value2+')\n';
@@ -97,6 +97,28 @@ window.onload = function() {
     assertEqual(sp1.distance(20, 15), 5,  "Point distance test 2");
     assertEqual(sp1.distance(15, 20), 5,  "Point distance test 3");
     assertEqual(sp1.distance(20, 20), Math.sqrt(5*5+5*5),  "Point distance test 4");
+
+    // Sprite instanciation tests
+
+    var sp1 = scene.Sprite('character.png', {x:40, y:50, w:30, h:25});
+    assertEqual(sp1.x, 40,  "Test init position 1");
+    assertEqual(sp1.y, 50,  "Test init position 2");
+    assertEqual(sp1.w, 30,  "Test init size 1");
+    assertEqual(sp1.h, 25,  "Test init size 2");
+
+    var fakelayer = {
+        dom:{appendChild:function(){}}
+    }
+
+    var sp1 = scene.Sprite('character.png', {position:[60, 60], size:[55, 65], toto:5, layer:fakelayer});
+    assertEqual(sp1.x, 60,  "Test init position 3");
+    assertEqual(sp1.y, 60,  "Test init position 4");
+    assertEqual(sp1.w, 55,  "Test init size 3");
+    assertEqual(sp1.h, 65,  "Test init size 4");
+
+
+    assertEqual(sp1.toto, undefined,  "Test init undefined");
+    assertEqual(sp1.layer, fakelayer,  "Test init layer");
 };
 </script>
 </html>
