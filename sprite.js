@@ -621,10 +621,41 @@ _Sprite.prototype.loadImg = function (src, resetSize) {
 
 
 _Sprite.prototype.isPointIn = function pointIn(x, y) {
-    // return true if the point is within the sprite surface
-    return (x >= this.x && x <= this.x+this.w - 1
-        && y >= this.y && y <= this.y+this.h - 1)
+    // Return true if the point is within the sprite surface
+    if(this.angle == 0)
+        return (x >= this.x && x < this.x+this.w
+            && y >= this.y && y < this.y+this.h);
+    return this.isPointInAngle(x, y);
 };
+
+sjs.lineSide = function(ax, ay, bx, by, cx, cy) {
+    // return true if the point is on the right of the line
+    var v = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+    if(v == 0)
+        return null;
+    return v > 0;
+}
+
+_Sprite.prototype.isPointInAngle = function pointInAngle(x, y) {
+    // Return true if the point is within the sprite surface
+    // handle the case where the sprite has an angle
+    var edges = this.edges();
+    for(var i=0; i<4; i++) {
+        var j = i+1;
+        if(j>3)
+            j=0;
+        // if on the right of the line, the point
+        // cannot be in the rectangle
+        if(sjs.lineSide(
+            edges[i][0], edges[i][1],
+            edges[j][0], edges[j][1],
+            x, y
+        )) {
+            return false
+        }
+    }
+    return true;
+}
 
 _Sprite.prototype.collidesWith = function collidesWith(sprite) {
     // Return true if the current sprite has any collision with the Sprite provided
@@ -644,20 +675,20 @@ _Sprite.prototype.collidesWith = function collidesWith(sprite) {
     return y_inter;
 };
 
-_Sprite.prototype.points = function collidesWith(sprite) {
-    // Return true if the current sprite has any collision with the Sprite provided
+_Sprite.prototype.edges = function edges() {
+    // Return the 4 edges of the rectangle.
     var distance = Math.sqrt(this.w / 2 * this.w / 2 + this.h / 2 * this.h / 2);
-    // starting up left
-    var angle = Math.atan2(-this.w, -this.h);
+    var angle = Math.atan2(this.h, this.w);
+    // 4 angles to reach the edges, starting up left (down left in the sprite.js coordinate) 
+    // and turning counter-clockwise
+    var angles = [Math.PI - angle, angle, -angle, Math.PI + angle];
     var points = [];
     for(var i=0; i < 4; i++) {
         points.push([
-            distance * Math.cos(this.angle + angle) + this.x + this.w/2 | 0, 
-            distance * Math.sin(this.angle + angle) + this.y + this.h/2 | 0
+            distance * Math.cos(this.angle + angles[i]) + this.x + this.w/2, 
+            distance * Math.sin(this.angle + angles[i]) + this.y + this.h/2
         ]);
-        angle += Math.PI / 2.0;
     }
-
     return points;
 };
 
