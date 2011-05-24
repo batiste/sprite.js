@@ -659,6 +659,9 @@ _Sprite.prototype.isPointInAngle = function pointInAngle(x, y) {
 
 _Sprite.prototype.collidesWith = function collidesWith(sprite) {
     // Return true if the current sprite has any collision with the Sprite provided
+    if(this.angle != 0 || sprite.angle != 0)
+        return this.collidesWithAngle(sprite);
+    
     if(sprite.x > this.x) {
         var x_inter = sprite._x_rounded - this._x_rounded < this.w - 1;
     } else {
@@ -675,8 +678,17 @@ _Sprite.prototype.collidesWith = function collidesWith(sprite) {
     return y_inter;
 };
 
+_Sprite.prototype.collidesWithAngle = function collidesWithAngle(sprite) {
+    var edges = sprite.edges();
+    for(var i=0; i<4; i++) {
+        if(this.isPointInAngle(edges[i][0], edges[i][1]))
+            return true
+    }
+    return false;
+}
+
 _Sprite.prototype.edges = function edges() {
-    // Return the 4 edges of the rectangle.
+    // Return the 4 edges coordinate of the rectangle
     var distance = Math.sqrt(this.w / 2 * this.w / 2 + this.h / 2 * this.h / 2);
     var angle = Math.atan2(this.h, this.w);
     // 4 angles to reach the edges, starting up left (down left in the sprite.js coordinate) 

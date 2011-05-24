@@ -173,11 +173,9 @@ Sprites comes with a bunch of methods to help you to implement a physic effects:
     sprite.reverseXVelocity()  // apply the horizontal xv velocity negatively
     sprite.reverseYVelocity()  // apply the vertical yv velocity negatively
 
-    sprite.isPointIn(x, y) // return true if the point (x, y) is within
-                           // the sprite surface (angles don't affect this function)
+    sprite.isPointIn(x, y)      // return true if the point (x, y) is within the sprite surface
 
-    sprite.collidesWith(sprite) // return true if the sprite is in
-                                // collision with the other sprite (angles don't affect this function).
+    sprite.collidesWith(sprite) // return true if the sprite is in collision with the other sprite
 
     sprite.collidesWithArray([sprites]) // Search in  an array of sprite for a colliding sprite.
                                         // If found, a sprite is returned.
@@ -198,7 +196,7 @@ There is also 2 methods that can help to create special effects. You can use exp
 Other important methods::
 
     sprite.loadImg(src, <bool resetSize>)    // change the image sprite. The size of the sprite will be reseted by
-                                           // the new image if resetSize is true.
+                                             // the new image if resetSize is true.
 
     sprite.remove // Remove the dom element if the HTML backend is used and facilite the garbage collection of the object.
 
