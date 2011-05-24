@@ -8,7 +8,7 @@
 
 <p>Sprite.js test suites</p>
 
-<textarea id="result" style="width:90%;height:600px"></textarea>
+<pre id="result" style="font-size:0.85em"></pre>
 
 </body>
 <script src="../sprite.js"></script>
@@ -26,25 +26,25 @@ window.onload = function() {
     function assertTrue(value, text) {
         text = getText(text)
         if(value) {
-            result.value += text + ': pass\n';
+            result.innerHTML += text + ': pass\n';
         } else {
-            result.value += text + ': fail ("'+value+'" is not true)\n';
+            result.innerHTML += text + ': <span style="color:red">fail ("'+value+'" is not true)</span>\n';
         }
     }
     function assertFalse(value, text) {
         text = getText(text)
         if(!value) {
-            result.value += text + ': pass\n';
+            result.innerHTML += text + ': pass\n';
         } else {
-            result.value += text + ': fail ("'+value+'" is not false)\n';
+            result.innerHTML += text + ': <span style="color:red">fail ("'+value+'" is not false)</span>\n';
         }
     }
     function assertEqual(value1, value2, text) {
         text = getText(text)
         if(value1 === value2) {
-            result.value += text + ': pass\n';
+            result.innerHTML += text + ': pass\n';
         } else {
-            result.value += text + ': fail ('+value1+' not equal to '+value2+')\n';
+            result.innerHTML += text + ': <span style="color:red">fail ('+value1+' not equal to '+value2+')</span>\n';
         }
     }
 
@@ -102,106 +102,117 @@ window.onload = function() {
     // Sprite instanciation tests
 
     var sp1 = scene.Sprite(false, {x:40, y:50, w:30, h:25});
-    assertEqual(sp1.x, 40,  "Test init position 1");
-    assertEqual(sp1.y, 50,  "Test init position 2");
-    assertEqual(sp1.w, 30,  "Test init size 1");
-    assertEqual(sp1.h, 25,  "Test init size 2");
+    assertEqual(sp1.x, 40,  "init position 1");
+    assertEqual(sp1.y, 50,  "init position 2");
+    assertEqual(sp1.w, 30,  "init size 1");
+    assertEqual(sp1.h, 25,  "init size 2");
 
     var fakelayer = {
         dom:{appendChild:function(){}}
     }
 
     var sp1 = scene.Sprite(false, {position:[60, 60], size:[55, 65], toto:5, layer:fakelayer});
-    assertEqual(sp1.x, 60,  "Test init position 3");
-    assertEqual(sp1.y, 60,  "Test init position 4");
-    assertEqual(sp1.w, 55,  "Test init size 3");
-    assertEqual(sp1.h, 65,  "Test init size 4");
+    assertEqual(sp1.x, 60,  "init position 3");
+    assertEqual(sp1.y, 60,  "init position 4");
+    assertEqual(sp1.w, 55,  "init size 3");
+    assertEqual(sp1.h, 65,  "init size 4");
 
 
-    assertEqual(sp1.toto, undefined,  "Test init undefined");
-    assertEqual(sp1.layer, fakelayer,  "Test init layer");
+    assertEqual(sp1.toto, undefined,  "init undefined");
+    assertEqual(sp1.layer, fakelayer,  "init layer");
 
     var sp1 = scene.Sprite(false, {position:[-5, -5], size:[10, 10]});
 
     assertEqual(JSON.stringify(sp1.edges()), 
-      "[[-5,5.000000000000001],[5.000000000000001,5],[5.000000000000001,-5],[-5,-5]]",  "Test edges function 1");
+      "[[-5,5.000000000000001],[5.000000000000001,5],[5.000000000000001,-5],[-5,-5]]",  "edges function 1");
 
     sp1.angle = Math.PI / 2.0;
     
     assertEqual(JSON.stringify(sp1.edges()), 
-      "[[-5,-5],[-5,5.000000000000001],[5.000000000000001,5],[4.999999999999999,-5]]",  "Test edges function 2");
+      "[[-5,-5],[-5,5.000000000000001],[5.000000000000001,5],[4.999999999999999,-5]]",  "edges function 2");
 
     sp1.angle += Math.PI / 4.0;
 
-    assertFalse(sjs.lineSide(0, 0, 10, 10, 2, 1), "Test lineSide");
-    assertTrue(sjs.lineSide(0, 0, 10, 10, 1, 2), "Test lineSide");
-    assertFalse(sjs.lineSide(10, 10, 0, 0, 1, 2), "Test lineSide");
-    assertFalse(sjs.lineSide(-5, 5, 5, 5, 4.8, 4.8), "Test lineSide");
-    assertFalse(sjs.lineSide(-5, 5, 5, 5, 1, 1), "Test lineSide");
-    assertTrue(sjs.lineSide(-5, 5, 5, 5, 5.1, 5.1), "Test lineSide");
+    assertFalse(sjs.lineSide(0, 0, 10, 10, 2, 1), "lineSide");
+    assertTrue(sjs.lineSide(0, 0, 10, 10, 1, 2), "lineSide");
+    assertFalse(sjs.lineSide(10, 10, 0, 0, 1, 2), "lineSide");
+    assertFalse(sjs.lineSide(-5, 5, 5, 5, 4.8, 4.8), "lineSide");
+    assertFalse(sjs.lineSide(-5, 5, 5, 5, 1, 1), "lineSide");
+    assertTrue(sjs.lineSide(-5, 5, 5, 5, 5.1, 5.1), "lineSide");
 
 
     sp1.angle = 0;
-    assertTrue(sp1.isPointIn(0, 0), "Test isPointIn with with no angle 1");
-    //assertTrue(sp1.isPointInAngle(0, 0), "Test isPointInAngle with no angle 1");
+    assertTrue(sp1.isPointIn(0, 0), "isPointIn with with no angle 1");
+    //assertTrue(sp1.isPointInAngle(0, 0), "isPointInAngle with no angle 1");
 
-    assertTrue(sp1.isPointIn(4.8, 4.8), "Test isPointIn with no angle 2");
-    //assertTrue(sp1.isPointInAngle(4.8, 4.8), "Test isPointInAngle with no angle 2");
+    assertTrue(sp1.isPointIn(4.8, 4.8), "isPointIn with no angle 2");
+    //assertTrue(sp1.isPointInAngle(4.8, 4.8), "isPointInAngle with no angle 2");
 
-    assertFalse(sp1.isPointIn(5.2, 5.2), "Test isPointIn with no angle 3");
-    assertFalse(sp1.isPointInAngle(5.2, 5.2), "Test isPointInAngle with no angle 3");
+    assertFalse(sp1.isPointIn(5.2, 5.2), "isPointIn with no angle 3");
+    assertFalse(sp1.isPointInAngle(5.2, 5.2), "isPointInAngle with no angle 3");
 
 
     sp1.angle = Math.PI / 2.0;
-    assertFalse(sp1.isPointInAngle(5.1, 5.1), "Test isPointInAngle with angle Math.PI / 2.0");
-    assertTrue(sp1.isPointInAngle(4.8, 4.8), "Test isPointInAngle with angle Math.PI / 2.0");
+    assertFalse(sp1.isPointInAngle(5.1, 5.1), "isPointInAngle with angle Math.PI / 2.0");
+    assertTrue(sp1.isPointInAngle(4.8, 4.8), "isPointInAngle with angle Math.PI / 2.0");
 
     sp1.angle = Math.PI / 4.0;
-    assertFalse(sp1.isPointInAngle(5.1, 5.1), "Test isPointInAngle with Math.PI / 4.0");
-    assertFalse(sp1.isPointInAngle(4.8, 4.8), "Test isPointInAngle with Math.PI / 4.0");
-    assertTrue(sp1.isPointInAngle(6.5, 0), "Test isPointInAngle with Math.PI / 4.0");
-    assertFalse(sp1.isPointInAngle(8, 0), "Test isPointInAngle with Math.PI / 4.0");
+    assertFalse(sp1.isPointInAngle(5.1, 5.1), "isPointInAngle with Math.PI / 4.0");
+    assertFalse(sp1.isPointInAngle(4.8, 4.8), "isPointInAngle with Math.PI / 4.0");
+    assertTrue(sp1.isPointInAngle(6.5, 0), "isPointInAngle with Math.PI / 4.0");
+    assertFalse(sp1.isPointInAngle(8, 0), "isPointInAngle with Math.PI / 4.0");
 
     var sp1 = scene.Sprite(false, {position:[-10, -5], size:[20, 10]});
     sp1.angle = 0
-    assertTrue(sp1.isPointInAngle(9, 0), "Test isPointInAngle 1");
-    assertTrue(sp1.isPointInAngle(9, -4.5), "Test isPointInAngle 2");
-    assertTrue(sp1.isPointInAngle(9, 4.5), "Test isPointInAngle 3");
-    assertFalse(sp1.isPointInAngle(11, 4.5), "Test isPointInAngle 4");
-    assertFalse(sp1.isPointInAngle(0, 6), "Test isPointInAngle 5");
-    assertFalse(sp1.isPointInAngle(-11, 0), "Test isPointInAngle 6");
-    assertTrue(sp1.isPointInAngle(-9, 4.5), "Test isPointInAngle 7");
-    assertTrue(sp1.isPointInAngle(-9, -4.5), "Test isPointInAngle 8");
+    assertTrue(sp1.isPointInAngle(9, 0), "isPointInAngle 1");
+    assertTrue(sp1.isPointInAngle(9, -4.5), "isPointInAngle 2");
+    assertTrue(sp1.isPointInAngle(9, 4.5), "isPointInAngle 3");
+    assertFalse(sp1.isPointInAngle(11, 4.5), "isPointInAngle 4");
+    assertFalse(sp1.isPointInAngle(0, 6), "isPointInAngle 5");
+    assertFalse(sp1.isPointInAngle(-11, 0), "isPointInAngle 6");
+    assertTrue(sp1.isPointInAngle(-9, 4.5), "isPointInAngle 7");
+    assertTrue(sp1.isPointInAngle(-9, -4.5), "isPointInAngle 8");
     
     sp1.angle = Math.PI / 2.0;
-    assertTrue(sp1.isPointInAngle(-4.8, 9.9), "Test isPointInAngle 9");
-    assertTrue(sp1.isPointInAngle(4.8, -9.9), "Test isPointInAngle 10");
-    assertFalse(sp1.isPointInAngle(0, 11), "Test isPointInAngle 11");
-    assertFalse(sp1.isPointInAngle(9, 0), "Test isPointInAngle 12");
+    assertTrue(sp1.isPointInAngle(-4.8, 9.9), "isPointInAngle 9");
+    assertTrue(sp1.isPointInAngle(4.8, -9.9), "isPointInAngle 10");
+    assertFalse(sp1.isPointInAngle(0, 11), "isPointInAngle 11");
+    assertFalse(sp1.isPointInAngle(9, 0), "isPointInAngle 12");
     
     sp1.angle = Math.PI / 4.0;
 
     console.log(11.7 * Math.cos(sp1.angle), 11.7 * Math.sin(sp1.angle))
-    assertTrue(sp1.isPointInAngle(6, 6), "Test isPointInAngle 13");
-    assertTrue(sp1.isPointInAngle(7, 7), "Test isPointInAngle 14");
-    assertFalse(sp1.isPointInAngle(8, 8), "Test isPointInAngle 15");
+    assertTrue(sp1.isPointInAngle(6, 6), "isPointInAngle 13");
+    assertTrue(sp1.isPointInAngle(7, 7), "isPointInAngle 14");
+    assertFalse(sp1.isPointInAngle(8, 8), "isPointInAngle 15");
     var max = 10.0 * Math.cos(Math.PI / 4.0);
-    assertTrue(sp1.isPointInAngle(max, max), "Test isPointInAngle 16");
+    assertTrue(sp1.isPointInAngle(max, max), "isPointInAngle 16");
     max = max + 0.1;
-    assertFalse(sp1.isPointInAngle(max, max), "Test isPointInAngle 17");
+    assertFalse(sp1.isPointInAngle(max, max), "isPointInAngle 17");
 
     var sp1 = scene.Sprite(false, {position:[10, 10], size:[10, 10]});
     var sp2 = scene.Sprite(false, {position:[20.1, 10], size:[10, 10]});
 
-    assertFalse(sp1.collidesWith(sp2), "Test collidesWithAngle 1");
-    assertFalse(sp1.collidesWithAngle(sp2), "Test collidesWithAngle 2");
+    assertFalse(sp1.collidesWith(sp2), "collidesWithAngle 1");
+    assertFalse(sp1.collidesWithAngle(sp2), "collidesWithAngle 2");
     sp1.angle = 0.01;
-    assertFalse(sp1.collidesWith(sp2), "Test collidesWithAngle 3");
+    assertFalse(sp1.collidesWith(sp2), "collidesWithAngle 3");
     sp2.angle = 0.01;
-    assertFalse(sp1.collidesWith(sp2), "Test collidesWithAngle 4");
+    assertFalse(sp1.collidesWith(sp2), "collidesWithAngle 4");
     sp2.angle = Math.PI / 4.0;
-    assertTrue(sp1.collidesWith(sp2), "Test collidesWithAngle 5");
+    assertTrue(sp1.collidesWith(sp2), "collidesWithAngle 5");
 
+    var sp1 = scene.Sprite(false, {position:[0, 200], size:[200, 100]});
+    var sp2 = scene.Sprite(false, {position:[50, 0], size:[20, 20]});
+    var nbCollision = 0;
+    sp2.rv = 0.1;
+    for(var i=0; i<100; i++) {
+        sp2.yv += 0.5;
+        sp2.applyVelocity();
+        if(sp2.collidesWithAngle(sp1))
+            nbCollision += 1;
+    }
+    assertTrue(nbCollision > 0, "collidesWithAngle 6")
 
 };
 </script>

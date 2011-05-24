@@ -222,7 +222,8 @@ about indexes and for loop syntax::
     sprite_list.add(sprite || array of sprite)  // add to the list
     sprite_list.remove(sprite)                  // delete from the list
     sprite_list.iterate()                       // iterate on the entire list then stops
-    sprite_list.length                          // length of the list
+    sprite_list.list.length                     // length of the list
+    sprite_list.list                            // the actual list of sprite
 
 Example of use::
 

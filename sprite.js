@@ -684,6 +684,11 @@ _Sprite.prototype.collidesWithAngle = function collidesWithAngle(sprite) {
         if(this.isPointInAngle(edges[i][0], edges[i][1]))
             return true
     }
+    var edges = this.edges();
+    for(var i=0; i<4; i++) {
+        if(sprite.isPointInAngle(edges[i][0], edges[i][1]))
+            return true
+    }
     return false;
 }
 

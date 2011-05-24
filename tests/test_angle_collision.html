@@ -1,0 +1,76 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test Exploding crates animation</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+</head>
+<body>
+
+<p>
+Sprite.js, exploding crates <a href="https://github.com/batiste/sprite.js">Github project page</a><br>
+<span id="result"></span> <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a>
+
+</p>
+
+</body>
+<script src="../sprite.js"></script>
+<script>
+
+window.onload = function() {
+
+if(window.location.href.indexOf('canvas') != -1) {
+    document.getElementById('canvas-mode').style.display = 'none';
+} else {
+    document.getElementById('html-mode').style.display = 'none';
+}
+var result = document.getElementById('result');
+
+var scene = sjs.Scene({w:600, h:600});
+
+scene.loadImages(['crate.png'], function() {
+
+    var ground = scene.Sprite();
+    ground.position(0, 600-32);
+    ground.size(600, 60);
+    ground.setColor('#999');
+    ground.update();
+
+    var gravity = 0.5;
+    var crates = sjs.SpriteList();
+
+    function paint() {
+
+        ground.update();
+
+        if(ticker.currentTick % 12 == 0 && crates.list.length < 30) {
+            var crate = scene.Sprite('crate.png');
+            crate.position(50 + Math.random() * 500 | 0, 50);
+            crate.rv = Math.random() / 4;
+            crates.add(crate);
+        }
+
+        var crate;
+        while(crate = crates.iterate()) {
+            crate.yv += gravity;
+            crate.applyVelocity();
+            if(crate.collidesWith(ground) || crate.collidesWithArray(crates.list)) {
+                crate.reverseVelocity();
+                crate.yv = -crate.yv / 2;
+                crate.rv = -crate.rv / 1.1;
+                //crate.applyVelocity();
+            }
+            crate.update();
+        }
+
+    };
+
+
+    var ticker = scene.Ticker(30, paint);
+    ticker.run();
+
+});
+
+};
+</script>
+
+</html>
