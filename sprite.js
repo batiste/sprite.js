@@ -1185,8 +1185,13 @@ function Layer(scene, name, options) {
     domElement.style.zIndex = String(layerZindex);
     domElement.style.backgroundColor = options.color || domElement.style.backgroundColor;
     domElement.style.position = 'absolute';
-    domElement.height = options.h || domH || scene.h;
-    domElement.width = options.w || domW || scene.w;
+    if (domElement.nodeName == "CANVAS") {
+      domElement.height = options.h || domH || scene.h;
+      domElement.width = options.w || domW || scene.w;
+    } else {
+      domElement.style.height = (options.h || domH || scene.h)+'px';
+      domElement.style.width = (options.w || domW || scene.w)+'px';
+    };
     domElement.style.top = domElement.style.top || '0px';
     domElement.style.left =  domElement.style.left || '0px';
 
