@@ -47,6 +47,7 @@ var sjs = {
     Input: Input,
     Scene: Scene,
     SpriteList:SpriteList,
+    Sprite:_Sprite,
     overlay:overlay,
     scenes:[]
 };
@@ -120,6 +121,7 @@ function Scene(options) {
 Scene.prototype.constructor = Scene;
 
 Scene.prototype.Sprite = function SceneSprite(src, layer) {
+    /* an actual shortcut for sjs.Sprite */
     return new _Sprite(this, src, layer);
 }
 

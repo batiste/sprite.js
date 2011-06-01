@@ -183,7 +183,7 @@ Sprites comes with a bunch of methods to help you to implement a physic effects:
 
 There is also 2 methods that can help to create special effects. You can use explode2 to separate the current sprite in 2 parts::
 
-    // return 2 new sprites that are the 2 pats of the sprite according to the given position.
+    // return 2 new sprites that are the 2 parts of the sprite according to the given position.
     // Default value for position is half the size of the sprite.
     [sprite1, sprite2] = sprite.explode2(<position>, <bool horizontal>, <layer>)
 
