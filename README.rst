@@ -111,9 +111,13 @@ To create a sprite you should use the scene.Sprite constructor::
 
     var sprite = scene.Sprite(<src>, <layer>)
 
-Both parameters are optionnal. If you want to set the layer but not any image::
+Both parameters are optionnal. If the layer is not specified, the default layer will be used. If you want to set the layer but not any image::
 
     var sprite = scene.Sprite(false, <layer>)
+
+You can also init any Sprite properties by passing an options object instead of the Layer object, eg::
+
+        var sprite = scene.Sprite("mysprite.png", {layer:layer, x:10, size:[20, 20], y:15})
 
 For technichal and performance reasons Sprite's attributes needs to be changed using a setters method. The following
 attributes are *READ ONLY*::
@@ -169,11 +173,9 @@ Sprites comes with a bunch of methods to help you to implement a physic effects:
     sprite.reverseXVelocity()  // apply the horizontal xv velocity negatively
     sprite.reverseYVelocity()  // apply the vertical yv velocity negatively
 
-    sprite.isPointIn(x, y) // return true if the point (x, y) is within
-                           // the sprite surface (angles don't affect this function)
+    sprite.isPointIn(x, y)      // return true if the point (x, y) is within the sprite surface
 
-    sprite.collidesWith(sprite) // return true if the sprite is in
-                                // collision with the other sprite (angles don't affect this function).
+    sprite.collidesWith(sprite) // return true if the sprite is in collision with the other sprite
 
     sprite.collidesWithArray([sprites]) // Search in  an array of sprite for a colliding sprite.
                                         // If found, a sprite is returned.
@@ -187,13 +189,14 @@ There is also 2 methods that can help to create special effects. You can use exp
     // Default value for position is half the size of the sprite.
     [sprite1, sprite2] = sprite.explode2(<position>, <bool horizontal>, <layer>)
 
-     // return 4 new sprites that are the split from the center (x, y). Default value for the center is the center of the sprite.
+    // Return 4 new sprites that are the split from the center (x, y).
+    // Default value for the center is the center of the sprite.
     [sprite1, sprite2, sprite3, sprite4] = sprite.explode4(<x>, <y>, <layer>)
 
 Other important methods::
 
-    sprite.loadImg(src, bool resetSize)    // change the image sprite. The size of the sprite will be rested by
-                                           // the new image if resetSize is true.
+    sprite.loadImg(src, <bool resetSize>)    // change the image sprite. The size of the sprite will be reseted by
+                                             // the new image if resetSize is true.
 
     sprite.remove // Remove the dom element if the HTML backend is used and facilite the garbage collection of the object.
 
@@ -201,7 +204,7 @@ Other important methods::
     sprite.canvasUpdate(layer)  // draw the sprite on a given Canvas layer. This doesn't work with an HTML layer.
 
 
-To update the view after modifying the sprite, call "update"::
+To update any visual changes to the view you should call the "update" method::
 
     Sprite.update()
 
@@ -219,7 +222,8 @@ about indexes and for loop syntax::
     sprite_list.add(sprite || array of sprite)  // add to the list
     sprite_list.remove(sprite)                  // delete from the list
     sprite_list.iterate()                       // iterate on the entire list then stops
-    sprite_list.list                            // the Array object that is manipulated
+    sprite_list.list.length                     // length of the list
+    sprite_list.list                            // the actual list of sprite
 
 Example of use::
 
@@ -323,7 +327,7 @@ You also have access to those helpers on the input object::
     input.arrows() // arrows return true if any directionnal keyboard arrows are pressed
     input.keydown  // this is true if any key is down
 
-If you need to know which key has just been pressed or released during the last game tick you can use those functions::
+If you need to know which key has just been pressed or released during the last game tick you can use those methods::
 
     input.keyPressed('up')
     input.keyReleased('up')

@@ -33,15 +33,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(global, undefined){
 
-// fixing the bad boys that don't have defineProperty
-if(!Object.defineProperty) {
-    Object.defineProperty = function(obj, name, dict) {
-        obj.__defineGetter__(name, dict['get']);
-        obj.__defineSetter__(name, dict['set']);
-    }
-}
-defineProperty = Object.defineProperty
-
 var sjs = {
     Cycle: Cycle,
     Input: Input,
@@ -146,8 +137,7 @@ Scene.prototype.reset = function reset() {
         }
     }
     // remove remaining children
-    while ( this.dom.childNodes.length >= 1 )
-    {
+    while ( this.dom.childNodes.length >= 1 ) {
         this.dom.removeChild( this.dom.firstChild );
     }
     this.layers = {};
@@ -218,7 +208,6 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
 function _Sprite(scene, src, layer) {
 
     this.scene = scene;
-    var sp = this;
     this._dirty = {};
     this.changed = false;
 
@@ -260,12 +249,29 @@ function _Sprite(scene, src, layer) {
 
     this.opacity = 1;
     this.color = false;
+    
+    // if it doesn't seems to kouak like a Layer object
+    if(layer) {
+        if(layer.sprites) {
+            this.layer = layer;
+        } else {
+            // we can receive things like this
+            // {x:10, y:10, w:10, h:50, size:[20, 30]}
+            this.layer = scene.layers['default'];
+            var properties = layer;
 
-    if(layer === undefined) {
-        layer = scene.layers['default'];
+            for(p in properties) {
+                var value = properties[p];
+                var target = this[p];
+                if(typeof target == "function")
+                    this[p].apply(this, value);
+                else if(target !== undefined)
+                    this[p] = value;
+            }
+        }
+    } else {
+        this.layer = scene.layers['default']; 
     }
-    this.layer = layer;
-    //this.layerIndex = layer.addSprite(this);
 
     if(!this.layer.useCanvas) {
         var d = document.createElement('div');
@@ -462,7 +468,7 @@ _Sprite.prototype.remove = function remove() {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
     }
-    delete this.layer.sprites[this.layerIndex];
+    //delete this.layer.sprites[this.layerIndex];
     this.layer = null;
     this.img = null;
 };
@@ -528,7 +534,7 @@ _Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
     ctx.save();
     ctx.translate(this.x + this.w/2 | 0, this.y + this.h/2 | 0);
     ctx.rotate(this.angle);
-    if(this.xscale != 1 || this.xscale != 1)
+    if(this.xscale != 1 || this.yscale != 1)
         ctx.scale(this.xscale, this.yscale);
     ctx.globalAlpha = this.opacity;
     ctx.translate(-this.w/2 | 0, -this.h/2 | 0);
@@ -617,13 +623,47 @@ _Sprite.prototype.loadImg = function (src, resetSize) {
 
 
 _Sprite.prototype.isPointIn = function pointIn(x, y) {
-    // return true if the point is within the sprite surface
-    return (x >= this.x && x <= this.x+this.w - 1
-        && y >= this.y && y <= this.y+this.h - 1)
+    // Return true if the point is within the sprite surface
+    if(this.angle == 0)
+        return (x >= this.x && x < this.x+this.w
+            && y >= this.y && y < this.y+this.h);
+    return this.isPointInAngle(x, y);
 };
+
+sjs.lineSide = function(ax, ay, bx, by, cx, cy) {
+    // return true if the point is on the right of the line
+    var v = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+    if(v == 0)
+        return null;
+    return v > 0;
+}
+
+_Sprite.prototype.isPointInAngle = function pointInAngle(x, y) {
+    // Return true if the point is within the sprite surface
+    // handle the case where the sprite has an angle
+    var edges = this.edges();
+    for(var i=0; i<4; i++) {
+        var j = i+1;
+        if(j>3)
+            j=0;
+        // if on the right of the line, the point
+        // cannot be in the rectangle
+        if(sjs.lineSide(
+            edges[i][0], edges[i][1],
+            edges[j][0], edges[j][1],
+            x, y
+        )) {
+            return false
+        }
+    }
+    return true;
+}
 
 _Sprite.prototype.collidesWith = function collidesWith(sprite) {
     // Return true if the current sprite has any collision with the Sprite provided
+    if(this.angle != 0 || sprite.angle != 0)
+        return this.collidesWithAngle(sprite);
+    
     if(sprite.x > this.x) {
         var x_inter = sprite._x_rounded - this._x_rounded < this.w - 1;
     } else {
@@ -638,6 +678,37 @@ _Sprite.prototype.collidesWith = function collidesWith(sprite) {
         var y_inter = this._y_rounded - sprite._y_rounded < sprite.h;
     }
     return y_inter;
+};
+
+_Sprite.prototype.collidesWithAngle = function collidesWithAngle(sprite) {
+    var edges = sprite.edges();
+    for(var i=0; i<4; i++) {
+        if(this.isPointInAngle(edges[i][0], edges[i][1]))
+            return true
+    }
+    var edges = this.edges();
+    for(var i=0; i<4; i++) {
+        if(sprite.isPointInAngle(edges[i][0], edges[i][1]))
+            return true
+    }
+    return false;
+}
+
+_Sprite.prototype.edges = function edges() {
+    // Return the 4 edges coordinate of the rectangle
+    var distance = Math.sqrt(this.w / 2 * this.w / 2 + this.h / 2 * this.h / 2);
+    var angle = Math.atan2(this.h, this.w);
+    // 4 angles to reach the edges, starting up left (down left in the sprite.js coordinate) 
+    // and turning counter-clockwise
+    var angles = [Math.PI - angle, angle, -angle, Math.PI + angle];
+    var points = [];
+    for(var i=0; i < 4; i++) {
+        points.push([
+            distance * Math.cos(this.angle + angles[i]) + this.x + this.w/2, 
+            distance * Math.sin(this.angle + angles[i]) + this.y + this.h/2
+        ]);
+    }
+    return points;
 };
 
 _Sprite.prototype.distance = function distancePoint(x, y) {
@@ -1058,8 +1129,6 @@ var layerZindex = 1;
 
 function Layer(scene, name, options) {
 
-    var canvas, domElement;
-
     if(this.constructor !== arguments.callee)
         return new Layer(scene, name, options);
 
@@ -1085,7 +1154,7 @@ function Layer(scene, name, options) {
     else
         error('Layer '+ name + ' already exist.');
 
-    domElement = document.getElementById(name);
+    var domElement = document.getElementById(name);
     if(!domElement)
         var needToCreate = true;
     else
@@ -1118,8 +1187,13 @@ function Layer(scene, name, options) {
     domElement.style.zIndex = String(layerZindex);
     domElement.style.backgroundColor = options.color || domElement.style.backgroundColor;
     domElement.style.position = 'absolute';
-    domElement.height = options.h || domH || scene.h;
-    domElement.width = options.w || domW || scene.w;
+    if (domElement.nodeName == "CANVAS") {
+      domElement.height = options.h || domH || scene.h;
+      domElement.width = options.w || domW || scene.w;
+    } else {
+      domElement.style.height = (options.h || domH || scene.h)+'px';
+      domElement.style.width = (options.w || domW || scene.w)+'px';
+    };
     domElement.style.top = domElement.style.top || '0px';
     domElement.style.left =  domElement.style.left || '0px';
 
@@ -1145,6 +1219,7 @@ function SpriteList(list) {
     if(this.constructor !== arguments.callee)
         return new SpriteList(list);
     this.list = list || [];
+    this.length = this.list.length;
     this.index = -1;
 }
 
@@ -1152,7 +1227,8 @@ SpriteList.prototype.add = function add(sprite) {
     if(sprite.length)
         this.list.push.apply(this.list, sprite);
     else
-        this.list.push(sprite)
+        this.list.push(sprite);
+    this.length = this.list.length;
 }
 
 SpriteList.prototype.remove = function remove(sprite) {
@@ -1162,6 +1238,7 @@ SpriteList.prototype.remove = function remove(sprite) {
             // delete during the iteration is possible
             if(this.index > -1)
                 this.index = this.index - 1;
+            this.length = this.list.length;
             return true;
         }
     }
