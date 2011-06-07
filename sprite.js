@@ -249,7 +249,7 @@ function _Sprite(scene, src, layer) {
 
     this.opacity = 1;
     this.color = false;
-    
+
     // if it doesn't seems to kouak like a Layer object
     if(layer) {
         if(layer.sprites) {
@@ -265,12 +265,16 @@ function _Sprite(scene, src, layer) {
                 var target = this[p];
                 if(typeof target == "function")
                     this[p].apply(this, value);
-                else if(target !== undefined)
-                    this[p] = value;
+                else if(target !== undefined) {
+                    var setF = 'set'+p.charAt(0).toUpperCase() + p.slice(1);
+                    if(this[setF]) {
+                        this[setF].apply(this, [value]);
+                    }
+                }
             }
         }
     } else {
-        this.layer = scene.layers['default']; 
+        this.layer = scene.layers['default'];
     }
 
     if(!this.layer.useCanvas) {
@@ -622,7 +626,7 @@ _Sprite.prototype.loadImg = function (src, resetSize) {
 };
 
 
-_Sprite.prototype.isPointIn = function pointIn(x, y) {
+_Sprite.prototype.isPointIn = function isPointIn(x, y) {
     // Return true if the point is within the sprite surface
     if(this.angle == 0)
         return (x >= this.x && x < this.x+this.w
@@ -661,9 +665,10 @@ _Sprite.prototype.isPointInAngle = function pointInAngle(x, y) {
 
 _Sprite.prototype.collidesWith = function collidesWith(sprite) {
     // Return true if the current sprite has any collision with the Sprite provided
-    if(this.angle != 0 || sprite.angle != 0)
+    if(this.angle != 0 || sprite.angle != 0) {
         return this.collidesWithAngle(sprite);
-    
+    }
+
     if(sprite.x > this.x) {
         var x_inter = sprite._x_rounded - this._x_rounded < this.w - 1;
     } else {
@@ -698,13 +703,13 @@ _Sprite.prototype.edges = function edges() {
     // Return the 4 edges coordinate of the rectangle
     var distance = Math.sqrt(this.w / 2 * this.w / 2 + this.h / 2 * this.h / 2);
     var angle = Math.atan2(this.h, this.w);
-    // 4 angles to reach the edges, starting up left (down left in the sprite.js coordinate) 
+    // 4 angles to reach the edges, starting up left (down left in the sprite.js coordinate)
     // and turning counter-clockwise
     var angles = [Math.PI - angle, angle, -angle, Math.PI + angle];
     var points = [];
     for(var i=0; i < 4; i++) {
         points.push([
-            distance * Math.cos(this.angle + angles[i]) + this.x + this.w/2, 
+            distance * Math.cos(this.angle + angles[i]) + this.x + this.w/2,
             distance * Math.sin(this.angle + angles[i]) + this.y + this.h/2
         ]);
     }
@@ -727,8 +732,12 @@ _Sprite.prototype.center = function center() {
 }
 
 _Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
-    // Return true if the current sprite has any collision with the Array provided
+    // Return a sprite if the current sprite has any collision with the Array provided
     // a sprite cannot collides with itself
+    // Make the SpriteList works
+    if(sprites.list)
+        sprites = sprites.list;
+
     for(var i=0, sprite; sprite = sprites[i]; i++) {
         if(this!=sprite && this.collidesWith(sprite)) {
             return sprite;
