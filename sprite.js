@@ -266,6 +266,7 @@ function _Sprite(scene, src, layer) {
                 if(typeof target == "function")
                     this[p].apply(this, value);
                 else if(target !== undefined) {
+                    // this is necessary to set cache value properly
                     var setF = 'set'+p.charAt(0).toUpperCase() + p.slice(1);
                     if(this[setF]) {
                         this[setF].apply(this, [value]);
