@@ -130,6 +130,8 @@ Scene.prototype.Input = function SceneInput() {
 }
 
 Scene.prototype.reset = function reset() {
+    if(this.ticker)
+        this.ticker.pause();
     for(l in this.layers) {
         if(this.layers.hasOwnProperty(l)) {
             this.dom.removeChild(this.layers[l].dom)
@@ -141,8 +143,6 @@ Scene.prototype.reset = function reset() {
         this.dom.removeChild( this.dom.firstChild );
     }
     this.layers = {};
-    if(this.ticker)
-        this.ticker.pause();
 }
 
 Scene.prototype.Ticker = function Ticker(tickDuration, paint) {

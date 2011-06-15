@@ -90,13 +90,14 @@ A list of the different methods available on the Scene object::
 
     scene.loadImages(Arrar(<src>), callback)       // load the array of image source. When all is loaded, the callback is called.
 
-    scene.Layer(<name>, <options>)                 // build a Layer object, see next Layer section
+    scene.Layer(<name>, <options>)                 // build a Layer object, see Layer section
 
     scene.Sprite(<src>, <layer>)                   // build a Sprite object, see Sprite section
 
     scene.Ticker(<tickDuration>, <paint function>) // build a Ticker object for this scene or reset the previous one
 
-    scene.reset()                                  // Delete all layer present in this scene, delete ticker.
+    scene.reset()                                  // Delete all layers present in this scene,
+                                                   // delete dom from HTML Sprite in layers, pause the ticker.
 
     scene.Cycle(<triplets>)                        // alias for sjs.Cycle, look at Cycle section
 
@@ -115,9 +116,9 @@ Both parameters are optionnal. If the layer is not specified, the default layer 
 
     var sprite = scene.Sprite(false, <layer>)
 
-You can also init any Sprite properties by passing an options object instead of the Layer object, eg::
+You can also init any Sprite properties by passing an object instead of the Layer object, eg::
 
-        var sprite = scene.Sprite("mysprite.png", {layer:layer, x:10, size:[20, 20], y:15})
+    var sprite = scene.Sprite("mysprite.png", {layer:layer, x:10, size:[20, 20], y:15})
 
 For technichal and performance reasons Sprite's attributes needs to be changed using a setters method. The following
 attributes are *READ ONLY*::
@@ -160,7 +161,7 @@ Or one of those helper methods::
     sprite.offset(x, y)
     sprite.size(w, h)       // set the width and height of the visible sprite
 
-Sprites comes with a bunch of methods to help you to implement a physic effects::
+Sprites comes with methods that can help you implement a basic physic engine::
 
     sprite.xv                // horizontal velocity
     sprite.yv                // vertical velocity
