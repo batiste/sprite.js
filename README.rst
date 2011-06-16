@@ -31,9 +31,9 @@ Example of a basic use::
         var sp = scene.Sprite('character.png');
 
         // change the visible size of the sprite
-        sp.h=55;
-        sp.w=30;
-        // apply the latest visual changes to the sprite;
+        sp.size(55, 30);
+
+        // apply the latest visual changes to the sprite (draw if canvas, update attribute if DOM);
         sp.update();
 
         // change the offset of the image in the sprite (this works the opposite way of a CSS background)
@@ -130,8 +130,8 @@ attributes are *READ ONLY*::
                     // you can set the width or height value bigger than the size of the image.
     sprite.h
 
-    sprite.xoffset  // offset in the image to start painting in the view surface
-    sprite.yoffset
+    sprite.xoffset  // horizontal offset in the image from where to start painting the sprite surface.
+    sprite.yoffset  // verical offset
     sprite.xscale   // vertical and horizontal scaling
     sprite.yscale
     sprite.angle    // use radians
@@ -144,7 +144,7 @@ If you want to change any of those attributes use the following setters::
     sprite.setY(12);
     sprite.setW(32);
     sprite.setH(32);
-    sprite.setXOffset(10); // offset in the image to start painting in the view surface
+    sprite.setXOffset(10);
     sprite.setYOffset(5);
     sprite.setXScale(2);
     sprite.setYScale(3);
@@ -157,7 +157,7 @@ Or one of those helper methods::
     sprite.rotate(radians)
     sprite.scale(x, y)      // if y is not defined, y take the same value as x
     sprite.move(x, y)       // move the sprite in the direction of the provided vector (x, y)
-    sprite.position(x, y)   // set the position of the sprite
+    sprite.position(x, y)   // set the position of the sprite (left, top)
     sprite.offset(x, y)
     sprite.size(w, h)       // set the width and height of the visible sprite
 
