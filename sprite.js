@@ -250,17 +250,21 @@ function _Sprite(scene, src, layer) {
     this.opacity = 1;
     this.color = false;
 
+    // necessary to get set
+    this.layer = null;
+
     // if it doesn't seems to kouak like a Layer object
     if(layer) {
+        // this is a layer object
         if(layer.sprites) {
             this.layer = layer;
         } else {
             // we can receive things like this
-            // {x:10, y:10, w:10, h:50, size:[20, 30]}
-            this.layer = scene.layers['default'];
+            // {x:10, y:10, w:10, h:50, size:[20, 30], layer:var}
             var properties = layer;
 
             for(p in properties) {
+                //console.log(p, this[p])
                 var value = properties[p];
                 var target = this[p];
                 if(typeof target == "function")
@@ -270,13 +274,19 @@ function _Sprite(scene, src, layer) {
                     var setF = 'set'+p.charAt(0).toUpperCase() + p.slice(1);
                     if(this[setF]) {
                         this[setF].apply(this, [value]);
+                    } else {
+                        // necessary for layer option
+                        this[p] = value;
                     }
                 }
             }
+
         }
-    } else {
-        this.layer = scene.layers['default'];
     }
+
+    // can be set by the properties
+    if(!this.layer)
+        this.layer = scene.layers['default'];
 
     if(!this.layer.useCanvas) {
         var d = document.createElement('div');

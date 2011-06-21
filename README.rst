@@ -354,3 +354,13 @@ The layer object can take those options::
         autoClear:false   // disable the automatic clearing of the canvas before every paint call.
     }
 
+
+Troubleshooting
+====================
+
+When using canvas, I get an "Uncaught Error: INDEX_SIZE_ERR: DOM Exception 1" in updateCanvas
+----------------------------------------------------------------------------------------------------
+
+This error appears when canvas try to read an image out of the boundary of the image itself. Check that your cycle doesn't
+go off the boundaries, and that the size and offset are correct.
+
