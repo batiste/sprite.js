@@ -85,6 +85,8 @@ function Scene(options) {
     if(!sjs.tproperty)
         init_transform_property();
 
+    this.autoPause = optionValue(options, 'autoPause', true);
+
     var div = document.createElement('div');
     div.style.overflow = 'hidden';
     div.style.position = 'relative';
@@ -541,7 +543,7 @@ _Sprite.prototype.update = function updateDomProperties () {
     return this;
 };
 
-_Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
+_Sprite.prototype.canvasUpdate = function updateCanvas(layer) {
     if(layer)
         var ctx = layer.ctx;
     else
@@ -1117,6 +1119,8 @@ _Input.prototype.arrows = function arrows() {
 global.addEventListener("blur", function (e) {
     for(var i=0; i < sjs.scenes.length; i++) {
         var scene = sjs.scenes[i];
+        if(!scene.autoPause)
+            continue;
         var anon = function(scene) {
             inputSingleton.keyboard = {}
             inputSingleton.keydown = false;
@@ -1202,9 +1206,16 @@ function Layer(scene, name, options) {
         var domW = false;
     }
 
-    scene.dom.appendChild(domElement);
+    if(options.parent)
+        this.parent = options.parent;
+    else
+        this.parent = this.scene.dom;
+    this.parent.appendChild(domElement);
     domElement.id = domElement.id || 'sjs'+scene.id+'-'+name;
-    domElement.style.zIndex = String(layerZindex);
+    if(!options.disableAutoZIndex) {
+        layerZindex += 1;
+        domElement.style.zIndex = String(layerZindex);
+    }
     domElement.style.backgroundColor = options.color || domElement.style.backgroundColor;
     domElement.style.position = 'absolute';
     if (domElement.nodeName == "CANVAS") {
@@ -1218,11 +1229,16 @@ function Layer(scene, name, options) {
     domElement.style.left =  domElement.style.left || '0px';
 
     this.dom = domElement;
-    layerZindex += 1;
+
 }
 
-Layer.prototype.clear = function() {
+Layer.prototype.clear = function clear() {
     this.ctx.clearRect(0, 0, this.dom.width, this.dom.height);
+}
+
+Layer.prototype.remove = function remove() {
+    this.parent.removeChild(this.dom);
+    delete this.scene.layers[this.name];
 }
 
 Layer.prototype.addSprite = function addSprite(sprite) {
@@ -1233,6 +1249,11 @@ Layer.prototype.addSprite = function addSprite(sprite) {
 
 Layer.prototype.setColor = function setColor(color) {
     this.dom.style.backgroundColor = color;
+}
+
+Layer.prototype.onTop = function onTop(color) {
+    layerZindex += 1;
+    this.dom.style.zIndex = String(layerZindex);
 }
 
 function SpriteList(list) {
