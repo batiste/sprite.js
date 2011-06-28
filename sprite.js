@@ -1217,7 +1217,6 @@ function Layer(scene, name, options) {
         domElement.style.zIndex = String(layerZindex);
     }
     domElement.style.backgroundColor = options.color || domElement.style.backgroundColor;
-    domElement.style.position = 'absolute';
     this.h = options.h || domH || scene.h;
     this.w = options.w || domW || scene.w;
     if (domElement.nodeName == "CANVAS") {
@@ -1227,6 +1226,7 @@ function Layer(scene, name, options) {
         domElement.style.height = this.h + 'px';
         domElement.style.width = this.w +'px';
     };
+    domElement.style.position = 'absolute';
     domElement.style.top = domElement.style.top || '0px';
     domElement.style.left =  domElement.style.left || '0px';
 
