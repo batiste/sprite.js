@@ -21,7 +21,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/* Sprite.js v1.0.0
+/* Sprite.js v1.1.0
  *
  * coding guideline
  *
@@ -40,6 +40,7 @@ var sjs = {
     SpriteList:SpriteList,
     Sprite:_Sprite,
     overlay:overlay,
+    SrollingSurface:SrollingSurface,
     scenes:[]
 };
 
@@ -266,7 +267,6 @@ function _Sprite(scene, src, layer) {
             var properties = layer;
 
             for(p in properties) {
-                //console.log(p, this[p])
                 var value = properties[p];
                 var target = this[p];
                 if(typeof target == "function")
@@ -1218,12 +1218,14 @@ function Layer(scene, name, options) {
     }
     domElement.style.backgroundColor = options.color || domElement.style.backgroundColor;
     domElement.style.position = 'absolute';
+    this.h = options.h || domH || scene.h;
+    this.w = options.w || domW || scene.w;
     if (domElement.nodeName == "CANVAS") {
-      domElement.height = options.h || domH || scene.h;
-      domElement.width = options.w || domW || scene.w;
+        domElement.height = this.h;
+        domElement.width = this.w;
     } else {
-      domElement.style.height = (options.h || domH || scene.h)+'px';
-      domElement.style.width = (options.w || domW || scene.w)+'px';
+        domElement.style.height = this.h + 'px';
+        domElement.style.width = this.w +'px';
     };
     domElement.style.top = domElement.style.top || '0px';
     domElement.style.left =  domElement.style.left || '0px';
@@ -1292,6 +1294,122 @@ SpriteList.prototype.iterate = function iterate() {
         return false;
     }
     return this.list[this.index];
+}
+
+function SrollingSurface(scene, w, h, redrawCallback) {
+
+    if(this.constructor !== arguments.callee)
+        return new SrollingSurface(scene, w, h, redrawCallback);
+
+    this.redrawCallback = redrawCallback;
+    this.block_h = Math.ceil(h / 2.0);
+    this.block_w = Math.ceil(w / 2.0);
+    this.x = 0;
+    this.y = 0;
+    this.w = w;
+    this.h = h;
+    this.tolerance = 0;
+    this.scene = scene;
+    this.dom = document.createElement('div');
+    this.dom.style.position = "relative";
+    scene.dom.appendChild(this.dom);
+    // block actually in use
+    this.rendered_blocks = [];
+    // layer available for rendering
+    this.available_layer = [];
+}
+
+SrollingSurface.prototype.neededBlocks = function neededBlocks() {
+    // Return a list of needed block for the surface
+    var needed_blocks = [];
+    var x_block_start = Math.floor((this.x + (this.w / 2)) / this.block_w) -1;
+    var y_block_start = Math.floor((this.y + (this.h / 2)) / this.block_h) -1;
+
+    for(var x=0; x<3; x++) {
+        for(var y=0; y<3; y++) {
+            needed_blocks.push([x_block_start + x, y_block_start + y])
+        }
+    }
+    return needed_blocks
+}
+
+SrollingSurface.prototype.blockToRender = function blockToRender() {
+    // Return the blocks that need rendering
+    var neededBlocks = this.neededBlocks();
+    var toRender = [];
+    var rendered = this.rendered_blocks;
+    for(var i=0; i<neededBlocks.length; i++) {
+        var needed_block =  neededBlocks[i];
+        var found = false;
+        for(var j=0; j<rendered.length; j++) {
+            if(rendered[j].block[0] == needed_block[0] && rendered[j].block[1] == needed_block[1]) {
+                found = true;
+                break;
+            }
+        }
+        if(!found)
+            toRender.push(needed_block);
+    }
+    return toRender
+}
+
+SrollingSurface.prototype.renderBlocks = function renderBlocks() {
+    // render blocks that need to be.
+    var render_list = this.blockToRender();
+    for(var i=0; i<render_list.length; i++) {
+        var toRender = render_list[i];
+        var x = toRender[0] * this.block_w;
+        var y = toRender[1] * this.block_h;
+        if(this.available_layer.length) {
+            var layer = this.available_layer[0];
+            layer.dom.style.display = 'block';
+            this.available_layer.splice(0, 1);
+        } else {
+            var t = new Date().getTime()
+            var layer = scene.Layer("block-"+Math.random(),
+                {w:this.block_w, h:this.block_h, x:x, y:y, autoClear:false,
+                useCanvas:true, parent:this.dom, disableAutoZIndex:true});
+        }
+        layer.dom.style.left = x + 'px';
+        layer.dom.style.top = y + 'px';
+        this.redrawCallback(layer, x, y);
+        this.rendered_blocks.push({layer:layer, block:[toRender[0], toRender[1]], pos:[x, y]});
+    }
+}
+
+SrollingSurface.prototype.move = function move(x, y) {
+    this.x = this.x + x;
+    this.y = this.y + y;
+}
+
+SrollingSurface.prototype.position = function position(x, y) {
+    this.x = x;
+    this.y = y;
+}
+
+SrollingSurface.prototype.deleteBlocks = function moveBlocks() {
+    for(var i=0; i<this.rendered_blocks.length; i++) {
+        var block = this.rendered_blocks[i];
+        if(
+            (block.pos[0] + this.block_w + this.tolerance) < this.x ||
+            (block.pos[1] + this.block_h + this.tolerance) < this.y ||
+            block.pos[0] > this.x + (this.w / 2) + this.block_w + this.tolerance  ||
+            block.pos[1] > this.y + (this.h / 2) + this.block_h + this.tolerance
+        ) {
+            block.layer.dom.style.display = 'none';
+            this.available_layer.push(block.layer);
+            delete block;
+            this.rendered_blocks.splice(i, 1);
+            i = i-1;
+        }
+    }
+}
+
+SrollingSurface.prototype.update = function update() {
+    this.deleteBlocks();
+    this.renderBlocks();
+    this.dom.style.left = -this.x + 'px';
+    this.dom.style.top = -this.y + 'px';
 }
 
 global.sjs = sjs;

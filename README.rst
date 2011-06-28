@@ -1,5 +1,5 @@
 =================
-sprite.js v1.0.0
+sprite.js v1.1.0
 =================
 
 The sprite.js framework lets you create animations and games
@@ -353,6 +353,29 @@ The layer object can take those options::
         useCanvas:true,   // force the use of the canvas on this layer, that enable you to mix HTML and canvas
         autoClear:false   // disable the automatic clearing of the canvas before every paint call.
     }
+
+
+ScrollingSurface object
+========================
+
+This object provide a simple and efficent way to display a moving static background within a scene. The surface
+only redraw the necessary parts instead of the whole scene at every frame.
+
+A scrolling surface is build this way::
+
+    var surface = sjs.SrollingSurface(scene, scene.w, scene.h, redrawCallback);
+
+    function redrawCallback(layer, x, y) {
+        // draw the necessary sprites on the layer
+        sprite.updateCanvas(layer);
+    })
+
+    surface.move(x, y);       // move the surface in direction (x, y)
+    surface.position(x, y);   // set the surface position to (x, y)
+    surface.update();         // update the latest changes to the surface and call the redrawCallback
+
+The redrawCallback is called everytime a part of the surface need to be updated. The absolute position on the surface
+is provided for you to determine what to draw on this layer. The layer object has a width and height (layer.x, layer.y).
 
 
 Troubleshooting
