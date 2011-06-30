@@ -729,7 +729,7 @@ _Sprite.prototype.edges = function edges() {
     return points;
 };
 
-_Sprite.prototype.distance = function distancePoint(x, y) {
+_Sprite.prototype.distance = function distance(x, y) {
     // Return the distance between this sprite and the point (x, y) or a Sprite
     if(typeof x == "number") {
         return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) +
@@ -957,31 +957,13 @@ _Ticker.prototype.run = function() {
     for(var name in this.scene.layers) {
         var layer = this.scene.layers[name];
         if(layer.useCanvas && layer.autoClear) {
-            // try a smarter way to clear
-            /*var xmin=0, ymin=0, xmax=0, ymax=0;
-            for(var index in layer.sprites) {
-                var sp = layer.sprites[index];
-                if(sp.x < xmin)
-                    xmin = sp.x
-                if(sp.y < ymin)
-                    ymin = sp.y
-                if(sp.x + sp.w > xmax)
-                    xmax = sp.x + sp.w
-                if(sp.y + sp.h > ymax)
-                    ymax = sp.y + sp.h
-            }
-            layer.ctx.clearRect(xmin, ymin, xmax - xmin, ymax - ymin);*/
             layer.clear();
-
         }
-        // trick to clear canvas, doesn't seems to do any better according to tests
-        // http://skookum.com/blog/practical-canvas-test-charlottejs/
-        // canvas.width = canvas.width
     }
 
     this.paint(this);
     // reset the keyboard change
-    inputSingleton.keyboardChange = {};
+    inputSingleton.next();
 
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
@@ -1008,20 +990,31 @@ _Ticker.prototype.resume = function() {
 
 
 var inputSingleton = false;
-function Input(){
+function Input(scene){
     if(!inputSingleton)
-        inputSingleton = new _Input();
+        inputSingleton = new _Input(scene);
     return inputSingleton
 };
 
-function _Input() {
+function _Input(scene) {
+
+    if(scene)
+        this.dom = scene.dom;
+    else
+        this.dom = global;
 
     var that = this;
 
     this.keyboard = {};
+    this.mouse = {};
     this.keyboardChange = {};
     this.mousedown = false;
     this.keydown = false;
+
+    this.next = function() {
+        that.keyboardChange = {};
+        that.mouse.click = false;
+    }
 
     this.keyPressed = function(name) {
         return that.keyboardChange[name] !== undefined && that.keyboardChange[name];
@@ -1064,7 +1057,7 @@ function _Input() {
     }
 
     var addEvent = function(name, fct) {
-        document.addEventListener(name, fct, false);
+        global.addEventListener(name, fct, false);
     }
 
     addEvent("touchstart", function(event) {
@@ -1085,12 +1078,15 @@ function _Input() {
         that.mousedown = false;
     });
 
-    //document.onclick = function(event) {
-        //that.click(event);
-    //}
+    addEvent("click", function(event) {
+        that.mouse.click = {
+            x:event.clientX - that.dom.offsetLeft,
+            y:event.clientY - that.dom.offsetTop
+        };
+    });
+
     addEvent("mousemove", function(event) {
-        that.xmouse = event.clientX;
-        that.ymouse = event.clientY;
+        that.mouse.position = {x:event.clientX, y:event.clientY};
     });
 
     addEvent("keydown", function(e) {
@@ -1122,7 +1118,7 @@ global.addEventListener("blur", function (e) {
         if(!scene.autoPause)
             continue;
         var anon = function(scene) {
-            inputSingleton.keyboard = {}
+            inputSingleton.keyboard = {};
             inputSingleton.keydown = false;
             inputSingleton.mousedown = false;
             // create a semi transparent layer on the game
@@ -1427,10 +1423,10 @@ SrollingSurface.prototype.deleteBlocks = function moveBlocks() {
     for(var i=0; i<this.rendered_blocks.length; i++) {
         var block = this.rendered_blocks[i];
         if(
-            (block.pos[0] + this.block_w + this.tolerance) < this.x ||
-            (block.pos[1] + this.block_h + this.tolerance) < this.y ||
-            block.pos[0] > this.x + (this.w / 2) + this.block_w + this.tolerance  ||
-            block.pos[1] > this.y + (this.h / 2) + this.block_h + this.tolerance
+            (block.pos[0] + this.block_w) < this.x ||
+            (block.pos[1] + this.block_h) < this.y ||
+            block.pos[0] > this.x + (this.w / 2) + this.block_w  ||
+            block.pos[1] > this.y + (this.h / 2) + this.block_h
         ) {
             delete block;
             this.rendered_blocks.splice(i, 1);
