@@ -1308,19 +1308,36 @@ function SrollingSurface(scene, w, h, redrawCallback) {
     this.y = 0;
     this.w = w;
     this.h = h;
-    this.tolerance = 0;
     this.scene = scene;
     this.dom = document.createElement('div');
     this.dom.style.position = "relative";
     scene.dom.appendChild(this.dom);
+
+    this.bufferCanvas = scene.Layer("buffer-"+Math.random(),
+            {w:1.5*this.w, h:1.5*this.h, x:0, y:0, autoClear:false,
+            useCanvas:true, parent:this.dom, disableAutoZIndex:true});
+
+    this.callbackCanvas = scene.Layer("buffer-"+Math.random(),
+            {w:this.block_w , h:this.block_h, x:0, y:0, autoClear:false,
+            useCanvas:true, parent:this.dom, disableAutoZIndex:true});
+
+    this.bufferCanvas.dom.style.display = 'none';
+    this.callbackCanvas.dom.style.display = 'none';
+
+    this.front = scene.Layer("front-"+Math.random(),
+        {w:this.w, h:this.h, x:0, y:0, autoClear:false,
+        useCanvas:true, parent:this.dom, disableAutoZIndex:true});
+
     // block actually in use
     this.rendered_blocks = [];
     // layer available for rendering
-    this.available_layer = [];
+    this.available_blocks = [];
 }
 
 SrollingSurface.prototype.neededBlocks = function neededBlocks() {
-    // Return a list of needed block for the surface
+    // Return a list of needed block for the surface,
+    // the block is a int pair eg: (0,0), (10,12) that indicates the position
+    // (x / this.block_w, y / this.block_h) within the map.
     var needed_blocks = [];
     var x_block_start = Math.floor((this.x + (this.w / 2)) / this.block_w) -1;
     var y_block_start = Math.floor((this.y + (this.h / 2)) / this.block_h) -1;
@@ -1353,27 +1370,46 @@ SrollingSurface.prototype.blockToRender = function blockToRender() {
     return toRender
 }
 
+function mod(n, base) {
+    // strictly positive modulo
+    return ((n%base)+base)%base;
+}
+
 SrollingSurface.prototype.renderBlocks = function renderBlocks() {
-    // render blocks that need to be.
+    // render blocks in the buffer.
+
+    // new blocks to that need rendering
     var render_list = this.blockToRender();
     for(var i=0; i<render_list.length; i++) {
         var toRender = render_list[i];
+        // real map coordinates
         var x = toRender[0] * this.block_w;
         var y = toRender[1] * this.block_h;
-        if(this.available_layer.length) {
-            var layer = this.available_layer[0];
-            layer.dom.style.display = 'block';
-            this.available_layer.splice(0, 1);
-        } else {
-            var t = new Date().getTime()
-            var layer = scene.Layer("block-"+Math.random(),
-                {w:this.block_w, h:this.block_h, x:x, y:y, autoClear:false,
-                useCanvas:true, parent:this.dom, disableAutoZIndex:true});
-        }
-        layer.dom.style.left = x + 'px';
-        layer.dom.style.top = y + 'px';
-        this.redrawCallback(layer, x, y);
-        this.rendered_blocks.push({layer:layer, block:[toRender[0], toRender[1]], pos:[x, y]});
+
+        this.redrawCallback(this.callbackCanvas, x, y);
+        // buffer position in pixels
+        var buffer_pos = [
+            mod(toRender[0], 3) * this.block_w,
+            mod(toRender[1], 3) * this.block_h
+        ];
+
+        this.bufferCanvas.ctx.drawImage(this.callbackCanvas.dom, buffer_pos[0], buffer_pos[1]);
+
+        this.rendered_blocks.push({block:[toRender[0], toRender[1]], pos:[x, y], buffer_pos:buffer_pos});
+    }
+}
+
+SrollingSurface.prototype.recomposeBlocks = function recomposeBlocks() {
+    // draw all the blocks on the surface. My tests show that it's more efficient
+    // than redrawing the canvas on itself.
+    for(var i=0; i<this.rendered_blocks.length; i++) {
+        var block = this.rendered_blocks[i];
+        // draw the block on the front canvas
+        this.front.ctx.drawImage(this.bufferCanvas.dom,
+            block.buffer_pos[0], block.buffer_pos[1],
+            this.block_w, this.block_h,
+            block.pos[0] - this.x, block.pos[1] - this.y,
+            this.block_w, this.block_h);
     }
 }
 
@@ -1396,8 +1432,6 @@ SrollingSurface.prototype.deleteBlocks = function moveBlocks() {
             block.pos[0] > this.x + (this.w / 2) + this.block_w + this.tolerance  ||
             block.pos[1] > this.y + (this.h / 2) + this.block_h + this.tolerance
         ) {
-            block.layer.dom.style.display = 'none';
-            this.available_layer.push(block.layer);
             delete block;
             this.rendered_blocks.splice(i, 1);
             i = i-1;
@@ -1408,8 +1442,7 @@ SrollingSurface.prototype.deleteBlocks = function moveBlocks() {
 SrollingSurface.prototype.update = function update() {
     this.deleteBlocks();
     this.renderBlocks();
-    this.dom.style.left = -this.x + 'px';
-    this.dom.style.top = -this.y + 'px';
+    this.recomposeBlocks();
 }
 
 global.sjs = sjs;
