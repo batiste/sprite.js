@@ -41,8 +41,33 @@ var sjs = {
     Sprite:_Sprite,
     overlay:overlay,
     SrollingSurface:SrollingSurface,
-    scenes:[]
+    scenes:[],
+    math:{hypo:hypo, mod:mod, normalVector:normalVector}
 };
+
+// math function
+
+function mod(n, base) {
+    // strictly positive modulo
+    return ((n%base)+base)%base;
+}
+
+function hypo(x, y) {
+    return Math.sqrt(x * x + y * y);
+}
+
+function normalVector(vx, vy, intensity) {
+    var n = hypo(vx, vy);
+    if(n==0)
+        return {x:vx, y:vy}
+    if(intensity) {
+        return {x:((vx/n)*intensity), y:((vy/n)*intensity)}
+    }
+    return {x:vx/n, y:vy/n};
+}
+
+// global z-index
+var zindex = 1;
 
 function init_transform_property() {
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform'];
@@ -87,6 +112,8 @@ function Scene(options) {
         init_transform_property();
 
     this.autoPause = optionValue(options, 'autoPause', true);
+    // main function
+    this.main = false;
 
     var div = document.createElement('div');
     div.style.overflow = 'hidden';
@@ -137,7 +164,7 @@ Scene.prototype.reset = function reset() {
         this.ticker.pause();
     for(l in this.layers) {
         if(this.layers.hasOwnProperty(l)) {
-            this.dom.removeChild(this.layers[l].dom)
+            this.layers[l].dom.parentNode.removeChild(this.layers[l].dom)
             delete this.layers[l];
         }
     }
@@ -146,6 +173,7 @@ Scene.prototype.reset = function reset() {
         this.dom.removeChild( this.dom.firstChild );
     }
     this.layers = {};
+    this.Layer("default");
 }
 
 Scene.prototype.Ticker = function Ticker(tickDuration, paint) {
@@ -157,6 +185,36 @@ Scene.prototype.Ticker = function Ticker(tickDuration, paint) {
     return this.ticker;
 };
 
+Scene.prototype.dialogEvent = function dialogEvent(div, el, event, callback) {
+    var that = this;
+    var event = function() {
+        el.removeEventListener(el);
+        that.dom.removeChild(div);
+        callback();
+    }
+    el.addEventListener("click", event, false);
+}
+
+Scene.prototype.dialog = function dialog(options) {
+    var div = document.createElement("div");
+    div.className = "dialog " + optionValue(options, "class", "");
+    var html = optionValue(options, "html");
+    div.innerHTML = html;
+    var buttons = optionValue(options, "buttons", []);
+    for(var i=0; i<buttons.length; i++) {
+        var b = buttons[i];
+        var button = document.createElement("button");
+        button.innerHTML = optionValue(b, "text", "Ok");
+        div.appendChild(button);
+        var callback = optionValue(b, "callback", function(){})
+        this.dialogEvent(div, button, "click", callback);
+    }
+    div.style.position = "absolute";
+    zindex += 1;
+    div.style.zIndex = String(zindex);
+    this.dom.appendChild(div);
+}
+
 // a global cache to load each sprite only one time
 var spriteList = {};
 
@@ -165,6 +223,9 @@ function error(msg) {alert(msg);}
 
 Scene.prototype.loadImages = function loadImages(images, callback) {
     /* function used to preload the sprite images */
+    if(!callback)
+        callback = this.main;
+
     var toLoad = 0;
     for(var i=0; i<images.length; i++) {
         if(!spriteList[images[i]]) {
@@ -466,6 +527,20 @@ _Sprite.prototype.reverseYVelocity = function (ticks) {
         this.setY(this.y-this.yv*ticks);
 }
 
+_Sprite.prototype.rotateVelocity = function (a) {
+    var x = this.xv * Math.cos(a) - this.yv * Math.sin(a);
+    this.yv = this.xv * Math.sin(a) + this.yv * Math.cos(a);
+    this.xv = x;
+};
+
+_Sprite.prototype.pointVelocityTo = function (x, y) {
+    var intensity = hypo(this.xv, this.yv);
+    var v = normalVector(x, y, intensity);
+    this.xv = v.x;
+    this.yv = v.y;
+};
+
+
 _Sprite.prototype.offset = function (x, y) {
     this.setXOffset(x);
     this.setYOffset(y);
@@ -481,7 +556,7 @@ _Sprite.prototype.size = function (w, h) {
 _Sprite.prototype.remove = function remove() {
     if(this.cycle)
         this.cycle.removeSprite(this);
-    if(!this.layer.useCanvas) {
+    if(this.layer && !this.layer.useCanvas) {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
     }
@@ -714,7 +789,7 @@ _Sprite.prototype.collidesWithAngle = function collidesWithAngle(sprite) {
 
 _Sprite.prototype.edges = function edges() {
     // Return the 4 edges coordinate of the rectangle
-    var distance = Math.sqrt(this.w / 2 * this.w / 2 + this.h / 2 * this.h / 2);
+    var distance = hypo(this.w / 2, this.h / 2);
     var angle = Math.atan2(this.h, this.w);
     // 4 angles to reach the edges, starting up left (down left in the sprite.js coordinate)
     // and turning counter-clockwise
@@ -932,12 +1007,14 @@ function _Ticker(scene, tickDuration, paint) {
     this.start = new Date().getTime();
     this.ticksElapsed = 0;
     this.currentTick = 0;
+    this._saved = 0;
 }
 
 _Ticker.prototype.next = function() {
+    // number of ticks that have happen tile the last pause
     var ticksElapsed = ((this.now - this.start) / this.tickDuration) | 0;
     this.lastTicksElapsed = ticksElapsed - this.currentTick;
-    this.currentTick = ticksElapsed;
+    this.currentTick = ticksElapsed + this._saved;
     return this.lastTicksElapsed;
 };
 
@@ -981,6 +1058,8 @@ _Ticker.prototype.pause = function() {
 }
 
 _Ticker.prototype.resume = function() {
+    // useful to keep the accurate number of ticks after resume
+    this._saved += ((this.now - this.start) / this.tickDuration) | 0
     this.start = new Date().getTime();
     this.ticksElapsed = 0;
     this.currentTick = 0;
@@ -1072,6 +1151,8 @@ function _Input(scene) {
 
     addEvent("mousedown", function(event) {
         that.mousedown = true;
+        // prevent unwanted browser drag and drop behavior
+        event.preventDefault();
     });
 
     addEvent("mouseup", function(event) {
@@ -1086,7 +1167,10 @@ function _Input(scene) {
     });
 
     addEvent("mousemove", function(event) {
-        that.mouse.position = {x:event.clientX, y:event.clientY};
+        that.mouse.position = {
+            x:event.clientX - that.dom.offsetLeft,
+            y:event.clientY - that.dom.offsetTop
+        };
     });
 
     addEvent("keydown", function(e) {
@@ -1144,8 +1228,6 @@ global.addEventListener("blur", function (e) {
         anon(scene);
     }
 }, false);
-
-var layerZindex = 1;
 
 function Layer(scene, name, options) {
 
@@ -1209,8 +1291,8 @@ function Layer(scene, name, options) {
     this.parent.appendChild(domElement);
     domElement.id = domElement.id || 'sjs'+scene.id+'-'+name;
     if(!options.disableAutoZIndex) {
-        layerZindex += 1;
-        domElement.style.zIndex = String(layerZindex);
+        zindex += 1;
+        domElement.style.zIndex = String(zindex);
     }
     domElement.style.backgroundColor = options.color || domElement.style.backgroundColor;
     this.h = options.h || domH || scene.h;
@@ -1250,8 +1332,8 @@ Layer.prototype.setColor = function setColor(color) {
 }
 
 Layer.prototype.onTop = function onTop(color) {
-    layerZindex += 1;
-    this.dom.style.zIndex = String(layerZindex);
+    zindex += 1;
+    this.dom.style.zIndex = String(zindex);
 }
 
 function SpriteList(list) {
@@ -1364,11 +1446,6 @@ SrollingSurface.prototype.blockToRender = function blockToRender() {
             toRender.push(needed_block);
     }
     return toRender
-}
-
-function mod(n, base) {
-    // strictly positive modulo
-    return ((n%base)+base)%base;
 }
 
 SrollingSurface.prototype.renderBlocks = function renderBlocks() {

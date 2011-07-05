@@ -41,6 +41,10 @@ window.onload = function() {
     }
     function assertEqual(value1, value2, text) {
         text = getText(text)
+        if(typeof value1 == "object")
+            value1 = JSON.stringify(value1)
+        if(typeof value2 == "object")
+            value2 = JSON.stringify(value2)
         if(value1 === value2) {
             result.innerHTML += text + ': pass\n';
         } else {
@@ -126,13 +130,13 @@ window.onload = function() {
 
     var sp1 = scene.Sprite(false, {position:[-5, -5], size:[10, 10]});
 
-    assertEqual(JSON.stringify(sp1.edges()),
-      "[[-5,5.000000000000001],[5.000000000000001,5],[5.000000000000001,-5],[-5,-5]]",  "edges function 1");
+    assertEqual(sp1.edges(),
+      [[-5,5.000000000000001],[5.000000000000001,5],[5.000000000000001,-5],[-5,-5]],  "edges function 1");
 
     sp1.angle = Math.PI / 2.0;
 
-    assertEqual(JSON.stringify(sp1.edges()),
-      "[[-5,-5],[-5,5.000000000000001],[5.000000000000001,5],[4.999999999999999,-5]]",  "edges function 2");
+    assertEqual(sp1.edges(),
+      [[-5,-5],[-5,5.000000000000001],[5.000000000000001,5],[4.999999999999999,-5]],  "edges function 2");
 
     sp1.angle += Math.PI / 4.0;
 
@@ -217,6 +221,14 @@ window.onload = function() {
     }
     assertTrue(nbCollision > 0, "collidesWithAngle 6")
 
+    math = sjs.math;
+
+    assertEqual(math.hypo(5, 5), Math.sqrt(50), "Test pythagore theorem")
+    assertEqual(math.mod(3, 2), 1, "Test modulo 1")
+    assertEqual(math.mod(-1, 2), 1, "Test modulo 2")
+
+    assertEqual(math.normalVector(2, 2), {x:(2/math.hypo(2, 2)), y:(2/math.hypo(2, 2))}, "Test normal vector 1")
+    assertEqual(math.normalVector(2, 2, math.hypo(2, 2)), {x:2, y:2}, "Test normal vector 2")
 };
 </script>
 </html>
