@@ -8,6 +8,10 @@ framework for Desktop and mobile browsers.
 
 sprite.js has been tested on Chromium, Firefox, Android emulator, Opera and IE9.
 
+For an example of a game made with sprite.js there is an example game named "The invasion of the evil lords":
+
+http://batiste.dosimple.ch/games/rpg/game.html
+
 For an example of the what the framework offers, have a look at the test files:
 
 http://batiste.dosimple.ch/sprite.js/tests/
