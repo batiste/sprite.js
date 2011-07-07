@@ -188,7 +188,7 @@ Scene.prototype.Ticker = function Ticker(tickDuration, paint) {
 Scene.prototype.dialogEvent = function dialogEvent(div, el, event, callback) {
     var that = this;
     var event = function() {
-        el.removeEventListener(el);
+        el.removeEventListener("click", event, false);
         that.dom.removeChild(div);
         callback();
     }
