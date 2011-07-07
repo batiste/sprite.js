@@ -839,9 +839,9 @@ _Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
         layer = this.layer;
     if(v == undefined) {
         if(horizontal)
-            v = this.w / 2;
-        else
             v = this.h / 2;
+        else
+            v = this.w / 2;
     }
     v = v | 0;
     var s1 = layer.scene.Sprite(this.src, layer);
