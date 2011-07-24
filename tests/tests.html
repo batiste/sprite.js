@@ -41,6 +41,10 @@ window.onload = function() {
     }
     function assertEqual(value1, value2, text) {
         text = getText(text)
+        if(typeof value1 == "object")
+            value1 = JSON.stringify(value1)
+        if(typeof value2 == "object")
+            value2 = JSON.stringify(value2)
         if(value1 === value2) {
             result.innerHTML += text + ': pass\n';
         } else {
@@ -100,16 +104,19 @@ window.onload = function() {
     assertEqual(sp1.distance(20, 20), Math.sqrt(5*5+5*5),  "Point distance test 4");
 
     // Sprite instanciation tests
+    var fakelayer = {
+        dom:{appendChild:function(){}},
+        sprites:[]
+    }
 
-    var sp1 = scene.Sprite(false, {x:40, y:50, w:30, h:25});
+    var sp1 = scene.Sprite(false, {x:40, y:50, w:30, h:25, layer:fakelayer});
     assertEqual(sp1.x, 40,  "init position 1");
     assertEqual(sp1.y, 50,  "init position 2");
     assertEqual(sp1.w, 30,  "init size 1");
     assertEqual(sp1.h, 25,  "init size 2");
+    assertEqual(sp1.layer, fakelayer,  "init layer");
 
-    var fakelayer = {
-        dom:{appendChild:function(){}}
-    }
+
 
     var sp1 = scene.Sprite(false, {position:[60, 60], size:[55, 65], toto:5, layer:fakelayer});
     assertEqual(sp1.x, 60,  "init position 3");
@@ -123,13 +130,13 @@ window.onload = function() {
 
     var sp1 = scene.Sprite(false, {position:[-5, -5], size:[10, 10]});
 
-    assertEqual(JSON.stringify(sp1.edges()), 
-      "[[-5,5.000000000000001],[5.000000000000001,5],[5.000000000000001,-5],[-5,-5]]",  "edges function 1");
+    assertEqual(sp1.edges(),
+      [[-5,5.000000000000001],[5.000000000000001,5],[5.000000000000001,-5],[-5,-5]],  "edges function 1");
 
     sp1.angle = Math.PI / 2.0;
-    
-    assertEqual(JSON.stringify(sp1.edges()), 
-      "[[-5,-5],[-5,5.000000000000001],[5.000000000000001,5],[4.999999999999999,-5]]",  "edges function 2");
+
+    assertEqual(sp1.edges(),
+      [[-5,-5],[-5,5.000000000000001],[5.000000000000001,5],[4.999999999999999,-5]],  "edges function 2");
 
     sp1.angle += Math.PI / 4.0;
 
@@ -172,13 +179,13 @@ window.onload = function() {
     assertFalse(sp1.isPointInAngle(-11, 0), "isPointInAngle 6");
     assertTrue(sp1.isPointInAngle(-9, 4.5), "isPointInAngle 7");
     assertTrue(sp1.isPointInAngle(-9, -4.5), "isPointInAngle 8");
-    
+
     sp1.angle = Math.PI / 2.0;
     assertTrue(sp1.isPointInAngle(-4.8, 9.9), "isPointInAngle 9");
     assertTrue(sp1.isPointInAngle(4.8, -9.9), "isPointInAngle 10");
     assertFalse(sp1.isPointInAngle(0, 11), "isPointInAngle 11");
     assertFalse(sp1.isPointInAngle(9, 0), "isPointInAngle 12");
-    
+
     sp1.angle = Math.PI / 4.0;
 
     console.log(11.7 * Math.cos(sp1.angle), 11.7 * Math.sin(sp1.angle))
@@ -214,6 +221,14 @@ window.onload = function() {
     }
     assertTrue(nbCollision > 0, "collidesWithAngle 6")
 
+    math = sjs.math;
+
+    assertEqual(math.hypo(5, 5), Math.sqrt(50), "Test pythagore theorem")
+    assertEqual(math.mod(3, 2), 1, "Test modulo 1")
+    assertEqual(math.mod(-1, 2), 1, "Test modulo 2")
+
+    assertEqual(math.normalVector(2, 2), {x:(2/math.hypo(2, 2)), y:(2/math.hypo(2, 2))}, "Test normal vector 1")
+    assertEqual(math.normalVector(2, 2, math.hypo(2, 2)), {x:2, y:2}, "Test normal vector 2")
 };
 </script>
 </html>

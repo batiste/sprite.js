@@ -21,7 +21,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/* Sprite.js v1.0.0
+/* Sprite.js v1.1.0
  *
  * coding guideline
  *
@@ -38,9 +38,36 @@ var sjs = {
     Input: Input,
     Scene: Scene,
     SpriteList:SpriteList,
+    Sprite:_Sprite,
     overlay:overlay,
-    scenes:[]
+    SrollingSurface:SrollingSurface,
+    scenes:[],
+    math:{hypo:hypo, mod:mod, normalVector:normalVector}
 };
+
+// math function
+
+function mod(n, base) {
+    // strictly positive modulo
+    return ((n%base)+base)%base;
+}
+
+function hypo(x, y) {
+    return Math.sqrt(x * x + y * y);
+}
+
+function normalVector(vx, vy, intensity) {
+    var n = hypo(vx, vy);
+    if(n==0)
+        return {x:vx, y:vy}
+    if(intensity) {
+        return {x:((vx/n)*intensity), y:((vy/n)*intensity)}
+    }
+    return {x:vx/n, y:vy/n};
+}
+
+// global z-index
+var zindex = 1;
 
 function init_transform_property() {
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform'];
@@ -84,6 +111,10 @@ function Scene(options) {
     if(!sjs.tproperty)
         init_transform_property();
 
+    this.autoPause = optionValue(options, 'autoPause', true);
+    // main function
+    this.main = false;
+
     var div = document.createElement('div');
     div.style.overflow = 'hidden';
     div.style.position = 'relative';
@@ -111,6 +142,7 @@ function Scene(options) {
 Scene.prototype.constructor = Scene;
 
 Scene.prototype.Sprite = function SceneSprite(src, layer) {
+    /* an actual shortcut for sjs.Sprite */
     return new _Sprite(this, src, layer);
 }
 
@@ -128,9 +160,11 @@ Scene.prototype.Input = function SceneInput() {
 }
 
 Scene.prototype.reset = function reset() {
+    if(this.ticker)
+        this.ticker.pause();
     for(l in this.layers) {
         if(this.layers.hasOwnProperty(l)) {
-            this.dom.removeChild(this.layers[l].dom)
+            this.layers[l].dom.parentNode.removeChild(this.layers[l].dom)
             delete this.layers[l];
         }
     }
@@ -139,8 +173,7 @@ Scene.prototype.reset = function reset() {
         this.dom.removeChild( this.dom.firstChild );
     }
     this.layers = {};
-    if(this.ticker)
-        this.ticker.pause();
+    this.Layer("default");
 }
 
 Scene.prototype.Ticker = function Ticker(tickDuration, paint) {
@@ -152,6 +185,36 @@ Scene.prototype.Ticker = function Ticker(tickDuration, paint) {
     return this.ticker;
 };
 
+Scene.prototype.dialogEvent = function dialogEvent(div, el, event, callback) {
+    var that = this;
+    var event = function() {
+        el.removeEventListener("click", event, false);
+        that.dom.removeChild(div);
+        callback();
+    }
+    el.addEventListener("click", event, false);
+}
+
+Scene.prototype.dialog = function dialog(options) {
+    var div = document.createElement("div");
+    div.className = "dialog " + optionValue(options, "class", "");
+    var html = optionValue(options, "html");
+    div.innerHTML = html;
+    var buttons = optionValue(options, "buttons", []);
+    for(var i=0; i<buttons.length; i++) {
+        var b = buttons[i];
+        var button = document.createElement("button");
+        button.innerHTML = optionValue(b, "text", "Ok");
+        div.appendChild(button);
+        var callback = optionValue(b, "callback", function(){})
+        this.dialogEvent(div, button, "click", callback);
+    }
+    div.style.position = "absolute";
+    zindex += 1;
+    div.style.zIndex = String(zindex);
+    this.dom.appendChild(div);
+}
+
 // a global cache to load each sprite only one time
 var spriteList = {};
 
@@ -160,6 +223,9 @@ function error(msg) {alert(msg);}
 
 Scene.prototype.loadImages = function loadImages(images, callback) {
     /* function used to preload the sprite images */
+    if(!callback)
+        callback = this.main;
+
     var toLoad = 0;
     for(var i=0; i<images.length; i++) {
         if(!spriteList[images[i]]) {
@@ -247,15 +313,18 @@ function _Sprite(scene, src, layer) {
 
     this.opacity = 1;
     this.color = false;
-    
+
+    // necessary to get set
+    this.layer = null;
+
     // if it doesn't seems to kouak like a Layer object
     if(layer) {
+        // this is a layer object
         if(layer.sprites) {
             this.layer = layer;
         } else {
             // we can receive things like this
-            // {x:10, y:10, w:10, h:50, size:[20, 30]}
-            this.layer = scene.layers['default'];
+            // {x:10, y:10, w:10, h:50, size:[20, 30], layer:var}
             var properties = layer;
 
             for(p in properties) {
@@ -263,13 +332,24 @@ function _Sprite(scene, src, layer) {
                 var target = this[p];
                 if(typeof target == "function")
                     this[p].apply(this, value);
-                else if(target !== undefined)
-                    this[p] = value;
+                else if(target !== undefined) {
+                    // this is necessary to set cache value properly
+                    var setF = 'set'+p.charAt(0).toUpperCase() + p.slice(1);
+                    if(this[setF]) {
+                        this[setF].apply(this, [value]);
+                    } else {
+                        // necessary for layer option
+                        this[p] = value;
+                    }
+                }
             }
+
         }
-    } else {
-        this.layer = scene.layers['default']; 
     }
+
+    // can be set by the properties
+    if(!this.layer)
+        this.layer = scene.layers['default'];
 
     if(!this.layer.useCanvas) {
         var d = document.createElement('div');
@@ -447,6 +527,20 @@ _Sprite.prototype.reverseYVelocity = function (ticks) {
         this.setY(this.y-this.yv*ticks);
 }
 
+_Sprite.prototype.rotateVelocity = function (a) {
+    var x = this.xv * Math.cos(a) - this.yv * Math.sin(a);
+    this.yv = this.xv * Math.sin(a) + this.yv * Math.cos(a);
+    this.xv = x;
+};
+
+_Sprite.prototype.pointVelocityTo = function (x, y) {
+    var intensity = hypo(this.xv, this.yv);
+    var v = normalVector(x, y, intensity);
+    this.xv = v.x;
+    this.yv = v.y;
+};
+
+
 _Sprite.prototype.offset = function (x, y) {
     this.setXOffset(x);
     this.setYOffset(y);
@@ -462,7 +556,7 @@ _Sprite.prototype.size = function (w, h) {
 _Sprite.prototype.remove = function remove() {
     if(this.cycle)
         this.cycle.removeSprite(this);
-    if(!this.layer.useCanvas) {
+    if(this.layer && !this.layer.useCanvas) {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
     }
@@ -524,7 +618,7 @@ _Sprite.prototype.update = function updateDomProperties () {
     return this;
 };
 
-_Sprite.prototype.canvasUpdate = function updateCanvas (layer) {
+_Sprite.prototype.canvasUpdate = function updateCanvas(layer) {
     if(layer)
         var ctx = layer.ctx;
     else
@@ -620,7 +714,7 @@ _Sprite.prototype.loadImg = function (src, resetSize) {
 };
 
 
-_Sprite.prototype.isPointIn = function pointIn(x, y) {
+_Sprite.prototype.isPointIn = function isPointIn(x, y) {
     // Return true if the point is within the sprite surface
     if(this.angle == 0)
         return (x >= this.x && x < this.x+this.w
@@ -659,9 +753,10 @@ _Sprite.prototype.isPointInAngle = function pointInAngle(x, y) {
 
 _Sprite.prototype.collidesWith = function collidesWith(sprite) {
     // Return true if the current sprite has any collision with the Sprite provided
-    if(this.angle != 0 || sprite.angle != 0)
+    if(this.angle != 0 || sprite.angle != 0) {
         return this.collidesWithAngle(sprite);
-    
+    }
+
     if(sprite.x > this.x) {
         var x_inter = sprite._x_rounded - this._x_rounded < this.w - 1;
     } else {
@@ -694,22 +789,22 @@ _Sprite.prototype.collidesWithAngle = function collidesWithAngle(sprite) {
 
 _Sprite.prototype.edges = function edges() {
     // Return the 4 edges coordinate of the rectangle
-    var distance = Math.sqrt(this.w / 2 * this.w / 2 + this.h / 2 * this.h / 2);
+    var distance = hypo(this.w / 2, this.h / 2);
     var angle = Math.atan2(this.h, this.w);
-    // 4 angles to reach the edges, starting up left (down left in the sprite.js coordinate) 
+    // 4 angles to reach the edges, starting up left (down left in the sprite.js coordinate)
     // and turning counter-clockwise
     var angles = [Math.PI - angle, angle, -angle, Math.PI + angle];
     var points = [];
     for(var i=0; i < 4; i++) {
         points.push([
-            distance * Math.cos(this.angle + angles[i]) + this.x + this.w/2, 
+            distance * Math.cos(this.angle + angles[i]) + this.x + this.w/2,
             distance * Math.sin(this.angle + angles[i]) + this.y + this.h/2
         ]);
     }
     return points;
 };
 
-_Sprite.prototype.distance = function distancePoint(x, y) {
+_Sprite.prototype.distance = function distance(x, y) {
     // Return the distance between this sprite and the point (x, y) or a Sprite
     if(typeof x == "number") {
         return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) +
@@ -725,8 +820,12 @@ _Sprite.prototype.center = function center() {
 }
 
 _Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
-    // Return true if the current sprite has any collision with the Array provided
+    // Return a sprite if the current sprite has any collision with the Array provided
     // a sprite cannot collides with itself
+    // Make the SpriteList works
+    if(sprites.list)
+        sprites = sprites.list;
+
     for(var i=0, sprite; sprite = sprites[i]; i++) {
         if(this!=sprite && this.collidesWith(sprite)) {
             return sprite;
@@ -740,9 +839,9 @@ _Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
         layer = this.layer;
     if(v == undefined) {
         if(horizontal)
-            v = this.w / 2;
-        else
             v = this.h / 2;
+        else
+            v = this.w / 2;
     }
     v = v | 0;
     var s1 = layer.scene.Sprite(this.src, layer);
@@ -908,12 +1007,14 @@ function _Ticker(scene, tickDuration, paint) {
     this.start = new Date().getTime();
     this.ticksElapsed = 0;
     this.currentTick = 0;
+    this._saved = 0;
 }
 
 _Ticker.prototype.next = function() {
+    // number of ticks that have happen tile the last pause
     var ticksElapsed = ((this.now - this.start) / this.tickDuration) | 0;
     this.lastTicksElapsed = ticksElapsed - this.currentTick;
-    this.currentTick = ticksElapsed;
+    this.currentTick = ticksElapsed + this._saved;
     return this.lastTicksElapsed;
 };
 
@@ -933,31 +1034,13 @@ _Ticker.prototype.run = function() {
     for(var name in this.scene.layers) {
         var layer = this.scene.layers[name];
         if(layer.useCanvas && layer.autoClear) {
-            // try a smarter way to clear
-            /*var xmin=0, ymin=0, xmax=0, ymax=0;
-            for(var index in layer.sprites) {
-                var sp = layer.sprites[index];
-                if(sp.x < xmin)
-                    xmin = sp.x
-                if(sp.y < ymin)
-                    ymin = sp.y
-                if(sp.x + sp.w > xmax)
-                    xmax = sp.x + sp.w
-                if(sp.y + sp.h > ymax)
-                    ymax = sp.y + sp.h
-            }
-            layer.ctx.clearRect(xmin, ymin, xmax - xmin, ymax - ymin);*/
             layer.clear();
-
         }
-        // trick to clear canvas, doesn't seems to do any better according to tests
-        // http://skookum.com/blog/practical-canvas-test-charlottejs/
-        // canvas.width = canvas.width
     }
 
     this.paint(this);
     // reset the keyboard change
-    inputSingleton.keyboardChange = {};
+    inputSingleton.next();
 
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
@@ -975,6 +1058,8 @@ _Ticker.prototype.pause = function() {
 }
 
 _Ticker.prototype.resume = function() {
+    // useful to keep the accurate number of ticks after resume
+    this._saved += ((this.now - this.start) / this.tickDuration) | 0
     this.start = new Date().getTime();
     this.ticksElapsed = 0;
     this.currentTick = 0;
@@ -984,20 +1069,31 @@ _Ticker.prototype.resume = function() {
 
 
 var inputSingleton = false;
-function Input(){
+function Input(scene){
     if(!inputSingleton)
-        inputSingleton = new _Input();
+        inputSingleton = new _Input(scene);
     return inputSingleton
 };
 
-function _Input() {
+function _Input(scene) {
+
+    if(scene)
+        this.dom = scene.dom;
+    else
+        this.dom = global;
 
     var that = this;
 
     this.keyboard = {};
+    this.mouse = {};
     this.keyboardChange = {};
     this.mousedown = false;
     this.keydown = false;
+
+    this.next = function() {
+        that.keyboardChange = {};
+        that.mouse.click = false;
+    }
 
     this.keyPressed = function(name) {
         return that.keyboardChange[name] !== undefined && that.keyboardChange[name];
@@ -1040,7 +1136,7 @@ function _Input() {
     }
 
     var addEvent = function(name, fct) {
-        document.addEventListener(name, fct, false);
+        global.addEventListener(name, fct, false);
     }
 
     addEvent("touchstart", function(event) {
@@ -1055,18 +1151,26 @@ function _Input() {
 
     addEvent("mousedown", function(event) {
         that.mousedown = true;
+        // prevent unwanted browser drag and drop behavior
+        event.preventDefault();
     });
 
     addEvent("mouseup", function(event) {
         that.mousedown = false;
     });
 
-    //document.onclick = function(event) {
-        //that.click(event);
-    //}
+    addEvent("click", function(event) {
+        that.mouse.click = {
+            x:event.clientX - that.dom.offsetLeft,
+            y:event.clientY - that.dom.offsetTop
+        };
+    });
+
     addEvent("mousemove", function(event) {
-        that.xmouse = event.clientX;
-        that.ymouse = event.clientY;
+        that.mouse.position = {
+            x:event.clientX - that.dom.offsetLeft,
+            y:event.clientY - that.dom.offsetTop
+        };
     });
 
     addEvent("keydown", function(e) {
@@ -1095,8 +1199,10 @@ _Input.prototype.arrows = function arrows() {
 global.addEventListener("blur", function (e) {
     for(var i=0; i < sjs.scenes.length; i++) {
         var scene = sjs.scenes[i];
+        if(!scene.autoPause)
+            continue;
         var anon = function(scene) {
-            inputSingleton.keyboard = {}
+            inputSingleton.keyboard = {};
             inputSingleton.keydown = false;
             inputSingleton.mousedown = false;
             // create a semi transparent layer on the game
@@ -1122,8 +1228,6 @@ global.addEventListener("blur", function (e) {
         anon(scene);
     }
 }, false);
-
-var layerZindex = 1;
 
 function Layer(scene, name, options) {
 
@@ -1180,27 +1284,41 @@ function Layer(scene, name, options) {
         var domW = false;
     }
 
-    scene.dom.appendChild(domElement);
+    if(options.parent)
+        this.parent = options.parent;
+    else
+        this.parent = this.scene.dom;
+    this.parent.appendChild(domElement);
     domElement.id = domElement.id || 'sjs'+scene.id+'-'+name;
-    domElement.style.zIndex = String(layerZindex);
+    if(!options.disableAutoZIndex) {
+        zindex += 1;
+        domElement.style.zIndex = String(zindex);
+    }
     domElement.style.backgroundColor = options.color || domElement.style.backgroundColor;
-    domElement.style.position = 'absolute';
+    this.h = options.h || domH || scene.h;
+    this.w = options.w || domW || scene.w;
     if (domElement.nodeName == "CANVAS") {
-      domElement.height = options.h || domH || scene.h;
-      domElement.width = options.w || domW || scene.w;
+        domElement.height = this.h;
+        domElement.width = this.w;
     } else {
-      domElement.style.height = (options.h || domH || scene.h)+'px';
-      domElement.style.width = (options.w || domW || scene.w)+'px';
+        domElement.style.height = this.h + 'px';
+        domElement.style.width = this.w +'px';
     };
+    domElement.style.position = 'absolute';
     domElement.style.top = domElement.style.top || '0px';
     domElement.style.left =  domElement.style.left || '0px';
 
     this.dom = domElement;
-    layerZindex += 1;
+
 }
 
-Layer.prototype.clear = function() {
+Layer.prototype.clear = function clear() {
     this.ctx.clearRect(0, 0, this.dom.width, this.dom.height);
+}
+
+Layer.prototype.remove = function remove() {
+    this.parent.removeChild(this.dom);
+    delete this.scene.layers[this.name];
 }
 
 Layer.prototype.addSprite = function addSprite(sprite) {
@@ -1211,6 +1329,11 @@ Layer.prototype.addSprite = function addSprite(sprite) {
 
 Layer.prototype.setColor = function setColor(color) {
     this.dom.style.backgroundColor = color;
+}
+
+Layer.prototype.onTop = function onTop(color) {
+    zindex += 1;
+    this.dom.style.zIndex = String(zindex);
 }
 
 function SpriteList(list) {
@@ -1250,6 +1373,150 @@ SpriteList.prototype.iterate = function iterate() {
         return false;
     }
     return this.list[this.index];
+}
+
+function SrollingSurface(scene, w, h, redrawCallback) {
+
+    if(this.constructor !== arguments.callee)
+        return new SrollingSurface(scene, w, h, redrawCallback);
+
+    this.redrawCallback = redrawCallback;
+    this.block_h = Math.ceil(h / 2.0);
+    this.block_w = Math.ceil(w / 2.0);
+    this.x = 0;
+    this.y = 0;
+    this.w = w;
+    this.h = h;
+    this.scene = scene;
+    this.dom = document.createElement('div');
+    this.dom.style.position = "relative";
+    scene.dom.appendChild(this.dom);
+
+    this.bufferCanvas = scene.Layer("buffer-"+Math.random(),
+            {w:1.5*this.w, h:1.5*this.h, x:0, y:0, autoClear:false,
+            useCanvas:true, parent:this.dom, disableAutoZIndex:true});
+
+    this.callbackCanvas = scene.Layer("buffer-"+Math.random(),
+            {w:this.block_w , h:this.block_h, x:0, y:0, autoClear:false,
+            useCanvas:true, parent:this.dom, disableAutoZIndex:true});
+
+    this.bufferCanvas.dom.style.display = 'none';
+    this.callbackCanvas.dom.style.display = 'none';
+
+    this.front = scene.Layer("front-"+Math.random(),
+        {w:this.w, h:this.h, x:0, y:0, autoClear:false,
+        useCanvas:true, parent:this.dom, disableAutoZIndex:true});
+
+    // block actually in use
+    this.rendered_blocks = [];
+    // layer available for rendering
+    this.available_blocks = [];
+}
+
+SrollingSurface.prototype.neededBlocks = function neededBlocks() {
+    // Return a list of needed block for the surface,
+    // the block is a int pair eg: (0,0), (10,12) that indicates the position
+    // (x / this.block_w, y / this.block_h) within the map.
+    var needed_blocks = [];
+    var x_block_start = Math.floor((this.x + (this.w / 2)) / this.block_w) -1;
+    var y_block_start = Math.floor((this.y + (this.h / 2)) / this.block_h) -1;
+
+    for(var x=0; x<3; x++) {
+        for(var y=0; y<3; y++) {
+            needed_blocks.push([x_block_start + x, y_block_start + y])
+        }
+    }
+    return needed_blocks
+}
+
+SrollingSurface.prototype.blockToRender = function blockToRender() {
+    // Return the blocks that need rendering
+    var neededBlocks = this.neededBlocks();
+    var toRender = [];
+    var rendered = this.rendered_blocks;
+    for(var i=0; i<neededBlocks.length; i++) {
+        var needed_block =  neededBlocks[i];
+        var found = false;
+        for(var j=0; j<rendered.length; j++) {
+            if(rendered[j].block[0] == needed_block[0] && rendered[j].block[1] == needed_block[1]) {
+                found = true;
+                break;
+            }
+        }
+        if(!found)
+            toRender.push(needed_block);
+    }
+    return toRender
+}
+
+SrollingSurface.prototype.renderBlocks = function renderBlocks() {
+    // render blocks in the buffer.
+
+    // new blocks to that need rendering
+    var render_list = this.blockToRender();
+    for(var i=0; i<render_list.length; i++) {
+        var toRender = render_list[i];
+        // real map coordinates
+        var x = toRender[0] * this.block_w;
+        var y = toRender[1] * this.block_h;
+
+        this.redrawCallback(this.callbackCanvas, x, y);
+        // buffer position in pixels
+        var buffer_pos = [
+            mod(toRender[0], 3) * this.block_w,
+            mod(toRender[1], 3) * this.block_h
+        ];
+
+        this.bufferCanvas.ctx.drawImage(this.callbackCanvas.dom, buffer_pos[0], buffer_pos[1]);
+
+        this.rendered_blocks.push({block:[toRender[0], toRender[1]], pos:[x, y], buffer_pos:buffer_pos});
+    }
+}
+
+SrollingSurface.prototype.recomposeBlocks = function recomposeBlocks() {
+    // draw all the blocks on the surface. My tests show that it's more efficient
+    // than redrawing the canvas on itself.
+    for(var i=0; i<this.rendered_blocks.length; i++) {
+        var block = this.rendered_blocks[i];
+        // draw the block on the front canvas
+        this.front.ctx.drawImage(this.bufferCanvas.dom,
+            block.buffer_pos[0], block.buffer_pos[1],
+            this.block_w, this.block_h,
+            block.pos[0] - this.x, block.pos[1] - this.y,
+            this.block_w, this.block_h);
+    }
+}
+
+SrollingSurface.prototype.move = function move(x, y) {
+    this.x = this.x + x;
+    this.y = this.y + y;
+}
+
+SrollingSurface.prototype.position = function position(x, y) {
+    this.x = x;
+    this.y = y;
+}
+
+SrollingSurface.prototype.deleteBlocks = function moveBlocks() {
+    for(var i=0; i<this.rendered_blocks.length; i++) {
+        var block = this.rendered_blocks[i];
+        if(
+            (block.pos[0] + this.block_w) < this.x ||
+            (block.pos[1] + this.block_h) < this.y ||
+            block.pos[0] > this.x + (this.w / 2) + this.block_w  ||
+            block.pos[1] > this.y + (this.h / 2) + this.block_h
+        ) {
+            delete block;
+            this.rendered_blocks.splice(i, 1);
+            i = i-1;
+        }
+    }
+}
+
+SrollingSurface.prototype.update = function update() {
+    this.deleteBlocks();
+    this.renderBlocks();
+    this.recomposeBlocks();
 }
 
 global.sjs = sjs;

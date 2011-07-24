@@ -1,5 +1,5 @@
 =================
-sprite.js v1.0.0
+sprite.js v1.1.0
 =================
 
 The sprite.js framework lets you create animations and games
@@ -7,6 +7,10 @@ using sprites in an efficient way. The goal is to have common
 framework for Desktop and mobile browsers.
 
 sprite.js has been tested on Chromium, Firefox, Android emulator, Opera and IE9.
+
+For an example of a game made with sprite.js there is an example game named "The invasion of the evil lords":
+
+http://batiste.dosimple.ch/games/rpg/game.html
 
 For an example of the what the framework offers, have a look at the test files:
 
@@ -31,9 +35,9 @@ Example of a basic use::
         var sp = scene.Sprite('character.png');
 
         // change the visible size of the sprite
-        sp.h=55;
-        sp.w=30;
-        // apply the latest visual changes to the sprite;
+        sp.size(55, 30);
+
+        // apply the latest visual changes to the sprite (draw if canvas, update attribute if DOM);
         sp.update();
 
         // change the offset of the image in the sprite (this works the opposite way of a CSS background)
@@ -90,13 +94,14 @@ A list of the different methods available on the Scene object::
 
     scene.loadImages(Arrar(<src>), callback)       // load the array of image source. When all is loaded, the callback is called.
 
-    scene.Layer(<name>, <options>)                 // build a Layer object, see next Layer section
+    scene.Layer(<name>, <options>)                 // build a Layer object, see Layer section
 
     scene.Sprite(<src>, <layer>)                   // build a Sprite object, see Sprite section
 
     scene.Ticker(<tickDuration>, <paint function>) // build a Ticker object for this scene or reset the previous one
 
-    scene.reset()                                  // Delete all layer present in this scene, delete ticker.
+    scene.reset()                                  // Delete all layers present in this scene,
+                                                   // delete dom from HTML Sprite in layers, pause the ticker.
 
     scene.Cycle(<triplets>)                        // alias for sjs.Cycle, look at Cycle section
 
@@ -115,9 +120,9 @@ Both parameters are optionnal. If the layer is not specified, the default layer 
 
     var sprite = scene.Sprite(false, <layer>)
 
-You can also init any Sprite properties by passing an options object instead of the Layer object, eg::
+You can also init any Sprite properties by passing an object instead of the Layer object, eg::
 
-        var sprite = scene.Sprite("mysprite.png", {layer:layer, x:10, size:[20, 20], y:15})
+    var sprite = scene.Sprite("mysprite.png", {layer:layer, x:10, size:[20, 20], y:15})
 
 For technichal and performance reasons Sprite's attributes needs to be changed using a setters method. The following
 attributes are *READ ONLY*::
@@ -129,8 +134,8 @@ attributes are *READ ONLY*::
                     // you can set the width or height value bigger than the size of the image.
     sprite.h
 
-    sprite.xoffset  // offset in the image to start painting in the view surface
-    sprite.yoffset
+    sprite.xoffset  // horizontal offset in the image from where to start painting the sprite surface.
+    sprite.yoffset  // verical offset
     sprite.xscale   // vertical and horizontal scaling
     sprite.yscale
     sprite.angle    // use radians
@@ -143,7 +148,7 @@ If you want to change any of those attributes use the following setters::
     sprite.setY(12);
     sprite.setW(32);
     sprite.setH(32);
-    sprite.setXOffset(10); // offset in the image to start painting in the view surface
+    sprite.setXOffset(10);
     sprite.setYOffset(5);
     sprite.setXScale(2);
     sprite.setYScale(3);
@@ -156,11 +161,11 @@ Or one of those helper methods::
     sprite.rotate(radians)
     sprite.scale(x, y)      // if y is not defined, y take the same value as x
     sprite.move(x, y)       // move the sprite in the direction of the provided vector (x, y)
-    sprite.position(x, y)   // set the position of the sprite
+    sprite.position(x, y)   // set the position of the sprite (left, top)
     sprite.offset(x, y)
     sprite.size(w, h)       // set the width and height of the visible sprite
 
-Sprites comes with a bunch of methods to help you to implement a physic effects::
+Sprites comes with methods that can help you implement a basic physic engine::
 
     sprite.xv                // horizontal velocity
     sprite.yv                // vertical velocity
@@ -185,11 +190,11 @@ Sprites comes with a bunch of methods to help you to implement a physic effects:
 
 There is also 2 methods that can help to create special effects. You can use explode2 to separate the current sprite in 2 parts::
 
-    // Return 2 new sprites split the sprite in half according to the position. 
+    // return 2 new sprites that are the 2 parts of the sprite according to the given position.
     // Default value for position is half the size of the sprite.
     [sprite1, sprite2] = sprite.explode2(<position>, <bool horizontal>, <layer>)
 
-    // Return 4 new sprites that are the split from the center (x, y). 
+    // Return 4 new sprites that are the split from the center (x, y).
     // Default value for the center is the center of the sprite.
     [sprite1, sprite2, sprite3, sprite4] = sprite.explode4(<x>, <y>, <layer>)
 
@@ -352,4 +357,37 @@ The layer object can take those options::
         useCanvas:true,   // force the use of the canvas on this layer, that enable you to mix HTML and canvas
         autoClear:false   // disable the automatic clearing of the canvas before every paint call.
     }
+
+
+ScrollingSurface object
+========================
+
+This object provide a simple and efficent way to display a moving static background within a scene. The surface
+only redraw the necessary parts instead of the whole scene at every frame.
+
+A scrolling surface is build this way::
+
+    var surface = sjs.SrollingSurface(scene, scene.w, scene.h, redrawCallback);
+
+    function redrawCallback(layer, x, y) {
+        // draw the necessary sprites on the layer
+        sprite.updateCanvas(layer);
+    })
+
+    surface.move(x, y);       // move the surface in direction (x, y)
+    surface.position(x, y);   // set the surface position to (x, y)
+    surface.update();         // update the latest changes to the surface and call the redrawCallback
+
+The redrawCallback is called everytime a part of the surface need to be updated. The absolute position on the surface
+is provided for you to determine what to draw on this layer. The layer object has a width and height (layer.x, layer.y).
+
+
+Troubleshooting
+====================
+
+When using canvas, I get an "Uncaught Error: INDEX_SIZE_ERR: DOM Exception 1" in updateCanvas
+----------------------------------------------------------------------------------------------------
+
+This error appears when canvas try to read an image out of the boundary of the image itself. Check that your cycle doesn't
+go off the boundaries, and that the size and offset are correct.
 
