@@ -1040,14 +1040,15 @@ _Ticker.prototype.run = function() {
 
     this.paint(this);
     // reset the keyboard change
-    inputSingleton.next();
+    Input(this.scene).next();
 
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
     this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) / 2 | 0;
     // We need some pause to let the browser catch up the update. Here at least 16 ms of pause
     var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 16);
-
+    this.fps = Math.round(1000/(this.now - (this.lastPaintAt || 0)));
+    this.lastPaintAt = this.now;
     //window.webkitRequestAnimationFrame(function(){t.run()});
     this.timeout = setTimeout(function(){t.run()}, _nextPaint);
 }
