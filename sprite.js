@@ -1417,7 +1417,6 @@ SpriteList.prototype.remove = function remove(sprite) {
             if(this.index > -1)
                 this.index = this.index - 1;
             this.length = this.list.length;
-            sprite.remove();
             return true;
         }
     }
