@@ -1091,6 +1091,10 @@ function _Input(scene) {
     this.mousedown = false;
     this.keydown = false;
 
+    this.touchable = 'createTouch' in document;
+    this.touchTap = {};
+    this.touchChange = {};
+    
     this.next = function() {
         that.keyboardChange = {};
         that.mouse.click = false;
@@ -1139,6 +1143,58 @@ function _Input(scene) {
     var addEvent = function(name, fct) {
         global.addEventListener(name, fct, false);
     }
+
+    if (this.touchable) {
+        addEvent("touchstart", function(e) {
+            updateKeyChange('space', true); // tap imitates space
+            for(var i = 0; i < e.changedTouches.length; i++){
+                var touch = e.changedTouches[i]; 
+                that.touchTap[touch.identifier] = {"x" : touch.clientX, "y": touch.clientY}; //store initial coordinates to find out swipe directions later
+            };
+        });
+
+      addEvent("touchend", function(e) {
+          // probably can be done in a cleaner way
+          updateKeyChange('up', false);
+          updateKeyChange('down', false);
+          updateKeyChange('left', false);
+          updateKeyChange('right', false);
+          updateKeyChange('space', false);
+          for(var i = 0; i < e.changedTouches.length; i++){
+              var touch = e.changedTouches[i]; 
+              that.touchTap[touch.identifier] = null; 
+          }
+      });
+
+      addEvent("touchmove", function(e) {
+          e.preventDefault(); // avoid scrolling the page
+          updateKeyChange('space', false); // if it moves: it is not a tap
+          for(var i = 0; i < e.changedTouches.length; i++){
+              var touch = e.changedTouches[i];
+              var start = that.touchTap[touch.identifier];
+              if (start) {
+                  var deltaX = start["x"] - touch.clientX;
+                  var deltaY = start["y"] - touch.clientY;
+                  if(Math.abs(deltaY) > Math.abs(deltaX)){ //swipe is more vertical than horizontal
+                      if (deltaY > 0){
+                          updateKeyChange('up', true);
+                      } else {
+                          updateKeyChange('down', true);
+                      };
+                  } else {
+                      if (deltaX > 0){
+                          updateKeyChange('left', true);
+                      } else {
+                          updateKeyChange('right', true);
+                      };
+                  };
+              } else {
+                  console.log("ZOMG, some event slipped through!");
+              };
+          }
+      });
+    };
+    
 
     addEvent("touchstart", function(event) {
         that.mousedown = true;
