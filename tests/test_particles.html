@@ -7,7 +7,9 @@
 <body style="overflow:hidden">
 
 <p>This demo is gonna produce particles and stop when 70% percent javascript load is reached.<br>
-<span id="nb"></span> particles, system load <span id="load"></span>% <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
+<span id="nb"></span> particles, system load <span id="load"></span>% 
+(<span id="fps"></span>FPS)
+<br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
 
 </body>
 <script src="../sprite.js"></script>
@@ -17,6 +19,7 @@ window.onload = function() {
 
     var l = document.getElementById('load');
     var nb = document.getElementById('nb');
+    var fps = document.getElementById('fps');
     var scene = sjs.Scene({w:window.innerWidth, h:window.innerHeight});
 
     if(window.location.href.indexOf('canvas') != -1) {
@@ -60,6 +63,7 @@ window.onload = function() {
         if(ticker.currentTick % 30 == 0) {
             l.innerHTML = ticker.load;
             nb.innerHTML = particles.list.length;
+            fps.innerHTML = ticker.fps;
         }
 
     };
