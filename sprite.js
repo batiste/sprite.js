@@ -618,7 +618,7 @@ _Sprite.prototype.update = function updateDomProperties () {
     return this;
 };
 
-_Sprite.prototype.canvasUpdate = function updateCanvas(layer) {
+_Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
     if(layer)
         var ctx = layer.ctx;
     else
@@ -1094,7 +1094,7 @@ function _Input(scene) {
     this.touchable = 'createTouch' in document;
     this.touchTap = {};
     this.touchChange = {};
-    
+
     this.next = function() {
         that.keyboardChange = {};
         that.mouse.click = false;
@@ -1148,7 +1148,7 @@ function _Input(scene) {
         addEvent("touchstart", function(e) {
             updateKeyChange('space', true); // tap imitates space
             for(var i = 0; i < e.changedTouches.length; i++){
-                var touch = e.changedTouches[i]; 
+                var touch = e.changedTouches[i];
                 that.touchTap[touch.identifier] = {"x" : touch.clientX, "y": touch.clientY}; //store initial coordinates to find out swipe directions later
             };
         });
@@ -1161,8 +1161,8 @@ function _Input(scene) {
           updateKeyChange('right', false);
           updateKeyChange('space', false);
           for(var i = 0; i < e.changedTouches.length; i++){
-              var touch = e.changedTouches[i]; 
-              that.touchTap[touch.identifier] = null; 
+              var touch = e.changedTouches[i];
+              that.touchTap[touch.identifier] = null;
           }
       });
 
@@ -1194,26 +1194,30 @@ function _Input(scene) {
           }
       });
     };
-    
+
 
     addEvent("touchstart", function(event) {
         that.mousedown = true;
+        that.mouse.down = true;
     });
 
     addEvent("touchend", function(event) {
         that.mousedown = false;
+        that.mouse.down = false;
     });
 
     addEvent("touchmove", function(event) {});
 
     addEvent("mousedown", function(event) {
         that.mousedown = true;
+        that.mouse.down = true;
         // prevent unwanted browser drag and drop behavior
         event.preventDefault();
     });
 
     addEvent("mouseup", function(event) {
         that.mousedown = false;
+        that.mouse.down = false;
     });
 
     addEvent("click", function(event) {
