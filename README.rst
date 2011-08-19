@@ -371,8 +371,8 @@ A scrolling surface is build this way::
 
     function redrawCallback(layer, x, y) {
         // draw the necessary sprites on the layer
-        sprite.updateCanvas(layer);
-    })
+        sprite.canvasUpdate(layer);
+    }
 
     surface.move(x, y);       // move the surface in direction (x, y)
     surface.position(x, y);   // set the surface position to (x, y)
