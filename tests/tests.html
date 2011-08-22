@@ -118,12 +118,24 @@ window.onload = function() {
 
 
 
-    var sp1 = scene.Sprite(false, {position:[60, 60], size:[55, 65], toto:5, layer:fakelayer});
+    var sp1 = scene.Sprite(false, {position:[60, 60], size:[55, 65], toto:5, layer:fakelayer, xoffset:20, yoffset:21, xscale:2});
     assertEqual(sp1.x, 60,  "init position 3");
     assertEqual(sp1.y, 60,  "init position 4");
     assertEqual(sp1.w, 55,  "init size 3");
     assertEqual(sp1.h, 65,  "init size 4");
 
+    assertEqual(sp1.xoffset, 20,  "init xoffset");
+    assertEqual(sp1.yoffset, 21,  "init yoffset");
+    assertEqual(sp1._dirty['xoffset'], true, "dirty offset");
+    assertEqual(sp1._dirty['yoffset'], true, "dirty offset");
+
+    assertEqual(sp1.xscale, 2,  "init xscale");
+    assertEqual(sp1._dirty['xscale'], true, "dirty xscale");
+
+    assertEqual(sp1.xoffset, 20,  "init xoffset");
+    assertEqual(sp1.yoffset, 21,  "init yoffset");
+    assertEqual(sp1._dirty['xoffset'], true, "dirty offset");
+    assertEqual(sp1._dirty['yoffset'], true, "dirty offset");
 
     assertEqual(sp1.toto, undefined,  "init undefined");
     assertEqual(sp1.layer, fakelayer,  "init layer");

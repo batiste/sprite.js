@@ -334,7 +334,13 @@ function _Sprite(scene, src, layer) {
                     this[p].apply(this, value);
                 else if(target !== undefined) {
                     // this is necessary to set cache value properly
-                    var setF = 'set'+p.charAt(0).toUpperCase() + p.slice(1);
+                    // this is necessary to set cache value properly
+                    var first_char = p.charAt(0);
+                    if((first_char == 'x' || first_char == 'y') && p.length > 1)
+                        var setF = 'set'+first_char.toUpperCase() + p.charAt(1).toUpperCase() + p.slice(2);
+                    else
+                        var setF = 'set'+first_char.toUpperCase() + p.slice(1);
+
                     if(this[setF]) {
                         this[setF].apply(this, [value]);
                     } else {
