@@ -349,7 +349,6 @@ function _Sprite(scene, src, layer) {
                     }
                 }
             }
-
         }
     }
 

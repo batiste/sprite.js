@@ -382,6 +382,32 @@ The redrawCallback is called everytime a part of the surface need to be updated.
 is provided for you to determine what to draw on this layer. The layer object has a width and height (layer.x, layer.y).
 
 
+Dealing with events
+=====================
+
+Sprite.js provides the Input helper object to know which keyboard key has been pressed. If you want to play with more complex
+events the recommanded way to handle them is to use event delegation on the Scene object or a specific Layer object::
+
+    var scene = sjs.Scene({w:640, h:480});
+    var frontLayer = scene.Layer("front");
+
+    frontLayer.dom.onclick = function(e) {
+        var target = e.target || e.srcElement;
+        target.className = 'selected';
+    }
+
+    scene.dom.onclick = function(e) {
+        var target = e.target || e.srcElement;
+        target.className = 'selected';
+    }
+
+If you need to use event on a Sprite level you can do it if you use the HTML backend::
+
+    srpite.dom.addEventListener('click', function(e) {
+        sprite.dom.className = 'selected';
+    }, true);
+
+
 Troubleshooting
 ====================
 
