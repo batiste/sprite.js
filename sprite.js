@@ -122,7 +122,8 @@ function Scene(options) {
     div.id = 'sjs' + nb_scene;
     this.id = nb_scene;
     nb_scene = nb_scene + 1;
-    document.body.appendChild(div);
+    var parent = optionValue(options, 'parent', document.body);
+    parent.appendChild(div);
     this.w = optionValue(options, 'w', 480);
     this.h = optionValue(options, 'h', 320);
     this.dom = div;
