@@ -16,142 +16,142 @@ the grid.</p>
 
 window.onload = function() {
 
-	var scene = sjs.Scene({w:400, h:400});
-	var layer = scene.Layer("front", {useCanvas:true});
-	var sprite = scene.Sprite(false, {w:38, h:38, color:"#999", layer:layer});
-		var wall = scene.Sprite(false, {w:38, h:38, color:"#333", layer:layer});
-			var pathSprite = scene.Sprite(false, {w:34, h:34, color:"#1f2", layer:layer});
+    var scene = sjs.Scene({w:400, h:400});
+    var layer = scene.Layer("front", {useCanvas:true});
+    var sprite = scene.Sprite(false, {w:38, h:38, color:"#999", layer:layer});
+        var wall = scene.Sprite(false, {w:38, h:38, color:"#333", layer:layer});
+            var pathSprite = scene.Sprite(false, {w:34, h:34, color:"#1f2", layer:layer});
 
-	var forbidden_nodes = [];
-	scene.dom.onclick = function(e) {
-		var x = Math.floor(e.offsetX / 40.);
-		var y = Math.floor(e.offsetY / 40.);
-		var node = new Node(x, y);
-		forbidden_nodes.push(node);
-		draw();
-	}
+    var forbidden_nodes = [];
+    scene.dom.onclick = function(e) {
+        var x = Math.floor(e.offsetX / 40.);
+        var y = Math.floor(e.offsetY / 40.);
+        var node = new Node(x, y);
+        forbidden_nodes.push(node);
+        draw();
+    }
 
-	function Node(x, y, parent) {
-		this.parent = parent;
-		this.x = x;
-		this.y = y;
-	}
-	
-	Node.prototype.neighbors = function() {
-		return [
-			new Node(this.x-1, this.y, this), 
-			new Node(this.x+1, this.y, this),
-			new Node(this.x, this.y + 1, this),
-			new Node(this.x, this.y - 1, this)
-		];
-	}
-	
-	Node.prototype.distance = function(node) {
-		return sjs.math.hypo(this.x - node.x, this.y-node.y);
-	}
-	
-	Node.prototype.disabled = function() {
-		if(this.x < 0 | this.y < 0 | this.y > 9 | this.x > 9)
-			return true;
-		for(var i=0; i<forbidden_nodes.length; i++) {
-			if(forbidden_nodes[i].equals(this)) {
-				return true;
-			}		
-		}
-		return false;
-	}
-	
-	Node.prototype.equals = function(node) {
-		return this.x == node.x && this.y == node.y;
-	}
+    function Node(x, y, parent) {
+        this.parent = parent;
+        this.x = x;
+        this.y = y;
+    }
+    
+    Node.prototype.neighbors = function() {
+        return [
+            new Node(this.x-1, this.y, this), 
+            new Node(this.x+1, this.y, this),
+            new Node(this.x, this.y + 1, this),
+            new Node(this.x, this.y - 1, this)
+        ];
+    }
+    
+    Node.prototype.distance = function(node) {
+        return sjs.math.hypo(this.x - node.x, this.y-node.y);
+    }
+    
+    Node.prototype.disabled = function() {
+        if(this.x < 0 | this.y < 0 | this.y > 9 | this.x > 9)
+            return true;
+        for(var i=0; i<forbidden_nodes.length; i++) {
+            if(forbidden_nodes[i].equals(this)) {
+                return true;
+            }		
+        }
+        return false;
+    }
+    
+    Node.prototype.equals = function(node) {
+        return this.x == node.x && this.y == node.y;
+    }
 
-	
-	function find_path(startNode, endNode) {
+    
+    function find_path(startNode, endNode) {
 
-		startNode.cost = 0;
-		startNode.distance_to_end = endNode.distance(startNode);
-		var to_visit = [startNode];
-		var visited = [];
-		var current_node = false;
-		while(to_visit.length) {
-			current_node = to_visit[0];
-			
-			// discard the node
-			if(current_node.disabled()) {
-				to_visit.shift();
-				continue;
-			}
-				
-			// avoid infinite loops
-			if(visited.length > 500) {
-				break
-			}
-			
-			if(current_node.equals(endNode)) {
-				return current_node;
-			}
-			
-			// check if the node is not already visited
-			var already_visited = false;
-			for(var i=0; i<visited.length; i++) {
-				if(visited[i].equals(current_node)) {
-					already_visited = true;
-					break;
-				}		
-			}
-			if(already_visited) {
-				to_visit.shift();
-				continue;
-			}
-			
-			visited.push(current_node);
-			to_visit.shift();
-			
-			// add neighbors nodes
-			var neighbors = current_node.neighbors()
-			for(var i=0; i<neighbors.length; i++) {
-				neighbors[i].distance_to_end = endNode.distance(neighbors[i]);
-				neighbors[i].cost = neighbors[i].parent.cost + 1;
-			}
-			to_visit.push.apply(to_visit, neighbors);
-			
-			// the sort works with undefined
-			to_visit.sort(function(a, b) {
-			    // Less than 0: Sort "a" to be a lower index than "b", so on top of the list
-				return (a.cost + a.distance_to_end) - (b.cost + b.distance_to_end);
-			});
-		}
-	}
+        startNode.cost = 0;
+        startNode.distance_to_end = endNode.distance(startNode);
+        var to_visit = [startNode];
+        var visited = [];
+        var current_node = false;
+        while(to_visit.length) {
+            current_node = to_visit[0];
+            
+            // discard the node
+            if(current_node.disabled()) {
+                to_visit.shift();
+                continue;
+            }
+                
+            // avoid infinite loops
+            if(visited.length > 500) {
+                break
+            }
+            
+            if(current_node.equals(endNode)) {
+                return current_node;
+            }
+            
+            // check if the node is not already visited
+            var already_visited = false;
+            for(var i=0; i<visited.length; i++) {
+                if(visited[i].equals(current_node)) {
+                    already_visited = true;
+                    break;
+                }		
+            }
+            if(already_visited) {
+                to_visit.shift();
+                continue;
+            }
+            
+            visited.push(current_node);
+            to_visit.shift();
+            
+            // add neighbors nodes
+            var neighbors = current_node.neighbors()
+            for(var i=0; i<neighbors.length; i++) {
+                neighbors[i].distance_to_end = endNode.distance(neighbors[i]);
+                neighbors[i].cost = neighbors[i].parent.cost + 1;
+            }
+            to_visit.push.apply(to_visit, neighbors);
+            
+            // the sort works with undefined
+            to_visit.sort(function(a, b) {
+                // Less than 0: Sort "a" to be a lower index than "b", so on top of the list
+                return (a.cost + a.distance_to_end) - (b.cost + b.distance_to_end);
+            });
+        }
+    }
 
-	
-	function draw() {
-		layer.clear();
-	
-		for(var x=0; x<10; x+=1) {
-			for(var y=0; y<10; y+=1) {
-				sprite.position(x*40, y*40);
-				sprite.canvasUpdate(layer);
-			}
-		}
-		for(var i=0; i<forbidden_nodes.length; i++) {
-			var node = forbidden_nodes[i];
-			wall.position(node.x*40, node.y*40);
-			wall.canvasUpdate(layer);	
-		}
-		
-		var startNode = new Node(1,1);
-		var endNode = new Node(8,8);
-		var node = find_path(startNode, endNode);
-	
-		while(node) {
-			pathSprite.position(2 + node.x*40, 2 + node.y*40);
-			pathSprite.canvasUpdate(layer);
-			node = node.parent;
-		}
-		
-	}
+    
+    function draw() {
+        layer.clear();
+    
+        for(var x=0; x<10; x+=1) {
+            for(var y=0; y<10; y+=1) {
+                sprite.position(x*40, y*40);
+                sprite.canvasUpdate(layer);
+            }
+        }
+        for(var i=0; i<forbidden_nodes.length; i++) {
+            var node = forbidden_nodes[i];
+            wall.position(node.x*40, node.y*40);
+            wall.canvasUpdate(layer);	
+        }
+        
+        var startNode = new Node(1,1);
+        var endNode = new Node(8,8);
+        var node = find_path(startNode, endNode);
+    
+        while(node) {
+            pathSprite.position(2 + node.x*40, 2 + node.y*40);
+            pathSprite.canvasUpdate(layer);
+            node = node.parent;
+        }
+        
+    }
 
-	draw();
+    draw();
 
 }
 </script>
