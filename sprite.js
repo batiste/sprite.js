@@ -1556,11 +1556,13 @@ SrollingSurface.prototype.recomposeBlocks = function recomposeBlocks() {
 SrollingSurface.prototype.move = function move(x, y) {
     this.x = this.x + x;
     this.y = this.y + y;
+    return this;
 }
 
 SrollingSurface.prototype.position = function position(x, y) {
     this.x = x;
     this.y = y;
+    return this;
 }
 
 SrollingSurface.prototype.deleteBlocks = function moveBlocks() {
