@@ -65,65 +65,6 @@ window.onload = function() {
         return this.x == node.x && this.y == node.y;
     }
 
-    
-    function find_path(startNode, endNode) {
-
-        startNode.cost = 0;
-        startNode.distance_to_end = endNode.distance(startNode);
-        var to_visit = [startNode];
-        var visited = [];
-        var current_node = false;
-        while(to_visit.length) {
-            current_node = to_visit[0];
-            
-            // discard the node
-            if(current_node.disabled()) {
-                to_visit.shift();
-                continue;
-            }
-                
-            // avoid infinite loops
-            if(visited.length > 500) {
-                break
-            }
-            
-            if(current_node.equals(endNode)) {
-                return current_node;
-            }
-            
-            // check if the node is not already visited
-            var already_visited = false;
-            for(var i=0; i<visited.length; i++) {
-                if(visited[i].equals(current_node)) {
-                    already_visited = true;
-                    break;
-                }		
-            }
-            if(already_visited) {
-                to_visit.shift();
-                continue;
-            }
-            
-            visited.push(current_node);
-            to_visit.shift();
-            
-            // add neighbors nodes
-            var neighbors = current_node.neighbors()
-            for(var i=0; i<neighbors.length; i++) {
-                neighbors[i].distance_to_end = endNode.distance(neighbors[i]);
-                neighbors[i].cost = neighbors[i].parent.cost + 1;
-            }
-            to_visit.push.apply(to_visit, neighbors);
-            
-            // the sort works with undefined
-            to_visit.sort(function(a, b) {
-                // Less than 0: Sort "a" to be a lower index than "b", so on top of the list
-                return (a.cost + a.distance_to_end) - (b.cost + b.distance_to_end);
-            });
-        }
-    }
-
-    
     function draw() {
         layer.clear();
     
@@ -141,7 +82,7 @@ window.onload = function() {
         
         var startNode = new Node(1,1);
         var endNode = new Node(8,8);
-        var node = find_path(startNode, endNode);
+        var node = sjs.path.find(startNode, endNode);
     
         while(node) {
             pathSprite.position(2 + node.x*40, 2 + node.y*40);
