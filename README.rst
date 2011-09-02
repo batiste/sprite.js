@@ -92,9 +92,9 @@ The scene object is where all the Sprites will be drawned. You always need to st
 
 Scene constructor options are:
 
-    * parent : a dom object to attach the scene to. By default the scene is added at the end of the HTML body element.
-    * w and h: width and height of the scene element
-    * useCanvas : the default mode for the Layer that will be created in this Scene
+ * parent : a dom object to attach the scene to. By default the scene is added at the end of the HTML body element.
+ * w and h: width and height of the scene element
+ * useCanvas : the default mode for the Layer that will be created in this Scene
 
 The list of the different methods available on the Scene object::
 
