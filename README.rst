@@ -92,18 +92,18 @@ The scene object is where all the Sprites will be drawned. You always need to st
 
 A list of the different methods available on the Scene object::
 
-    scene.loadImages(Arrar(<src>), callback)       // load the array of image source. When all is loaded, the callback is called.
+    scene.loadImages(Array(image source), callback)     // load the array of image source. When all is loaded, the callback is called.
 
-    scene.Layer(<name>, <options>)                 // build a Layer object, see Layer section
+    scene.Layer(name, <options>)                    // build a Layer object, see Layer section
 
-    scene.Sprite(<src>, <layer>)                   // build a Sprite object, see Sprite section
+    scene.Sprite(<src>, <layer|options>)            // build a Sprite object, see Sprite section
 
-    scene.Ticker(<tickDuration>, <paint function>) // build a Ticker object for this scene or reset the previous one
+    scene.Ticker(tickDuration, paint function) // build a Ticker object for this scene or reset the previous one
 
     scene.reset()                                  // Delete all layers present in this scene,
                                                    // delete dom from HTML Sprite in layers, pause the ticker.
 
-    scene.Cycle(<triplets>)                        // alias for sjs.Cycle, look at Cycle section
+    scene.Cycle(Array(triplets))                   // alias for sjs.Cycle, look at Cycle section
 
     scene.Input()                                  // alias for sjs.Input, look at Input section
 
@@ -224,7 +224,7 @@ about indexes and for loop syntax::
 
     var sprite_list = sjs.SpriteList(<array of sprites>)
 
-    sprite_list.add(sprite || array of sprite)  // add to the list
+    sprite_list.add(sprite | array of sprite)  // add to the list
     sprite_list.remove(sprite)                  // delete from the list
     sprite_list.iterate()                       // iterate on the entire list then stops
     sprite_list.list.length                     // length of the list
