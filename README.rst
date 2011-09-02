@@ -1,5 +1,5 @@
 =================
-sprite.js v1.1.0
+sprite.js v1.1.1
 =================
 
 The sprite.js framework lets you create animations and games
@@ -407,6 +407,37 @@ If you need to use event on a Sprite level you can do it if you use the HTML bac
         sprite.dom.className = 'selected';
     }, true);
 
+Extra features
+==============
+
+Sprite.js comes packed with a few basic math functions::
+
+    sjs.math.hypo(x, y)                     // hypotenuse
+    sjs.math.mod(n, base)                   // a modulo function that return strictly positive result
+    sjs.normalVector(vx, vy, <intensity>)   // return a normal vector {x, y}. If you define the intensity
+                                            // the vestor will be multiplied by it
+
+Sprite.js comes with a flexible path finding function::
+
+    sjs.path.find(startNode, endNode, <maxVisit=1000>)
+
+A node object should implement those 4 methods::
+
+    Node.neighbors()        // return a list of Nodes that are the neighbor of the current one
+    Node.distance(node)     // return the distance from this node to another one. It's mainly used as a hint for
+                            // the algorithm to find a quicker way to the end. You can just return 0 if don't
+                            // want to implement this method.
+    Node.equals(node)       // return true if 2 nodes are identical, eg: return this.x == node.x && this.y && node.y;
+    Node.disabled()         // return true if the current node cannot be used to find the path.
+
+The algorithm return undefined if no path has been fund and the startNode if a path is found.
+You can then follow the path using this code::
+
+    var node = sjs.path.find(startNode, endNode);
+    while(node) {
+        console.log(node);
+        node = node.parent;
+    }
 
 Troubleshooting
 ====================
