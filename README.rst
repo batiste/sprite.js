@@ -403,7 +403,7 @@ events the recommanded way to handle them is to use event delegation on the Scen
 
 If you need to use event on a Sprite level you can do it if you use the HTML backend::
 
-    srpite.dom.addEventListener('click', function(e) {
+    sprite.dom.addEventListener('click', function(e) {
         sprite.dom.className = 'selected';
     }, true);
 
@@ -427,7 +427,7 @@ A node object should implement those 4 methods::
     Node.distance(node)     // return the distance from this node to another one. It's mainly used as a hint for
                             // the algorithm to find a quicker way to the end. You can just return 0 if don't
                             // want to implement this method.
-    Node.equals(node)       // return true if 2 nodes are identical, eg: return this.x == node.x && this.y && node.y;
+    Node.equals(node)       // return true if 2 nodes are identical, eg: return this.x == node.x && this.y == node.y;
     Node.disabled()         // return true if the current node cannot be used to find the path.
 
 The algorithm return undefined if no path has been fund and the startNode if a path is found.
