@@ -90,7 +90,7 @@ The scene object is where all the Sprites will be drawned. You always need to st
 
     var scene = sjs.Scene({w:640, h:680});
 
-Scene constructor options are::
+Scene constructor options are:
 
     * parent : a dom object to attach the scene to. By default the scene is added at the end of the HTML body element.
     * w and h: width and height of the scene element
