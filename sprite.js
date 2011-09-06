@@ -920,7 +920,10 @@ function Cycle(triplets) {
         this.cycleDuration = this.cycleDuration + triplet[2];
         this.changingTicks.push(this.cycleDuration);
     }
-    this.changingTicks.pop()
+
+    this.currentTripletIndex = undefined;
+
+    this.changingTicks.pop();
     // suppose to be private
     this.sprites = [];
     // if set to false, the animation will stop automaticaly after one run
@@ -966,16 +969,24 @@ Cycle.prototype.next = function (ticks, update) {
             return this;
         }
     }
-    for(var i=0; i<this.changingTicks.length; i++) {
-        if(this.tick == this.changingTicks[i]) {
-            for(var j=0, sprite; sprite = this.sprites[j]; j++) {
-                sprite.setXOffset(this.triplets[i][0]);
-                sprite.setYOffset(this.triplets[i][1]);
-                if(update)
-                    sprite.update();
-            }
+    // search if we are in a new triplet
+    var newTripletIndex = undefined;
+    for(var i=0; i < this.changingTicks.length - 1; i++) {
+        if(this.tick >= this.changingTicks[i] && this.tick <= this.changingTicks[i+1]) {
+            newTripletIndex = i;
+            break;
         }
     }
+    if(newTripletIndex != undefined && newTripletIndex != this.currentTickIndex) {
+        for(var j=0, sprite; sprite = this.sprites[j]; j++) {
+            sprite.setXOffset(this.triplets[i][0]);
+            sprite.setYOffset(this.triplets[i][1]);
+            if(update)
+                sprite.update();
+        }
+        this.currentTripletIndex = newTripletIndex;
+    }
+
     ticks = ticks || 1; // default tick: 1
     this.tick = this.tick + ticks;
     return this;
