@@ -158,7 +158,7 @@ Scene.prototype.Cycle = function SceneCycle(triplets) {
 }
 
 Scene.prototype.Input = function SceneInput() {
-    return Input();
+    return Input(this);
 }
 
 Scene.prototype.reset = function reset() {
@@ -1088,12 +1088,12 @@ function _Input(scene) {
     if(scene)
         this.dom = scene.dom;
     else
-        this.dom = global;
+        this.dom = global.document.body;
 
     var that = this;
 
     this.keyboard = {};
-    this.mouse = {};
+    this.mouse = {position:{}, click:undefined};
     this.keyboardChange = {};
     this.mousedown = false;
     this.keydown = false;
@@ -1154,9 +1154,10 @@ function _Input(scene) {
     if (this.touchable) {
         addEvent("touchstart", function(e) {
             updateKeyChange('space', true); // tap imitates space
-            for(var i = 0; i < e.changedTouches.length; i++){
+            for(var i = 0; i < e.changedTouches.length; i++) {
                 var touch = e.changedTouches[i];
-                that.touchTap[touch.identifier] = {"x" : touch.clientX, "y": touch.clientY}; //store initial coordinates to find out swipe directions later
+                //store initial coordinates to find out swipe directions later
+                that.touchTap[touch.identifier] = {"x" : touch.clientX, "y": touch.clientY};
             };
         });
 
@@ -1167,7 +1168,7 @@ function _Input(scene) {
           updateKeyChange('left', false);
           updateKeyChange('right', false);
           updateKeyChange('space', false);
-          for(var i = 0; i < e.changedTouches.length; i++){
+          for(var i = 0; i < e.changedTouches.length; i++) {
               var touch = e.changedTouches[i];
               that.touchTap[touch.identifier] = null;
           }
@@ -1176,7 +1177,7 @@ function _Input(scene) {
       addEvent("touchmove", function(e) {
           e.preventDefault(); // avoid scrolling the page
           updateKeyChange('space', false); // if it moves: it is not a tap
-          for(var i = 0; i < e.changedTouches.length; i++){
+          for(var i = 0; i < e.changedTouches.length; i++) {
               var touch = e.changedTouches[i];
               var start = that.touchTap[touch.identifier];
               if (start) {
