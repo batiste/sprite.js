@@ -33,6 +33,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function(global, undefined){
 
+var doc = global.document;
+
 var sjs = {
     Cycle: Cycle,
     Input: Input,
@@ -74,7 +76,7 @@ function init_transform_property() {
     var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform'];
     var p = false;
     while (p = properties.shift()) {
-        if (typeof document.body.style[p] !== 'undefined') {
+        if (typeof doc.body.style[p] !== 'undefined') {
             sjs.tproperty = p;
         }
     }
@@ -88,7 +90,7 @@ function optionValue(options, name, default_value) {
 }
 
 function overlay(x, y, w, h) {
-    var div = document.createElement('div');
+    var div = doc.createElement('div');
     var s = div.style;
     s.top = y + 'px';
     s.left = x + 'px';
@@ -116,14 +118,14 @@ function Scene(options) {
     // main function
     this.main = false;
 
-    var div = document.createElement('div');
+    var div = doc.createElement('div');
     div.style.overflow = 'hidden';
     div.style.position = 'relative';
     div.className = 'sjs';
     div.id = 'sjs' + nb_scene;
     this.id = nb_scene;
     nb_scene = nb_scene + 1;
-    var parent = optionValue(options, 'parent', document.body);
+    var parent = optionValue(options, 'parent', doc.body);
     parent.appendChild(div);
     this.w = optionValue(options, 'w', 480);
     this.h = optionValue(options, 'h', 320);
@@ -198,14 +200,14 @@ Scene.prototype.dialogEvent = function dialogEvent(div, el, event, callback) {
 }
 
 Scene.prototype.dialog = function dialog(options) {
-    var div = document.createElement("div");
+    var div = doc.createElement("div");
     div.className = "dialog " + optionValue(options, "class", "");
     var html = optionValue(options, "html");
     div.innerHTML = html;
     var buttons = optionValue(options, "buttons", []);
     for(var i=0; i<buttons.length; i++) {
         var b = buttons[i];
-        var button = document.createElement("button");
+        var button = doc.createElement("button");
         button.innerHTML = optionValue(b, "text", "Ok");
         div.appendChild(button);
         var callback = optionValue(b, "callback", function(){})
@@ -359,7 +361,7 @@ function _Sprite(scene, src, layer) {
         this.layer = scene.layers['default'];
 
     if(!this.layer.useCanvas) {
-        var d = document.createElement('div');
+        var d = doc.createElement('div');
         d.style.position = 'absolute';
         this.dom = d;
         this.layer.dom.appendChild(d);
@@ -1088,7 +1090,7 @@ function _Input(scene) {
     if(scene)
         this.dom = scene.dom;
     else
-        this.dom = global.document.body;
+        this.dom = doc.body;
 
     var that = this;
 
@@ -1098,7 +1100,7 @@ function _Input(scene) {
     this.mousedown = false;
     this.keydown = false;
 
-    this.touchable = 'createTouch' in document;
+    this.touchable = 'createTouch' in doc;
     this.touchTap = {};
     this.touchChange = {};
 
@@ -1285,12 +1287,12 @@ global.addEventListener("blur", function (e) {
                     e.stopPropagation();
                     e.preventDefault();
                     scene.dom.removeChild(div);
-                    document.removeEventListener('click', listener, false);
-                    document.removeEventListener('keyup', listener, false);
+                    doc.removeEventListener('click', listener, false);
+                    doc.removeEventListener('keyup', listener, false);
                     scene.ticker.resume();
                 }
-                document.addEventListener('click', listener, false);
-                document.addEventListener('keyup', listener, false);
+                doc.addEventListener('click', listener, false);
+                doc.addEventListener('keyup', listener, false);
                 scene.dom.appendChild(div);
             }
         }
@@ -1325,7 +1327,7 @@ function Layer(scene, name, options) {
     else
         error('Layer '+ name + ' already exist.');
 
-    var domElement = document.getElementById(name);
+    var domElement = doc.getElementById(name);
     if(!domElement)
         var needToCreate = true;
     else
@@ -1336,12 +1338,12 @@ function Layer(scene, name, options) {
             error("Cannot use HTMLElement " + domElement.nodeName + " with canvas renderer.");
         }
         if (needToCreate) {
-            domElement = document.createElement('canvas');
+            domElement = doc.createElement('canvas');
         }
         this.ctx = domElement.getContext('2d');
     } else {
         if (needToCreate) {
-            domElement = document.createElement('div');
+            domElement = doc.createElement('div');
         }
     }
 
@@ -1456,7 +1458,7 @@ function SrollingSurface(scene, w, h, redrawCallback) {
     this.w = w;
     this.h = h;
     this.scene = scene;
-    this.dom = document.createElement('div');
+    this.dom = doc.createElement('div');
     this.dom.style.position = "relative";
     scene.dom.appendChild(this.dom);
 
