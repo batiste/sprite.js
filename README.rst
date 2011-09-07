@@ -306,7 +306,7 @@ cycle applies to. this is a cycle with 3 position, each lasting 5 game ticks::
     cycle.next(2)        // apply the second game tick to the sprite (jump a frame)
 
 The next function doesn't necessarly involve an offset sprite change. It does only when all the ticks on current
-triplet have been consumed. Cycle has others usefull methods and attributes::
+triplet have been consumed. Cycle has others useful methods and attributes::
 
     cycle.goto(1)        // go to the second game tick in the triplet and apply the offsets
     cycle.reset()        // reset the cycle offsets to the original position
