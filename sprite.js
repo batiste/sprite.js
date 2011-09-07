@@ -248,6 +248,7 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
     div.innerHTML = 'Loading';
     this.dom.appendChild(div);
     var scene = this;
+    var error = false;
 
     function _loadImg(src) {
         spriteList[src].loading = true;
@@ -256,13 +257,21 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
         img.addEventListener('load', function() {
             spriteList[src].loaded = true;
             toLoad -= 1;
-            if(toLoad == 0) {
-                scene.dom.removeChild(div);
-                callback();
-            } else {
-                div.innerHTML = 'Loading ' + ((total - toLoad) / total * 100 | 0) + '%';
+            if(error == false) {
+                if(toLoad == 0) {
+                    scene.dom.removeChild(div);
+                    callback();
+                } else {
+                    div.innerHTML = 'Loading ' + ((total - toLoad) / total * 100 | 0) + '%';
+                }
             }
         }, false);
+
+        img.addEventListener('error', function() {
+            error = true;
+            div.innerHTML = 'Error loading image ' + src;
+        }, false);
+
         img.src = src;
     }
 
@@ -920,9 +929,7 @@ function Cycle(triplets) {
         this.cycleDuration = this.cycleDuration + triplet[2];
         this.changingTicks.push(this.cycleDuration);
     }
-
     this.currentTripletIndex = undefined;
-
     this.changingTicks.pop();
     // suppose to be private
     this.sprites = [];
