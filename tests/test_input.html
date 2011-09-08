@@ -53,13 +53,13 @@ window.onload = function() {
 
         if(input.keyboard.left) {
             sprite.move(-4, 0);
-            if(sprite.collidesWith([rock1, rock2]))
+            if(sprite.collidesWithArray([rock1, rock2]))
                 sprite.move(4, 0);
             sprite.scale(1, 1);
         }
         if(input.keyboard.right) {
             sprite.move(4, 0);
-            if(sprite.collidesWith([rock1, rock2]))
+            if(sprite.collidesWithArray([rock1, rock2]))
                 sprite.move(-4, 0);
             sprite.scale(-1, 1);
         }

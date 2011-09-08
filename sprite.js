@@ -1034,20 +1034,23 @@ function _Ticker(scene, tickDuration, paint) {
     this.start = new Date().getTime();
     this.ticksElapsed = 0;
     this.currentTick = 0;
-    this._saved = 0;
+    this.ticksSinceLastStart = 0;
 }
 
 _Ticker.prototype.next = function() {
-    // number of ticks that have happen tile the last pause
+    // absolute elapsed ticks that have elapsed since the last start
     var ticksElapsed = ((this.now - this.start) / this.tickDuration) | 0;
-    this.lastTicksElapsed = ticksElapsed - this.currentTick;
-    this.currentTick = ticksElapsed + this._saved;
+    // the diff from last run
+    this.lastTicksElapsed = ticksElapsed - this.ticksSinceLastStart;
+    this.ticksSinceLastStart = ticksElapsed;
+    // add the diff to the current ticks
+    this.currentTick += this.lastTicksElapsed;
     return this.lastTicksElapsed;
 };
 
 _Ticker.prototype.run = function() {
     if(this.paused)
-        return
+        return;
     var t = this;
     this.now = new Date().getTime();
     var ticksElapsed = this.next();
@@ -1086,11 +1089,9 @@ _Ticker.prototype.pause = function() {
 }
 
 _Ticker.prototype.resume = function() {
-    // useful to keep the accurate number of ticks after resume
-    this._saved += ((this.now - this.start) / this.tickDuration) | 0
     this.start = new Date().getTime();
     this.ticksElapsed = 0;
-    this.currentTick = 0;
+    this.ticksSinceLastStart = 0;
     this.paused = false;
     this.run();
 }
@@ -1112,8 +1113,10 @@ function _Input(scene) {
 
     var that = this;
 
+    // record the current keyboard state
     this.keyboard = {};
     this.mouse = {position:{}, click:undefined};
+    // recor the keyboard changes since the last next call
     this.keyboardChange = {};
     this.mousedown = false;
     this.keydown = false;
@@ -1182,45 +1185,40 @@ function _Input(scene) {
         });
 
       addEvent("touchend", function(e) {
-          // probably can be done in a cleaner way
-          updateKeyChange('up', false);
-          updateKeyChange('down', false);
-          updateKeyChange('left', false);
-          updateKeyChange('right', false);
-          updateKeyChange('space', false);
-          for(var i = 0; i < e.changedTouches.length; i++) {
-              var touch = e.changedTouches[i];
-              that.touchTap[touch.identifier] = null;
-          }
+            // probably can be done in a cleaner way
+            that.keyboard = {}
+            for(var i = 0; i < e.changedTouches.length; i++) {
+                var touch = e.changedTouches[i];
+                that.touchTap[touch.identifier] = null;
+            }
       });
 
       addEvent("touchmove", function(e) {
-          e.preventDefault(); // avoid scrolling the page
-          updateKeyChange('space', false); // if it moves: it is not a tap
-          for(var i = 0; i < e.changedTouches.length; i++) {
-              var touch = e.changedTouches[i];
-              var start = that.touchTap[touch.identifier];
-              if (start) {
-                  var deltaX = start["x"] - touch.clientX;
-                  var deltaY = start["y"] - touch.clientY;
-                  if(Math.abs(deltaY) > Math.abs(deltaX)){ //swipe is more vertical than horizontal
-                      if (deltaY > 0){
-                          updateKeyChange('up', true);
-                      } else {
-                          updateKeyChange('down', true);
-                      };
-                  } else {
-                      if (deltaX > 0){
-                          updateKeyChange('left', true);
-                      } else {
-                          updateKeyChange('right', true);
-                      };
-                  };
-              } else {
-                  console.log("ZOMG, some event slipped through!");
-              };
-          }
-      });
+            e.preventDefault(); // avoid scrolling the page
+            updateKeyChange('space', false); // if it moves: it is not a tap
+            for(var i = 0; i < e.changedTouches.length; i++) {
+                var touch = e.changedTouches[i];
+                var start = that.touchTap[touch.identifier];
+                if (start) {
+                    var deltaX = start["x"] - touch.clientX;
+                    var deltaY = start["y"] - touch.clientY;
+                    //swipe is more vertical than horizontal
+                    if(Math.abs(deltaY) > Math.abs(deltaX)){
+                        if (deltaY > 0){
+                            updateKeyChange('up', true);
+                        } else {
+                            updateKeyChange('down', true);
+                        };
+                    } else {
+                        if (deltaX > 0){
+                            updateKeyChange('left', true);
+                        } else {
+                            updateKeyChange('right', true);
+                        };
+                    };
+                }
+            }
+        });
     };
 
 

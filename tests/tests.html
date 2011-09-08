@@ -39,6 +39,16 @@ window.onload = function() {
             result.innerHTML += text + ': <span style="color:red">fail ("'+value+'" is not false)</span>\n';
         }
     }
+
+    function assertGreater(v1, v2, text) {
+        text = getText(text)
+        if(v1 > v2) {
+            result.innerHTML += text + ': pass\n';
+        } else {
+            result.innerHTML += text + ': <span style="color:red">fail ("'+v1+'" is not greater than "'+v2+'")</span>\n';
+        }
+    }
+
     function assertEqual(value1, value2, text) {
         text = getText(text)
         if(typeof value1 == "object")
@@ -200,7 +210,6 @@ window.onload = function() {
 
     sp1.angle = Math.PI / 4.0;
 
-    console.log(11.7 * Math.cos(sp1.angle), 11.7 * Math.sin(sp1.angle))
     assertTrue(sp1.isPointInAngle(6, 6), "isPointInAngle 13");
     assertTrue(sp1.isPointInAngle(7, 7), "isPointInAngle 14");
     assertFalse(sp1.isPointInAngle(8, 8), "isPointInAngle 15");
@@ -241,6 +250,21 @@ window.onload = function() {
 
     assertEqual(math.normalVector(2, 2), {x:(2/math.hypo(2, 2)), y:(2/math.hypo(2, 2))}, "Test normal vector 1")
     assertEqual(math.normalVector(2, 2, math.hypo(2, 2)), {x:2, y:2}, "Test normal vector 2")
+
+    var ticker = scene.Ticker(20, function() {});
+    ticker.run();
+    var ct = undefined;
+
+    setTimeout(function() {
+        ct = ticker.currentTick;
+        ticker.resume();
+    }, 20);
+
+    setTimeout(function() {
+        assertGreater(ticker.currentTick, ct, "Test that the currentTick value of the ticker still increase after a pause");
+        ticker.pause();
+    }, 50);
+
 };
 </script>
 </html>
