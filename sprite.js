@@ -1033,12 +1033,13 @@ function _Ticker(scene, tickDuration, paint) {
 
     this.start = new Date().getTime();
     this.ticksElapsed = 0;
+    // absolute number of ticks that have been played ever
     this.currentTick = 0;
     this.ticksSinceLastStart = 0;
 }
 
 _Ticker.prototype.next = function() {
-    // absolute elapsed ticks that have elapsed since the last start
+    // number of ticks that have elapsed since the last start
     var ticksElapsed = ((this.now - this.start) / this.tickDuration) | 0;
     // the diff from last run
     this.lastTicksElapsed = ticksElapsed - this.ticksSinceLastStart;
@@ -1185,7 +1186,6 @@ function _Input(scene) {
         });
 
       addEvent("touchend", function(e) {
-            // probably can be done in a cleaner way
             that.keyboard = {}
             for(var i = 0; i < e.changedTouches.length; i++) {
                 var touch = e.changedTouches[i];
@@ -1627,7 +1627,7 @@ function find_path(startNode, endNode, maxVisit) {
             continue;
         }
 
-        // to avoid infinite loops
+        // to avoid infinite search
         if(visited.length > maxVisit) {
             break
         }

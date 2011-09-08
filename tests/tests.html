@@ -2,13 +2,31 @@
 <head>
 <title>Sprite.js test suites</title>
 <meta name = "viewport" content = "user-scalable=no, width=device-width">
+<style>
+    html, body{
+        font-family:sans-serif;
+    }
 
+    .result {
+        width:23%;
+        float:left;
+        height:auto;
+        padding:0.2em;
+        margin:0.2em;
+        border-left:20px #2a2 solid;
+    }
+
+    .fail {
+        border-left:20px #e11 solid;
+    }
+
+</style>
 </head>
 <body>
 
-<p>Sprite.js test suites</p>
+<h1>Sprite.js test suites</h1>
 
-<pre id="result" style="font-size:0.85em"></pre>
+<div id="result" style="font-size:0.90em"></div>
 
 </body>
 <script src="../sprite.js"></script>
@@ -18,47 +36,46 @@ window.onload = function() {
 
     var result = document.getElementById('result');
     result.style['height'] = (window.window.innerHeight - 100) + 'px';
-    function getText(text) {
-        if(!text)
-            return "No description"
-        return text
+
+    function insertResult(desc, message, fail) {
+        if(fail)
+            result.innerHTML += '<div class="result fail">' + desc + ' failed.<br><strong>Because</strong><br>' + message + '</div>';
+        else
+            result.innerHTML += '<div class="result">' + desc + '</div>';
     }
-    function assertTrue(value, text) {
-        text = getText(text)
+
+    function assertTrue(value, desc) {
         if(value) {
-            result.innerHTML += text + ': pass\n';
+            insertResult(desc)
         } else {
-            result.innerHTML += text + ': <span style="color:red">fail ("'+value+'" is not true)</span>\n';
+            insertResult(desc, value+' is not true', true);
         }
     }
-    function assertFalse(value, text) {
-        text = getText(text)
+    function assertFalse(value, desc) {
         if(!value) {
-            result.innerHTML += text + ': pass\n';
+            insertResult(desc)
         } else {
-            result.innerHTML += text + ': <span style="color:red">fail ("'+value+'" is not false)</span>\n';
+            insertResult(desc, value+'" is not false', true);
         }
     }
 
-    function assertGreater(v1, v2, text) {
-        text = getText(text)
+    function assertGreater(v1, v2, desc) {
         if(v1 > v2) {
-            result.innerHTML += text + ': pass\n';
+            insertResult(desc)
         } else {
-            result.innerHTML += text + ': <span style="color:red">fail ("'+v1+'" is not greater than "'+v2+'")</span>\n';
+            insertResult(desc, v1+'" is not greater than "'+v2+'"', true);
         }
     }
 
-    function assertEqual(value1, value2, text) {
-        text = getText(text)
+    function assertEqual(value1, value2, desc) {
         if(typeof value1 == "object")
             value1 = JSON.stringify(value1)
         if(typeof value2 == "object")
             value2 = JSON.stringify(value2)
         if(value1 === value2) {
-            result.innerHTML += text + ': pass\n';
+            insertResult(desc)
         } else {
-            result.innerHTML += text + ': <span style="color:red">fail ('+value1+' not equal to '+value2+')</span>\n';
+            insertResult(desc, value1+' not equal to '+value2, true);
         }
     }
 
