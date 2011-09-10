@@ -583,8 +583,25 @@ _Sprite.prototype.remove = function remove() {
     this.img = null;
 };
 
+  function setMatrixUniforms() {
+    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+  }
+
+_Sprite.prototype.webGLUpdate = function webGLUpdate () {
+    if(!this.texture) {
+        this.texture = new webgl.Texture(this.layer.ctx, this.img);
+    }
+    this.texture.render(this.x, this.y);
+    return this;
+}
+
 _Sprite.prototype.update = function updateDomProperties () {
     // This is the CPU heavy function.
+
+    if(this.layer.useWebGL == true) {
+        return this.webGLUpdate();
+    }
 
     if(this.layer.useCanvas == true) {
         return this.canvasUpdate();
@@ -1327,6 +1344,9 @@ function Layer(scene, name, options) {
     if(options === undefined)
         options = {useCanvas:scene.useCanvas, autoClear:true}
 
+    if(options.useWebGL)
+        options.useCanvas = true;
+
     if(options.autoClear === undefined)
         this.autoClear = true;
     else
@@ -1336,6 +1356,8 @@ function Layer(scene, name, options) {
         this.useCanvas = this.scene.useCanvas;
     else
         this.useCanvas = options.useCanvas;
+
+    this.useWebGL = options.useWebGL;
 
     this.name = name;
     if(this.scene.layers[name] === undefined)
@@ -1356,7 +1378,6 @@ function Layer(scene, name, options) {
         if (needToCreate) {
             domElement = doc.createElement('canvas');
         }
-        this.ctx = domElement.getContext('2d');
     } else {
         if (needToCreate) {
             domElement = doc.createElement('div');
@@ -1397,14 +1418,30 @@ function Layer(scene, name, options) {
 
     this.dom = domElement;
 
+    // webgl needs to be set after the size
+    if(this.useCanvas) {
+        if(options.useWebGL) {
+            this.ctx = webgl.init(domElement);
+        } else {
+            this.ctx = domElement.getContext('2d');
+        }
+    }
 }
 
 Layer.prototype.clear = function clear() {
-    this.ctx.clearRect(0, 0, this.dom.width, this.dom.height);
+    if(this.useWebGL)
+        this.ctx.clear(this.ctx.COLOR_BUFFER_BIT | this.ctx.DEPTH_BUFFER_BIT);
+    else
+        this.ctx.clearRect(0, 0, this.dom.width, this.dom.height);
+}
+
+Layer.prototype.Sprite = function(src) {
+    return new _Sprite(this.scene, src, this);
 }
 
 Layer.prototype.remove = function remove() {
     this.parent.removeChild(this.dom);
+    this.texture = null;
     delete this.scene.layers[this.name];
 }
 

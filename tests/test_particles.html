@@ -3,16 +3,52 @@
 <title>Test 32 sprites in a cycle animation</title>
 <meta name = "viewport" content = "user-scalable=no, width=device-width">
 
+    <script type="text/javascript" src="../lib/glMatrix.js"></script>
+    <script type="text/javascript" src="../lib/webgl-utils.js"></script>
+    <script type="text/javascript" src="../lib/webgl.js"></script>
+    <script src="../sprite.js"></script>
+
+    <script id="shader-vs" type="x-shader/x-vertex"> 
+        attribute vec3 aVertexPosition;
+        attribute vec2 aTextureCoord;
+
+        uniform mat4 uMVMatrix;
+        uniform mat4 uPMatrix;
+
+        varying vec2 vTextureCoord;
+
+        void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+            vTextureCoord = aTextureCoord;
+        }
+    </script> 
+
+    <script id="shader-fs" type="x-shader/x-fragment"> 
+        #ifdef GL_ES
+            precision highp float;
+        #endif
+
+        varying vec2 vTextureCoord;
+
+        uniform sampler2D uSampler;
+
+        void main(void) {
+            gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+        }
+    </script> 
+
 </head>
 <body style="overflow:hidden">
 
 <p>This demo is gonna produce particles and stop when 70% percent javascript load is reached.<br>
 <span id="nb"></span> particles, system load <span id="load"></span>% 
 (<span id="fps"></span>FPS)
-<br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
+<br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> 
+<a href="?html=1" id="html-mode">Use HTML backend</a>
+<a href="?webgl=1" id="webgl-mode">Use WebGL backend (experimental)</a></p>
 
 </body>
-<script src="../sprite.js"></script>
+
 <script>
 
 window.onload = function() {
@@ -22,16 +58,25 @@ window.onload = function() {
     var fps = document.getElementById('fps');
     var scene = sjs.Scene({w:window.innerWidth, h:window.innerHeight});
 
-    if(window.location.href.indexOf('canvas') != -1) {
+    var canvas = window.location.href.indexOf('canvas') != -1;
+    var webgl = window.location.href.indexOf('webgl') != -1;
+
+    if(canvas) {
         document.getElementById('canvas-mode').style.display = 'none';
+        var layer = scene.Layer("layer", {useCanvas:true});
+    } else if(webgl) {
+        document.getElementById('webgl-mode').style.display = 'none';
+        var layer = scene.Layer("layer", {useWebGL:true});
     } else {
         document.getElementById('html-mode').style.display = 'none';
+        var layer = scene.Layer("layer", {useCanvas:false});
     }
+        
 
     var particles = sjs.SpriteList();
 
     function createParticle() {
-        particle = scene.Sprite('particule.png');
+        particle = scene.Sprite('particule.png', layer);
         particle.setX(scene.w / 2);
         particle.setY(scene.h / 3);
         particle.xv = (Math.random() - 0.5) * 2;
