@@ -3,14 +3,51 @@
 <title>Test 32 sprites in a cycle animation</title>
 <meta name = "viewport" content = "user-scalable=no, width=device-width">
 
+    <script type="text/javascript" src="../lib/glMatrix.js"></script>
+    <script type="text/javascript" src="../lib/webgl-utils.js"></script>
+    <script type="text/javascript" src="../lib/webgl.js"></script>
+    <script src="../sprite.js"></script>
+
+    <script id="shader-vs" type="x-shader/x-vertex"> 
+        attribute vec3 aVertexPosition;
+        attribute vec2 aTextureCoord;
+
+        uniform mat4 uMVMatrix;
+        uniform mat4 uPMatrix;
+
+        varying vec2 vTextureCoord;
+
+        void main(void) {
+        gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+            vTextureCoord = aTextureCoord;
+        }
+    </script> 
+
+    <script id="shader-fs" type="x-shader/x-fragment"> 
+        #ifdef GL_ES
+            precision highp float;
+        #endif
+
+        varying vec2 vTextureCoord;
+
+        uniform sampler2D uSampler;
+
+        void main(void) {
+            gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+        }
+    </script> 
+
 </head>
 <body>
 
 <p>Sprite.js, 32 animated sprites. <a href="https://github.com/batiste/sprite.js">Github project page</a><br>
-<span id="result"></span> <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> <a href="?html=1" id="html-mode">Use HTML backend</a></p>
+<br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> 
+<a href="?html=1" id="html-mode">Use HTML backend</a>
+<a href="?webgl=1" id="webgl-mode">Use WebGL backend (experimental)</a></p>
+<span id="result"></span></p>
 
 </body>
-<script src="../sprite.js"></script>
+
 <script>
 
 window.onload = function() {
@@ -19,22 +56,30 @@ window.onload = function() {
 
     scene.loadImages(['character.png', 'spritejs.png'], function() {
 
+    var canvas = window.location.href.indexOf('canvas') != -1;
+    var webgl = window.location.href.indexOf('webgl') != -1;
+
     var sprites = [];
-    if(window.location.href.indexOf('canvas') != -1) {
+    if(canvas) {
         document.getElementById('canvas-mode').style.display = 'none';
+        var layer = scene.Layer("layer", {useCanvas:true});
+    } else if(webgl) {
+        document.getElementById('webgl-mode').style.display = 'none';
+        var layer = scene.Layer("layer", {useWebGL:true});
     } else {
         document.getElementById('html-mode').style.display = 'none';
+        var layer = scene.Layer("layer", {useCanvas:false});
     }
 
     for(var i=0; i<32; i++) {
-        var sp = scene.Sprite('character.png');
+        var sp = scene.Sprite('character.png', layer);
         sp.size(30, 55);
         sp.setYOffset(2);
         sp.move(6 * i + 10, 70 + ((i%4) * 60));
         sprites.push(sp);
     }
 
-    var logo = scene.Sprite();
+    var logo = scene.Sprite(false, layer);
     logo.move(120, 170);
     logo.loadImg('spritejs.png');
 
@@ -73,6 +118,7 @@ window.onload = function() {
         if(ticker.currentTick % 30 == 0) {
             result.innerHTML = 'system load ' + ticker.load + '%';
         }
+        //ticker.pause()
     };
     var ticker = scene.Ticker(35, paint);
     ticker.run();
