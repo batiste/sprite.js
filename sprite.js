@@ -590,7 +590,7 @@ _Sprite.prototype.remove = function remove() {
 
 _Sprite.prototype.webGLUpdate = function webGLUpdate () {
     if(!this.texture) {
-        this.texture = new webgl.Texture(this.layer.ctx, this.img);
+        this.texture = new webgl.Texture(this);
     }
     this.texture.render(this.x, this.y);
     return this;
