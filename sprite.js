@@ -578,15 +578,13 @@ _Sprite.prototype.remove = function remove() {
         this.layer.dom.removeChild(this.dom);
         this.dom = null;
     }
+    if(this.texture)
+        this.texture.remove();
+    this.texture = null;
     //delete this.layer.sprites[this.layerIndex];
     this.layer = null;
     this.img = null;
 };
-
-  function setMatrixUniforms() {
-    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
-    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
-  }
 
 _Sprite.prototype.webGLUpdate = function webGLUpdate () {
     if(!this.texture) {
@@ -1441,7 +1439,6 @@ Layer.prototype.Sprite = function(src) {
 
 Layer.prototype.remove = function remove() {
     this.parent.removeChild(this.dom);
-    this.texture = null;
     delete this.scene.layers[this.name];
 }
 
