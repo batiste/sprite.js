@@ -8,6 +8,8 @@
     <script type="text/javascript" src="../lib/webgl.js"></script>
     <script src="../sprite.js"></script>
 
+    <style>.sjs{border:2px #999 solid;}</style>
+
     <script id="shader-vs" type="x-shader/x-vertex"> 
         attribute vec3 aVertexPosition;
         attribute vec2 aTextureCoord;
@@ -40,7 +42,7 @@
 </head>
 <body style="overflow:hidden">
 
-<p>This demo is gonna produce particles and stop when 2000 particules are on the screen or 50% percent javascript load is reached .<br>
+<p>This demo is gonna produce particles and stop when 2000 particules are on the screen or 50% percent javascript load is reached . <a href="https://github.com/batiste/sprite.js">Get the source</a>.<br>
 <span id="nb"></span> particles, system load <span id="load"></span>% 
 (<span id="fps"></span>FPS)
 <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> 
@@ -56,7 +58,7 @@ window.onload = function() {
     var l = document.getElementById('load');
     var nb = document.getElementById('nb');
     var fps = document.getElementById('fps');
-    var scene = sjs.Scene({w:window.innerWidth, h:window.innerHeight});
+    var scene = sjs.Scene({w:window.innerWidth-20, h:window.innerHeight-120});
 
     var canvas = window.location.href.indexOf('canvas') != -1;
     var webgl = window.location.href.indexOf('webgl') != -1;

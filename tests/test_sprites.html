@@ -8,6 +8,8 @@
     <script type="text/javascript" src="../lib/webgl.js"></script>
     <script src="../sprite.js"></script>
 
+    <style>.sjs{border:2px #999 solid;}</style>
+
     <script id="shader-vs" type="x-shader/x-vertex"> 
         attribute vec3 aVertexPosition;
         attribute vec2 aTextureCoord;
@@ -40,11 +42,12 @@
 </head>
 <body>
 
-<p>Sprite.js, 32 animated sprites. <a href="https://github.com/batiste/sprite.js">Github project page</a><br>
+<p>Sprite.js, 32 animated sprites, rotation and scaling. <a href="https://github.com/batiste/sprite.js">Get the source</a>. <br>
+system load <span id="load"></span>%  (<span id="fps"></span>FPS)
 <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> 
 <a href="?html=1" id="html-mode">Use HTML backend</a>
-<a href="?webgl=1" id="webgl-mode">Use WebGL backend (experimental)</a></p>
-<span id="result"></span></p>
+<a href="?webgl=1" id="webgl-mode">Use WebGL backend (experimental)</a>
+</p>
 
 </body>
 
@@ -95,7 +98,8 @@ window.onload = function() {
     var sin_cycle = 0,
         ms_to_render = 0,
         average_ms = 0,
-        result = document.getElementById('result');
+        load = document.getElementById('load'),
+        fps = document.getElementById('fps');
 
     function paint() {
 
@@ -116,11 +120,12 @@ window.onload = function() {
             .update();
         
         if(ticker.currentTick % 30 == 0) {
-            result.innerHTML = 'system load ' + ticker.load + '%';
+            load.innerHTML = ticker.load;
+            fps.innerHTML = ticker.fps;
         }
         //ticker.pause()
     };
-    var ticker = scene.Ticker(35, paint);
+    var ticker = scene.Ticker(30, paint);
     ticker.run();
 
     });
