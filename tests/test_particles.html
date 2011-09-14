@@ -40,7 +40,7 @@
 </head>
 <body style="overflow:hidden">
 
-<p>This demo is gonna produce particles and stop when 70% percent javascript load is reached.<br>
+<p>This demo is gonna produce particles and stop when 2000 particules are on the screen or 50% percent javascript load is reached .<br>
 <span id="nb"></span> particles, system load <span id="load"></span>% 
 (<span id="fps"></span>FPS)
 <br><a href="?canvas=1" id="canvas-mode">Use canvas backend.</a> 
@@ -86,7 +86,7 @@ window.onload = function() {
 
     function paint() {
 
-        if(ticker.load < 70 && particles.length < 1000) {
+        if(ticker.load < 50 && particles.length < 2000) {
             createParticle();
             createParticle();
             createParticle();
