@@ -657,12 +657,12 @@ _Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
     else
         var ctx = this.layer.ctx;
     ctx.save();
-    ctx.translate(this.x + this.w/2 | 0, this.y + this.h/2 | 0);
+    ctx.translate(this.x + this.w/2, this.y + this.h/2);
     ctx.rotate(this.angle);
     if(this.xscale != 1 || this.yscale != 1)
         ctx.scale(this.xscale, this.yscale);
     ctx.globalAlpha = this.opacity;
-    ctx.translate(-this.w/2 | 0, -this.h/2 | 0);
+    ctx.translate(-this.w/2, -this.h/2);
     // handle background colors.
     if(this.color) {
         ctx.fillStyle = this.color;
