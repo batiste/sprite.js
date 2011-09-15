@@ -120,15 +120,20 @@ Sprite object public methods and attributes
 
 To create a sprite you should use the scene.Sprite constructor::
 
-    var sprite = scene.Sprite(<src>, <layer>)
+    var sprite = scene.Sprite(<src>, <layer|options>);
+
+Or if you have Layer object you can also create the sprite using the layer::
+
+    var layer = scene.Layer("foreground");
+    var player = layer.Sprite(<src>, <options>);
 
 Both parameters are optionnal. If the layer is not specified, the default layer will be used. If you want to set the layer but not any image::
 
-    var sprite = scene.Sprite(false, <layer>)
+    var sprite = scene.Sprite(false, layer);
 
-You can also init any Sprite properties by passing an object instead of the Layer object, eg::
+You can also init any Sprite properties by passing an options object instead of the Layer object, eg::
 
-    var sprite = scene.Sprite("mysprite.png", {layer:layer, x:10, size:[20, 20], y:15})
+    var sprite = scene.Sprite("mysprite.png", {layer:layer, x:10, size:[20, 20], y:15});
 
 For technichal and performance reasons Sprite's attributes needs to be changed using a setters method. The following
 attributes are *READ ONLY*::
@@ -164,20 +169,20 @@ If you want to change any of those attributes use the following setters::
 
 Or one of those helper methods::
 
-    sprite.rotate(radians)
-    sprite.scale(x, y)      // if y is not defined, y take the same value as x
-    sprite.move(x, y)       // move the sprite in the direction of the provided vector (x, y)
-    sprite.position(x, y)   // set the position of the sprite (left, top)
-    sprite.offset(x, y)
-    sprite.size(w, h)       // set the width and height of the visible sprite
+    sprite.rotate(radians);
+    sprite.scale(x, y);      // if y is not defined, y take the same value as x
+    sprite.move(x, y);       // move the sprite in the direction of the provided vector (x, y)
+    sprite.position(x, y);   // set the position of the sprite (left, top)
+    sprite.offset(x, y);
+    sprite.size(w, h);       // set the width and height of the visible sprite
 
 Sprites comes with methods that can help you implement a basic physic engine::
 
-    sprite.xv                // horizontal velocity
-    sprite.yv                // vertical velocity
-    sprite.rv                // radial velocity
-    sprite.applyVelocity()   // apply all velocities on the current Sprite
-    sprite.reverseVelocity() // apply all the negative velocities on the current Sprite
+    sprite.xv                  // horizontal velocity
+    sprite.yv                  // vertical velocity
+    sprite.rv                  // radial velocity
+    sprite.applyVelocity()     // apply all velocities on the current Sprite
+    sprite.reverseVelocity()   // apply all the negative velocities on the current Sprite
 
     sprite.applyXVelocity()    // apply the horizontal xv velocity
     sprite.applyYVelocity()    // apply the vertical yv velocity
@@ -209,7 +214,8 @@ Other important methods::
     sprite.loadImg(src, <bool resetSize>)    // change the image sprite. The size of the sprite will be reseted by
                                              // the new image if resetSize is true.
 
-    sprite.remove // Remove the dom element if the HTML backend is used and facilite the garbage collection of the object.
+    sprite.remove()              // Remove the dom element if the HTML backend is used and 
+                                 // enable the garbage collection of the object.
 
 
     sprite.canvasUpdate(layer)  // draw the sprite on a given Canvas layer. This doesn't work with an HTML layer.
@@ -286,9 +292,9 @@ rendered.
 Cycle object
 ============
 
-A cycle object handles sprite animations by moving the offsets of the sprite.
-A cycle is defined by list of tuples: (x offset, y offset, game tick duration), and the sprites the
-cycle applies to. this is a cycle with 3 position, each lasting 5 game ticks::
+A cycle object handles sprite animations by moving the offsets within the viewport of the sprites.
+A cycle is defined by a list of tuples: (x offset, y offset, game tick duration) and a list of sprites. 
+This is an example cycle with 3 different offset, each lasting 5 game ticks::
 
     var cycle = scene.Cycle([[0, 2, 5],
                               [30, 2, 5],
@@ -301,9 +307,9 @@ cycle applies to. this is a cycle with 3 position, each lasting 5 game ticks::
 
     cycle.removeSprite(sprite); // remove the sprite from the cycle
 
-    cycle.next()         // apply the next tick to the sprite
+    cycle.next()         // apply the next tick to the sprites
     cycle.next(1, true)  // apply the next tick *and* call update() on the sprites
-    cycle.next(2)        // apply the second game tick to the sprite (jump a frame)
+    cycle.next(2)        // apply the second game tick to the sprites (jump a frame)
 
 The next function doesn't necessarly involve an offset sprite change. It does only when all the ticks on current
 triplet have been consumed. Cycle has others useful methods and attributes::
@@ -389,7 +395,7 @@ A scrolling surface is build this way::
     surface.update();         // update the latest changes to the surface and call the redrawCallback
 
 The redrawCallback is called everytime a part of the surface need to be updated. The absolute position on the surface
-is provided for you to determine what to draw on this layer. The layer object has a width and height (layer.x, layer.y).
+is provided for you to determine what to draw on this layer. The layer object has a width and height (layer.w, layer.h).
 
 
 Dealing with events
