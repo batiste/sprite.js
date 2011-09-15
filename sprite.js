@@ -1022,7 +1022,7 @@ Cycle.prototype.reset = function resetCycle() {
     return this;
 };
 
-Cycle.prototype.goto = function gotoCycle(n) {
+Cycle.prototype.go = function gotoCycle(n) {
     for(var j=0, sprite; sprite = this.sprites[j]; j++) {
         sprite.setXOffset(this.triplets[n][0]);
         sprite.setYOffset(this.triplets[n][1]);
