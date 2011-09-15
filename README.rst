@@ -58,10 +58,10 @@ Example of a basic use::
 Performance and different ways to draw
 =======================================
 
-This library provides 2 rendering backends: HTML and canvas.
+This library provides 2 rendering engines: HTML and canvas.
 
-By default the HTML backend is used. The HTML backend displays sprites using DOM elements when the canvas
-backend draw the sprites on the canvas. Each layer of the application can have a different backend.
+By default the HTML engine is used. The HTML engine displays sprites using DOM elements when the canvas
+engine draw the sprites on the canvas. Each layer of the application can have a different engine.
 This enable you to mix the 2 technics if needed.
 
 To use canvas with a layer you need to specify it in the options::
@@ -77,9 +77,9 @@ Performances on particle test can be quite different depending on the device and
 +------------------------+---------------+-------------+---------------+---------------------+-------+
 | Browsers               | Chrome linux  | Opera linux | Firefox linux | HTC Desire (webkit) | IE9   |
 +========================+===============+=============+===============+=====================+=======+
-| HTML backend           | 2000          | 60          | 500           | 120                 | 30    |
+| HTML engine            | 2000          | 60          | 500           | 120                 | 30    |
 +------------------------+---------------+-------------+---------------+---------------------+-------+
-| Canvas backend         | 1300          | 100         | 300           | 80                  | 600   |
+| Canvas engine          | 1300          | 100         | 300           | 80                  | 600   |
 +------------------------+---------------+-------------+---------------+---------------------+-------+
 
 
@@ -214,7 +214,7 @@ Other important methods::
     sprite.loadImg(src, <bool resetSize>)    // change the image sprite. The size of the sprite will be reseted by
                                              // the new image if resetSize is true.
 
-    sprite.remove()              // Remove the dom element if the HTML backend is used and 
+    sprite.remove()              // Remove the dom element if the HTML engine is used and 
                                  // enable the garbage collection of the object.
 
 
@@ -225,7 +225,7 @@ To update any visual changes to the view you should call the "update" method::
 
     Sprite.update()
 
-With a canvas backend, the surface will be automaticaly cleared before each game tick. You will need to call update
+With a canvas engine, the surface will be automaticaly cleared before each game tick. You will need to call update
 to draw the sprite on the canvas again. If you don't want to do this you can set the layer autoClear attribute to false.
 
 SpriteList object
@@ -417,7 +417,7 @@ events the recommanded way to handle them is to use event delegation on the Scen
         target.className = 'selected';
     }
 
-If you need to use event on a Sprite level you can do it if you use the HTML backend::
+If you need to use event on a Sprite level you can do it if you use the HTML engine::
 
     sprite.dom.addEventListener('click', function(e) {
         sprite.dom.className = 'selected';
