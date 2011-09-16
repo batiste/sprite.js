@@ -4,14 +4,18 @@
    contain the root `toctree` directive.
 
 =====================================
-Welcome to sprite.js's documentation!
+This is Sprite.js documentation
 =====================================
 
-The sprite.js framework lets you create animations and games
+Sprite.js is a framework that lets you create animations and games
 using sprites in an efficient way. The goal is to have common
-framework for Desktop and mobile browsers.
+framework for Desktop and mobile browsers and using the latest technology available on each plateform.
 
-sprite.js has been tested on Chromium, Firefox, Android emulator, Opera and IE9.
+Sprite.js has been tested on Chromium, Firefox, Android emulator, Opera and IE9.
+
+To download the latest version of sprite.js, go to the github repository:
+
+https://github.com/batiste/sprite.js
 
 For an example of a game made with sprite.js there is an example game named "The invasion of the evil lords":
 
@@ -22,17 +26,8 @@ For an example of the what the framework offers, have a look at the test files:
 http://batiste.dosimple.ch/sprite.js/tests/
 
 
-Contents:
-
 .. toctree::
    :maxdepth: 2
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
 
 Example usage
@@ -93,7 +88,7 @@ The canvas will be automaticaly cleared by the game ticker. If you don't need it
 
     var background = scene.Layer('background', {useCanvas:true, autoClear:false});
 
-Performances on particle test can be quite different depending on the device and browser and plateform:
+Performances with the particle test can be quite different depending on the device and browser and plateform:
 
 +------------------------+---------------+-------------+---------------+---------------------+-------+
 | Browsers               | Chrome linux  | Opera linux | Firefox linux | HTC Desire (webkit) | IE9   |
@@ -108,6 +103,11 @@ Scene object
 ==============
 
 The scene object is a dom container where all the Sprites will be drawned. You always need to start by creating a Scene object.
+
+.. code-block:: javascript
+
+    // create a Scene object
+    var scene = sjs.Scene({w:640, h:480});
 
 .. js:class:: sjs.Scene(options)
 
@@ -133,9 +133,9 @@ The list of the different methods available on the Scene object:
 
     Create a Layer object, see the Layer section.
 
-.. js:class:: Scene.Sprite([<src>, layer|options])
+.. js:class:: Scene.Sprite([source, layer|options])
 
-    :param string src: source of the image.
+    :param string source: source of the image.
     :param Layer layer: the layer object.
     :param object options: options.
 
@@ -143,7 +143,7 @@ The list of the different methods available on the Scene object:
 
 .. js:class:: Scene.Ticker(tickDuration, paint)
 
-    :param numer tickDuration: duration in milli seconds of each game tick.
+    :param number tickDuration: duration in milliseconds of each game tick.
     :param function paint: Get's called at every game tick.
 
     Create a Ticker object for this scene or reset the previous one.
@@ -198,9 +198,40 @@ To create a sprite you should use the Scene.Sprite constructor:
         var options = {layer:layer, x:10, size:[20, 20], y:15};
         var sprite = scene.Sprite("mysprite.png", options);
 
-
-Sprite attributes
+Important methods
 -------------------
+
+To update any visual changes to the view you should call the *update* method:
+
+.. js:function:: Sprite.update()
+
+    Apply the latest changes to the sprite's layer.
+
+.. js:function:: Sprite.loadImg(source[, resetSize])
+
+    :param string source: new image source.
+    :param boolean resetSize: if true the size of the sprite will be reseted by the new image.
+
+    Change the image sprite.
+
+.. js:function:: Sprite.remove() 
+
+    Remove the dom element if the HTML engine is used and enable the garbage collection of the object.
+
+
+.. js:function:: Sprite.canvasUpdate(layer)
+
+    Draw the sprite on a given Canvas layer. This doesn't work with an HTML layer.
+
+
+
+
+With a canvas engine, the surface will be automaticaly cleared before each game tick. You will need to call update
+to draw the sprite on the canvas again. If you don't want to do this you can set the layer autoClear attribute to false.
+
+
+Read only Sprite attributes
+------------------------------
 
 For technichal and performance reasons Sprite's attributes needs to be changed using a setters method. The following
 attributes are *READ ONLY*:
@@ -268,7 +299,7 @@ If you want to change any of those attributes use the following setters:
 Or one of those helper methods:
 
 .. js:function:: Sprite.rotate(radians)
-.. js:function:: Sprite.scale(xscale, yscale)
+.. js:function:: Sprite.scale(xscale[, yscale])
 
     If y is not defined, y take the same value as x.
 
@@ -285,87 +316,134 @@ Or one of those helper methods:
 
     Set the width and height of the visible sprite.
 
+
+Sprite physic
+-------------------
+
 Sprites comes with methods that can help you implement a basic physic engine:
 
-.. code-block:: javascript
 
-    sprite.xv                  // horizontal velocity
-    sprite.yv                  // vertical velocity
-    sprite.rv                  // radial velocity
-    sprite.applyVelocity()     // apply all velocities on the current Sprite
-    sprite.reverseVelocity()   // apply all the negative velocities on the current Sprite
 
-    sprite.applyXVelocity()    // apply the horizontal xv velocity
-    sprite.applyYVelocity()    // apply the vertical yv velocity
-    sprite.reverseXVelocity()  // apply the horizontal xv velocity negatively
-    sprite.reverseYVelocity()  // apply the vertical yv velocity negatively
+.. js:attribute:: Sprite.xv
 
-    sprite.isPointIn(x, y)      // return true if the point (x, y) is within the sprite surface
+    Horizontal velocity.
 
-    sprite.collidesWith(sprite) // return true if the sprite is in collision with the other sprite
+.. js:attribute:: Sprite.yv
 
-    sprite.collidesWithArray([sprites]) // Search in  an array of sprite for a colliding sprite.
-                                        // If found, a sprite is returned.
+    Vertical velocity.
 
-    sprite.distance(sprite)     // return the distance between 2 sprite center
-    sprite.distance(x, y)       // return the distance between the sprite center and the point (x, y)
+.. js:attribute:: Sprite.rv
+
+    Radial velocity
+
+.. js:function:: Sprite.applyVelocity()     
+
+    Apply all velocities on the current Sprite.
+
+.. js:function:: Sprite.reverseVelocity()  
+
+    Reverse all velocities on the current Sprite.
+
+.. js:function:: Sprite.applyXVelocity()
+
+    Apply the horizontal xv velocity.
+
+
+.. js:function:: Sprite.applyYVelocity()
+
+    Apply the vertical yv velocity.
+
+.. js:function:: Sprite.reverseXVelocity()
+
+    Apply the horizontal xv velocity negatively.
+
+.. js:function:: Sprite.reverseYVelocity()
+
+    Apply the vertical yv velocity negatively.
+
+.. js:function:: Sprite.isPointIn(x, y)
+
+    Return true if the point (x, y) is within the sprite surface.
+
+.. js:function:: Sprite.collidesWith(sprite)
+
+    Return true if the sprite is in collision with the other sprite
+
+.. js:function:: Sprite.collidesWithArray(sprites)
+
+    :param Array sprites: An array of Sprite objects.
+
+    Search in  an array of sprite for a colliding sprite. If found, a sprite is returned.
+
+.. js:function:: Sprite.distance(sprite)
+
+    Return the distance between 2 sprite center.
+
+.. js:function:: Sprite.distance(x, y)       
+
+    Return the distance between the sprite center and the point (x, y)
+
+
+Special effects
+-------------------
 
 There is also 2 methods that can help to create special effects. You can use explode2 to separate the current sprite in 2 parts:
 
-.. code-block:: javascript
+.. js:function:: Sprite.explode2([position, horizontal=true, layer]) 
 
-    // return 2 new sprites that are the 2 parts of the sprite according to the given position.
-    // Default value for position is half the size of the sprite.
-    [sprite1, sprite2] = sprite.explode2(<position>, <bool horizontal>, <layer>)
+    :param number position: The position where to cute.
+    :param boolean horizontal: Cut horizontaly if true, verticaly if false.
 
-    // Return 4 new sprites that are the split from the center (x, y).
-    // Default value for the center is the center of the sprite.
-    [sprite1, sprite2, sprite3, sprite4] = sprite.explode4(<x>, <y>, <layer>)
+    Return an array of 2 new sprites that are the 2 parts of the sprite according to the given position.
+    The default value for position is half the size of the sprite.
 
-Other important methods:
+.. js:function:: Sprite.explode4([x, y, layer])
 
-.. code-block:: javascript
-
-    sprite.loadImg(src, <bool resetSize>)    // change the image sprite. The size of the sprite will be reseted by
-                                             // the new image if resetSize is true.
-
-    sprite.remove()              // Remove the dom element if the HTML engine is used and 
-                                 // enable the garbage collection of the object.
+    :param number x: The x position where to cute.
+    :param number y: The y position where to cute.
+    :param Layer layer: the Layer where to create the new Sprites, default being the current sprite's Layer.
+    
+    Return an array of 4 new sprites that are the split from the center (x, y).
+    the default value for (x, y) is the center of the sprite.
 
 
-    sprite.canvasUpdate(layer)  // draw the sprite on a given Canvas layer. This doesn't work with an HTML layer.
 
-
-To update any visual changes to the view you should call the "update" method:
-
-.. code-block:: javascript
-
-    Sprite.update()
-
-With a canvas engine, the surface will be automaticaly cleared before each game tick. You will need to call update
-to draw the sprite on the canvas again. If you don't want to do this you can set the layer autoClear attribute to false.
-
-SpriteList object
+List object
 ==================
 
-SpriteList is a convenience list type object that enable you to delete and add sprites without having to care
-about indexes and for loop syntax:
+List is an iterable object that simplify the management of sprites list or any other other object:
 
-.. code-block:: javascript
+.. js:class:: sjs.List([objects])
 
-    var sprite_list = sjs.SpriteList(<array of sprites>)
+    :param Array objects: An array of objects.
 
-    sprite_list.add(sprite | array of sprite)  // add to the list
-    sprite_list.remove(sprite)                  // delete from the list
-    sprite_list.iterate()                       // iterate on the entire list then stops
-    sprite_list.list.length                     // length of the list
-    sprite_list.list                            // the actual list of sprite
+    Create the object list.
+
+.. js:function:: List.add(object | objects)
+
+    Add an object or an array of sprite to the the list.
+
+.. js:function:: List.remove(object)
+
+    Remove the first matching object from the list.
+
+.. js:function:: List.iterate()
+
+    Return an object and increment the pointer. Return false at the end of the list.
+
+.. js:attribute:: List.list.length
+
+    The length of the list.
+
+.. js:attribute:: List.list
+
+    If you need you can access the array of object.
 
 Example of use:
 
 .. code-block:: javascript
 
-    var crates = sjs.SpriteList([crate1, crate2]);
+    var crates = sjs.List([crate1, crate2]);
 
     var crate;
     while(crate = crates.iterate()) {
@@ -399,55 +477,108 @@ To setup a ticker:
 
     }
     var ticker = scene.Ticker(35, paint); // we want a tick every 35ms
-    ticker.run();
 
-    ticker.pause();
-    ticker.resume();
 
-lastTicksElapsed is the number of ticks elapsed during 2 runs of the paint
-function. If performances are good the value should be 1. If the number
-is higher than 1, it means that there have been more game ticks than calls
-to the paint function since the last time paint was called. In essence,
-there were dropped frames. The game loop can use the tick count to make
-sure it's physics end up in the right state, regardless of what has been
-rendered.
+.. js:class:: Scene.Ticker(duration, callback)
+
+    :param number duration: The duration of each tick in millisecondes.
+    :param function callback: The function that will be called after each tick.
+
+.. js:function:: Ticker.run()
+
+    Start the ticker.
+
+.. js:function:: Ticker.pause()
+
+    Pause the ticker.
+
+.. js:function:: Ticker.resume()
+   
+    Resume after a pause.
+    
+.. js:attribute:: Ticker.lastTicksElapsed
+
+    lastTicksElapsed is the number of ticks elapsed during 2 runs of the paint
+    function. If performances are good the value should be 1. If the number
+    is higher than 1, it means that there have been more game ticks than calls
+    to the paint function since the last time paint was called. In essence,
+    there were dropped frames. The game loop can use the tick count to make
+    sure it's physics end up in the right state, regardless of what has been
+    rendered.
+
+.. js:attribute:: Ticker.currentTick
+
+    The amount of elapsed ticks that have been played since the creation the the ticker.
 
 Cycle object
 ============
 
+
 A cycle object handles sprite animations by moving the offsets within the viewport of the sprites.
-A cycle is defined by a list of tuples: (x offset, y offset, game tick duration) and a list of sprites. 
+
 This is an example cycle with 3 different offset, each lasting 5 game ticks:
 
 .. code-block:: javascript
 
     var cycle = scene.Cycle([[0, 2, 5],
-                              [30, 2, 5],
-                              [60, 2, 5]);
+                             [30, 2, 5],
+                             [60, 2, 5]);
     var sprite = scene.Sprite("walk.png");
     cycle.addSprite(sprite);
+    cycle.update();
 
-    var sprites = [sprite1, sprite2];
-    cycle.addSprites(sprites);  // add an Array of sprites to the cycle
+    cycle.next(5).update();
 
-    cycle.removeSprite(sprite); // remove the sprite from the cycle
 
-    cycle.next()         // apply the next tick to the sprites
-    cycle.next(1, true)  // apply the next tick *and* call update() on the sprites
-    cycle.next(2)        // apply the second game tick to the sprites (jump a frame)
+Cycle complete reference:
 
-The next function doesn't necessarly involve an offset sprite change. It does only when all the ticks on current
-triplet have been consumed. Cycle has others useful methods and attributes:
 
-.. code-block:: javascript
+.. js:class:: sjs.Cycle(triplets)
 
-    cycle.go(1)          // go to the second game tick in the triplet and apply the offsets
-    cycle.reset()        // reset the cycle offsets to the original position
-    cycle.repeat = false // if set to false, the cycle will stop automaticaly after one run
-    cycle.done           // can be used to check if the cycle has completed
-                         // stays false if cycle is set to repeat = true
+    :param Array triplets: An array of triplets (xoffset, yoffset, ticks duration).
 
-    cycle.update()       // calls update() on all the sprites in the cycle
+.. js:function:: Cycle.addSprite(sprite)
+
+    :param Sprite sprite: Add a sprite to the cycle.
+
+.. js:function:: Cycle.addSprites(sprites)
+
+    :param Array sprites: Add an array of sprites to the cycle.
+
+.. js:function:: Cycle.removeSprite(sprite)
+
+    :param Sprite sprite: Remove a sprite from the cycle.
+
+.. js:function:: Cycle.next([ticks, update])
+
+    :param number ticks: The number of ticks you want to go forward. The default value is 1.
+    :param boolean update: if true, the sprite's offsets will automaticaly updated.
+
+    Calling the next method doesn't necessarly involve an offset change. It does only when all the ticks on current
+    triplet have been consumed.
+
+.. js:function:: Cycle.go(tick)
+
+    :param number tick: Go to the wanted tick in the triplets and apply the offsets.
+
+.. js:function:: Cycle.reset(update)
+
+    :param boolean update: if true, the sprite's offsets will automaticaly updated.
+
+    Reset the cycle offsets to the original position.
+
+.. js:function:: Cycle.update()
+
+    Calls the update method on all the sprites.
+
+.. js:attribute:: Cycle.done
+
+    Can be used to check if the cycle has completed. The value stays false if cycle is repeating.
+
+.. js:attribute:: Cycle.repeat
+
+    If set to false, the cycle will stop automaticaly after one run. The default value is true.
+
 
 Input object
 =============
@@ -464,47 +595,65 @@ that will be true if the key is pressed:
 
 Input.keyboard is a memory of which key is down and up. This is a list of the flags available in the keyboard object:
 
-.. code-block:: javascript
+.. js:class:: scene.Input()
 
-    keyboard.up
-    keyboard.right
-    keyboard.up
-    keyboard.down
-    keyboard.enter
-    keyboard.space
-    keyboard.ctrl
+    Creates an Input object for the scene.
 
-You also have access to those helpers on the input object:
 
-.. code-block:: javascript
+.. js:attribute:: Input.keyboard
 
-    input.arrows() // arrows return true if any directionnal keyboard arrows are pressed
-    input.keydown  // this is true if any key is down
+    In addition to the normal keyboard keys, the keyboard object keep track of those special keyboard states:
+
+    .. code-block:: javascript
+
+        keyboard.up
+        keyboard.right
+        keyboard.up
+        keyboard.down
+        keyboard.enter
+        keyboard.space
+        keyboard.ctrl
+        keyboard.esc
+
+.. js:attribute:: Input.keydown
+
+    True if any key is down.
+
+.. js:attribute:: Input.mousedown
+
+    True if any mouse button is down.
 
 If you need to know which key has just been pressed or released during the last game tick you can use those methods:
 
-.. code-block:: javascript
+.. js:function:: Input.keyPressed(code)
+    
+    :param string code: The type of key you want to test. eg: "up", "left"
 
-    input.keyPressed('up')
-    input.keyReleased('up')
+.. js:function:: Input.keyReleased(code)
+    
+    :param string code: The type of key you want to test. eg: "up", "left"
 
+.. js:attribute:: Input.mouse
+
+    The mouse object contains the position of the mouse and if the mouse is clicked. 
 
 
 Layer object
 =============
 
-If you need to separate you sprites into logical layers, you can use the Layer
-object:
+If you need to separate you sprites into logical layers, you can crate a Layer:
+
+.. js:class:: Scene.Layer(name[, options])
+
+    :param string name: The name of the layer
+    :param object options: an option object
+
+    Create the Layer object.
 
 .. code-block:: javascript
 
     var background = scene.Layer('background', options);
-
-You should then pass the layer as the second argument of the contructor of your sprites:
-
-.. code-block:: javascript
-
-    var sprite = scene.Sprite('bg.png', background);
+    var sprite = background.Sprite('background.png');
 
 The layer object can take those options:
 
@@ -513,32 +662,9 @@ The layer object can take those options:
     var options = {
         useCanvas:true,   // force the use of the canvas on this layer, that enable you to mix HTML and canvas
         autoClear:false   // disable the automatic clearing of the canvas before every paint call.
+        parent:dom        // The DOM node where to create the Layer. By default the scene is used.
     }
 
-
-ScrollingSurface object
-========================
-
-This object provide a simple and efficent way to display a moving static background within a scene. The surface
-only redraw the necessary parts instead of the whole scene at every frame.
-
-A scrolling surface is build this way:
-
-.. code-block:: javascript
-
-    var surface = sjs.SrollingSurface(scene, scene.w, scene.h, redrawCallback);
-
-    function redrawCallback(layer, x, y) {
-        // draw the necessary sprites on the layer
-        sprite.canvasUpdate(layer);
-    }
-
-    surface.move(x, y);       // move the surface in direction (x, y)
-    surface.position(x, y);   // set the surface position to (x, y)
-    surface.update();         // update the latest changes to the surface and call the redrawCallback
-
-The redrawCallback is called everytime a part of the surface need to be updated. The absolute position on the surface
-is provided for you to determine what to draw on this layer. The layer object has a width and height (layer.w, layer.h).
 
 
 Dealing with events
@@ -573,20 +699,56 @@ If you need to use event on a Sprite level you can do it if you use the HTML eng
 Extra features
 ==============
 
+Some of those feature need to include an extra javascript files to the page.
+
+ScrollingSurface object
+-------------------------
+
+This object provide a simple and efficent way to display an infinte moving background within a scene. Using a system of buffer the surface
+only redraw the necessary parts instead of the whole scene at every frame.
+
+A scrolling surface is build this way:
+
+.. code-block:: javascript
+
+    var surface = sjs.SrollingSurface(scene, w, h, redrawCallback);
+
+    function redrawCallback(layer, x, y) {
+        // draw the necessary sprites on the layer
+        sprite.canvasUpdate(layer);
+    }
+
+    surface.move(x, y);       // move the surface in direction (x, y)
+    surface.position(x, y);   // set the surface position to (x, y)
+    surface.update();         // update the latest changes to the surface and call the redrawCallback
+
+The redrawCallback is called everytime a part of the surface need to be updated. The absolute position on the surface
+is provided for you to determine what to draw on this layer. The layer object has a width and height (layer.w, layer.h).
+
+
+Math
+-------------------------
+
+
 Sprite.js comes packed with a few basic math functions:
 
 .. code-block:: javascript
 
     sjs.math.hypo(x, y)                     // hypotenuse
     sjs.math.mod(n, base)                   // a modulo function that return strictly positive result
-    sjs.normalVector(vx, vy, <intensity>)   // return a normal vector {x, y}. If you define the intensity
+    sjs.normalVector(vx, vy[, intensity])   // return a normal vector {x, y}. If you define the intensity
                                             // the vestor will be multiplied by it
+
+Path finfing
+-------------------------
+
+
 
 Sprite.js comes with a flexible path finding function:
 
 .. code-block:: javascript
 
-    sjs.path.find(startNode, endNode, <maxVisit=1000>)
+    sjs.path.find(startNode, endNode[, maxVisit=1000])
 
 A node object should implement those 4 methods:
 

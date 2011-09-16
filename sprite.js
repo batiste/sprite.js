@@ -39,7 +39,8 @@ var sjs = {
     Cycle: Cycle,
     Input: Input,
     Scene: Scene,
-    SpriteList:SpriteList,
+    SpriteList:List, // backward compatibility
+    List:List,
     Sprite:_Sprite,
     overlay:overlay,
     scenes:[],
@@ -955,6 +956,7 @@ function Cycle(triplets) {
 Cycle.prototype.addSprite = function addSprite(sprite) {
     this.sprites.push(sprite);
     sprite.cycle = this;
+    return this;
 }
 
 Cycle.prototype.update = function update() {
@@ -962,6 +964,7 @@ Cycle.prototype.update = function update() {
     for(var i=0, sp; sp = sprites[i]; i++) {
         sp.update();
     }
+    return this;
 }
 
 Cycle.prototype.addSprites = function addSprites(sprites) {
@@ -969,6 +972,7 @@ Cycle.prototype.addSprites = function addSprites(sprites) {
     for(var j=0, sp; sp = sprites[j]; j++) {
         sp.cycle = this;
     }
+    return this;
 }
 
 Cycle.prototype.removeSprite = function removeSprite(sprite) {
@@ -978,6 +982,7 @@ Cycle.prototype.removeSprite = function removeSprite(sprite) {
             this.sprites.splice(j, 1);
         }
     }
+    return this;
 }
 
 Cycle.prototype.next = function (ticks, update) {
@@ -1012,12 +1017,14 @@ Cycle.prototype.next = function (ticks, update) {
     return this;
 };
 
-Cycle.prototype.reset = function resetCycle() {
+Cycle.prototype.reset = function resetCycle(update) {
     this.tick = 0;
     this.done = false;
     for(var j=0, sprite; sprite = this.sprites[j]; j++) {
         sprite.setXOffset(this.triplets[0][0]);
         sprite.setYOffset(this.triplets[0][1]);
+        if(update)
+            sprite.update();
     }
     return this;
 };
@@ -1039,10 +1046,10 @@ function _Ticker(scene, tickDuration, paint) {
 
     this.paint = paint;
     if(tickDuration === undefined)
-        this.tickDuration = 25;
+        this.tickDuration = 16;
     else
         // FF behave weirdly with anything less than 25
-        this.tickDuration = Math.max(tickDuration, 25);
+        this.tickDuration = Math.max(tickDuration, 16);
 
     this.start = new Date().getTime();
     this.ticksElapsed = 0;
@@ -1089,8 +1096,8 @@ _Ticker.prototype.run = function() {
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
     this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) / 2 | 0;
-    // We need some pause to let the browser catch up the update. Here at least 16 ms of pause
-    var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 16);
+    // We need some pause to let the browser catch up the update. Here at least 25 ms of pause
+    var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 25);
     this.fps = Math.round(1000/(this.now - (this.lastPaintAt || 0)));
     this.lastPaintAt = this.now;
     //window.webkitRequestAnimationFrame(function(){t.run()});
@@ -1181,6 +1188,14 @@ function _Input(scene) {
         }
         if(e.keyCode==13) {
             updateKeyChange('enter', val);
+        }
+        if(e.keyCode==27) {
+            updateKeyChange('esc', val);
+        }
+        // 0..9, a-z
+        if(e.keyCode >= 48 && e.keyCode <= 90) {
+            var keyStr = String.fromCharCode(e.keyCode);
+            updateKeyChange(keyStr.toLowerCase(), val);
         }
     }
 
@@ -1455,15 +1470,15 @@ Layer.prototype.onTop = function onTop(color) {
     this.dom.style.zIndex = String(zindex);
 }
 
-function SpriteList(list) {
+function List(list) {
     if(this.constructor !== arguments.callee)
-        return new SpriteList(list);
+        return new List(list);
     this.list = list || [];
     this.length = this.list.length;
     this.index = -1;
 }
 
-SpriteList.prototype.add = function add(sprite) {
+List.prototype.add = function add(sprite) {
     if(sprite.length)
         this.list.push.apply(this.list, sprite);
     else
@@ -1471,9 +1486,9 @@ SpriteList.prototype.add = function add(sprite) {
     this.length = this.list.length;
 }
 
-SpriteList.prototype.remove = function remove(sprite) {
+List.prototype.remove = function remove(toRemove) {
     for(var i=0, el; el = this.list[i]; i++) {
-        if(el==sprite) {
+        if(el==toRemove) {
             this.list.splice(i, 1);
             // delete during the iteration is possible
             if(this.index > -1)
@@ -1484,7 +1499,7 @@ SpriteList.prototype.remove = function remove(sprite) {
     }
 }
 
-SpriteList.prototype.iterate = function iterate() {
+List.prototype.iterate = function iterate() {
     this.index += 1;
     if(this.index >= this.list.length) {
         this.index = -1;
