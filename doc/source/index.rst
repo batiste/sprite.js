@@ -51,10 +51,12 @@ Example of a basic use:
         // change the visible size of the sprite
         sp.size(55, 30);
 
-        // apply the latest visual changes to the sprite (draw if canvas, update attribute if DOM);
+        // apply the latest visual changes to the sprite
+        // (draw if canvas, update attribute if DOM);
         sp.update();
 
-        // change the offset of the image in the sprite (this works the opposite way of a CSS background)
+        // change the offset of the image in the sprite 
+        // (this works the opposite way of a CSS background)
         sp.offset(50, 50);
 
         // diverse transformations
@@ -111,8 +113,21 @@ The scene object is a dom container where all the Sprites will be drawned. You a
 
 .. js:class:: sjs.Scene(options)
 
-    :param number w: width of the scene.
-    :param number h: height of the scene.
+    Create a new Scene.
+
+Options details:
+
+.. js:attribute:: Scene.options.parent
+
+    Dom parent of the scene. The default is document.body.
+
+.. js:attribute:: Scene.options.w
+
+    Width of the scene.
+
+.. js:attribute:: Scene.options.h
+
+    Height of the scene.
 
 The list of the different methods available on the Scene object:
 
@@ -643,6 +658,14 @@ Layer object
 
 If you need to separate you sprites into logical layers, you can crate a Layer:
 
+.. code-block:: javascript
+
+    var background = scene.Layer('background', {
+        useCanvas:true,
+        autoClear:false
+    });
+    var sprite = background.Sprite('background.png');
+
 .. js:class:: Scene.Layer(name[, options])
 
     :param string name: The name of the layer
@@ -650,20 +673,18 @@ If you need to separate you sprites into logical layers, you can crate a Layer:
 
     Create the Layer object.
 
-.. code-block:: javascript
+.. js:attribute:: Layer.options.useCanvas
 
-    var background = scene.Layer('background', options);
-    var sprite = background.Sprite('background.png');
+    If true this layer will use the canvas element to draw the sprites. That enable you to mix HTML and canvas.
 
-The layer object can take those options:
+.. js:attribute:: Layer.options.autoClear
 
-.. code-block:: javascript
+    If false it disable the automatic clearing of the canvas before every paint call.
 
-    var options = {
-        useCanvas:true,   // force the use of the canvas on this layer, that enable you to mix HTML and canvas
-        autoClear:false   // disable the automatic clearing of the canvas before every paint call.
-        parent:dom        // The DOM node where to create the Layer. By default the scene is used.
-    }
+.. js:attribute:: Layer.options.parent
+
+    Set a different DOM parent instead of the scene.
+
 
 
 
@@ -704,10 +725,13 @@ Some of those feature need to include an extra javascript files to the page.
 ScrollingSurface object
 -------------------------
 
-This object provide a simple and efficent way to display an infinte moving background within a scene. Using a system of buffer the surface
-only redraw the necessary parts instead of the whole scene at every frame.
+This object is not included in sprite.js core and needs to be loaded indenpendantly::
 
-A scrolling surface is build this way:
+    <script src="lib/scrolling.js"></script>
+
+This object provide a simple and efficent way to display a moving background within a scene. The object buffers parts that have
+already been drawned and only redraw the necessary parts instead of the whole scene at every frame.
+
 
 .. code-block:: javascript
 
@@ -718,12 +742,36 @@ A scrolling surface is build this way:
         sprite.canvasUpdate(layer);
     }
 
-    surface.move(x, y);       // move the surface in direction (x, y)
-    surface.position(x, y);   // set the surface position to (x, y)
-    surface.update();         // update the latest changes to the surface and call the redrawCallback
+    surface.move(5, 0);
+    surface.update();
 
 The redrawCallback is called everytime a part of the surface need to be updated. The absolute position on the surface
 is provided for you to determine what to draw on this layer. The layer object has a width and height (layer.w, layer.h).
+
+.. js:class:: sjs.SrollingSurface(scene, w, h, redrawCallback)
+
+    :param Scene scene: The scene that will hold the surface.
+    :param number w: the width of the surface.
+    :param number h: the height of the surface.
+    :param function h: the callback the surface will call when a piece of surface needs to be painted.
+
+.. js:function:: redrawCallback(layer, x, y)
+
+    :param Layer layer: A layer where you need to draw your sprites. The layer object has a width and height (layer.w, layer.h) that is smaller than the surface size.
+    :param number x: the x position of the layer within the scrolling surface.
+    :param number y: the y position of the layer within the scrolling surface.
+
+.. js:function:: SrollingSurface.move(x, y)
+
+    Move the surface offset in direction (x, y).
+
+.. js:function:: SrollingSurface.position(x, y)
+
+    Set the surface offset position to (x, y)
+
+.. js:function:: SrollingSurface.update()
+
+    Update the latest changes to the surface and call the redrawCallback if necessary.
 
 
 Math
@@ -732,45 +780,72 @@ Math
 
 Sprite.js comes packed with a few basic math functions:
 
-.. code-block:: javascript
 
-    sjs.math.hypo(x, y)                     // hypotenuse
-    sjs.math.mod(n, base)                   // a modulo function that return strictly positive result
-    sjs.normalVector(vx, vy[, intensity])   // return a normal vector {x, y}. If you define the intensity
-                                            // the vestor will be multiplied by it
+.. js:function:: sjs.math.hypo(x, y)
+     
+    Hypotenuse
 
-Path finfing
+.. js:function:: sjs.math.mod(n, base)
+
+    A modulo function that return strictly positive result.
+
+.. js:function:: sjs.normalVector(vx, vy[, intensity])
+
+    Return a normal vector {x, y}. If you define the intensity the vector will be multiplied by it.
+
+Path finding
 -------------------------
 
+This object is not included in sprite.js core and needs to be loaded indenpendantly::
 
+    <script src="lib/path.js"></script>
 
 Sprite.js comes with a flexible path finding function:
 
-.. code-block:: javascript
+.. js:function:: sjs.path.find(startNode, endNode[, maxVisit=1000])
 
-    sjs.path.find(startNode, endNode[, maxVisit=1000])
+    The algorithm return undefined if no path has been fund and the startNode if a path is found.
+    You can then follow the path using this code:
+
+    .. code-block:: javascript
+
+        var node = sjs.path.find(startNode, endNode);
+        while(node) {
+            console.log(node);
+            node = node.parent;
+        }
 
 A node object should implement those 4 methods:
 
-.. code-block:: javascript
+.. js:class:: Node(...)
 
-    Node.neighbors()        // return a list of Nodes that are the neighbor of the current one
-    Node.distance(node)     // return the distance from this node to another one. It's mainly used as a hint for
-                            // the algorithm to find a quicker way to the end. You can just return 0 if don't
-                            // want to implement this method.
-    Node.equals(node)       // return true if 2 nodes are identical, eg: return this.x == node.x && this.y == node.y;
-    Node.disabled()         // return true if the current node cannot be used to find the path.
+    Define your own Node object.
 
-The algorithm return undefined if no path has been fund and the startNode if a path is found.
-You can then follow the path using this code:
+.. js:function:: Node.neighbors()
 
-.. code-block:: javascript
+    Must return a list of Nodes that are the neighbors of the current one.
 
-    var node = sjs.path.find(startNode, endNode);
-    while(node) {
-        console.log(node);
-        node = node.parent;
-    }
+
+.. js:function:: Node.distance(node)     
+
+    Return the distance from this node to another one. It's mainly used as
+    a hint for the algorithm to find a quicker way to the end. You can just return 0 if don't
+    want to implement this method.
+
+
+.. js:function:: Node.equals(node)
+
+    Return true if 2 nodes are identical, eg: 
+
+    .. code-block:: javascript
+
+        return this.x == node.x && this.y == node.y;
+
+.. js:function:: Node.disabled()
+
+    Return true if the current node cannot be used to find the path.
+
+
 
 Troubleshooting
 ====================
