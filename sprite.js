@@ -299,9 +299,13 @@ function _Sprite(scene, src, layer) {
     this.xv = 0;
     this.yv = 0;
     this.rv = 0;
-
-    this.mass = 0;
-
+    
+    this.mass = 1;
+    this.friction = 1;
+    // forces
+    this.fx= 0;
+    this.fy = 0;
+    
     // image
     this.src = null;
     this.img = null;
@@ -491,6 +495,13 @@ _Sprite.prototype.position = function (x, y) {
     this.setY(y);
     return this;
 };
+
+_Sprite.prototype.updatePhysic = function updatePhysic(ticks) {
+    //integrate newton's laws of motion 
+    this.xv = this.xv + ticks/this.mass*(this.fx - this.friction*this.xv); 
+    this.yv = this.yv + ticks/this.mass*(this.fy - this.friction*this.yv);
+    this.applyVelocity(ticks);
+}
 
 _Sprite.prototype.applyVelocity = function (ticks) {
     if(ticks === undefined)
@@ -1140,6 +1151,8 @@ function _Input(scene) {
     // recor the keyboard changes since the last next call
     this.keyboardChange = {};
     this.mousedown = false;
+    that.mousepressed = false;
+    this.mousereleased = false;
     this.keydown = false;
 
     this.touchable = 'createTouch' in doc;
@@ -1148,7 +1161,9 @@ function _Input(scene) {
 
     this.next = function() {
         that.keyboardChange = {};
+        that.mousepressed = false;
         that.mouse.click = false;
+        that.mousereleased = false;
     }
 
     this.keyPressed = function(name) {
@@ -1265,6 +1280,7 @@ function _Input(scene) {
     addEvent("mousedown", function(event) {
         that.mousedown = true;
         that.mouse.down = true;
+        that.mousepressed = true;
         // prevent unwanted browser drag and drop behavior
         event.preventDefault();
     });
@@ -1272,6 +1288,7 @@ function _Input(scene) {
     addEvent("mouseup", function(event) {
         that.mousedown = false;
         that.mouse.down = false;
+        that.mousereleased = true;
     });
 
     addEvent("click", function(event) {

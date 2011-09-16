@@ -1,0 +1,317 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test game like</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+<style>
+body {
+    margin-left:2em;
+}
+.sjs {
+    background:#f1f4fe;
+    border:1px #333 solid;
+}
+</style>
+</head>
+<body>
+    
+<span id="debug"></span>	
+    
+</body>
+<script src="../sprite.js"></script>
+<script src="extSprite.js"></script>
+
+
+<script>
+//author: Jonathan Bieler
+
+window.onload = function() {
+    
+    document.body.oncontextmenu = function() {return false};
+
+    var gameHeight = 500;
+    var gameWidth = 600;
+    var scene = sjs.Scene({w:gameWidth, h:gameHeight});
+    
+    var interfaceLayer = scene.Layer("interfaceLayer");
+    var playLayer = scene.Layer("playLayer");
+    
+    var parts = sjs.SpriteList();
+    
+    interfaceLayer.onTop();
+
+    var input  = scene.Input();
+    
+    //selection rect    
+    var selRect =  scene.Sprite(false, interfaceLayer);
+    var selDragging = false;
+    var selDownx = 0;
+    var selDowny = 0;
+    
+    selRect.size(20, 20);
+    selRect.move(200, 200);
+    selRect.dom.style.border  = '2px solid #000';
+    selRect.dom.style.color = '#353';
+    selRect.setOpacity(0.0);
+
+    //selection cursor, for collision
+    var selCursor =  scene.Sprite(false,interfaceLayer);
+    selRect.size(2, 2);
+
+    var Nu=20;
+    var units = sjs.SpriteList();
+    
+    for (var i=0;i<Nu;i++) {
+        units[i] = scene.Sprite('particule.png', playLayer);
+        units[i].move(0.8*gameWidth*Math.random()+20,20+10*Math.random());
+        units[i].size(19, 19);
+        units[i].setYOffset(7);
+        units[i].setXOffset(6);
+        units[i].mass = 0.1;
+        units[i].friction = 1.2;
+    }
+    
+    var Ne=15;
+    var enemies = sjs.SpriteList();;
+    
+    for (var i=0;i<Ne;i++) {
+        var enemy = scene.Sprite('particule2.png', playLayer);
+        enemy.move(gameWidth*Math.random(),gameHeight -(40 + 10*Math.random()) );
+        enemy.size(19, 19);
+        enemy.setYOffset(7);
+        enemy.setXOffset(6);
+        enemy.mass = 0.1;
+        enemy.friction = 1.2;
+        enemies.add(enemy);
+    }
+
+    
+    function paint() {
+
+        var mx = input.mouse.position.x;
+        var my = input.mouse.position.y;
+ 
+
+        //left click                        
+        if(input.mousepressed) {
+            /*for (var i=0;i<Nu;i++)
+                units[i].setTarget(mx,my);*/
+            selDownx = mx;  
+            selDowny = my;                                
+        }
+        
+        if(input.mousedown) {
+            
+            //check for single unit collide            
+            selCursor.setX(mx); selCursor.setY(my);
+            var singleUnitSelect = false;
+            
+            for (var i=0;i<Nu;i++) {
+                if(selCursor.collidesWith(units[i]))
+                {
+                    units[i].selected = true;
+                    singleUnitSelect = true;
+                    for (var j=0;j<Nu;j++) 
+                        if(j!=i && !input.keyboard['leftShift'])
+                            units[j].selected = false;                            
+                    break;
+                }
+            }
+
+            //select units within the selection rectangle                
+            if(!singleUnitSelect && selDragging){
+                for (var i=0;i<Nu;i++) {
+                    if (selRect.collidesWith(units[i])){
+                        units[i].selected = true;
+                    }
+                    else if(!input.keyboard['leftShift']){
+                        units[i].selected = false;
+                    }
+                }
+            }
+
+                                
+            selDragging = false;
+            selRect.setOpacity(0);            
+        }
+
+        if(input.mousereleased) {
+            //move command
+            if (!singleUnitSelect && !selDragging) { 
+                for (var i=0;i<Nu;i++) {
+                    if(units[i].selected)
+                        units[i].setTarget(mx,my);
+                }
+            }
+        }
+
+////////////////
+// UNITS //////
+
+        for (var i=0;i<Nu;i++) {
+            //reset forces
+            units[i].setForce(0,0);
+            var fx=0;
+            var fy=0;
+            
+            //collisions with units
+            for (var j=0;j<Nu;j++){		
+                if(i!=j){
+                    var collide = units[i].collidesWith(units[j]);
+                    if(collide) {
+                        
+                        var a = units[i]; 	var b = units[j];
+                        var colx = a.x - b.x;	var coly = a.y - b.y;    
+                        var ncol = sjs.math.hypo(colx,coly);
+                        
+                        if(ncol == 0)
+                            ncol = 1;
+                                                                            
+                        //just add a repulsive force
+                        fx += 800*colx/ncol * a.mass;
+                        fy += 800*coly/ncol * a.mass;
+                    }
+                }
+            }
+            
+            //collisions with borders
+            if( (units[i].x + units[i].w) > gameWidth){
+                fx += -400;
+                units[i].hastarget = false;
+            }
+            if( (units[i].x - units[i].w/2) < 0){
+                fx += 400;
+                units[i].hastarget = false;
+            }            
+                                                                            
+            units[i].addForce(fx,fy);
+            
+            //selected unit
+            units[i].dom.style.border  = '';
+            if(units[i].selected)
+                units[i].dom.style.border  = '1px solid #aaa';
+                
+            //attack
+            var enemy;
+            while(enemy = enemies.iterate()) {             
+                if(units[i].distance(enemy.x,enemy.y)<100){                    
+                units[i].dom.style.border  = '1px solid #f00';
+                enemy.dom.style.border  = 3*Math.random() + 'px solid #f00';
+                
+                enemy.health -= 1;
+                if(enemy.health <=0 ){
+                        var _parts = enemy.explode4(10, 10);                        
+                        enemies.remove(enemy);
+                        enemy.remove();
+                        
+                        for(var j=0; j<_parts.length; j++) {
+                            var p = _parts[j];
+                            p.age = 20;
+                            p.xv = 5 * (Math.random() - 0.5)
+                            p.yv = 5 * (Math.random() - 0.5);
+                            p.rv = Math.random() / 2;
+                            p.applyVelocity();
+                        }
+                        parts.add(_parts);                        
+                }
+                
+
+                }                
+            }
+            
+            units[i].updateUnit(30./1000.);
+            units[i].update();    
+        }
+        
+////////////////
+// PARTS //////
+        
+        var part;
+        while(part = parts.iterate()) {
+            
+            if(part.age <= 0) {
+                parts.remove(part);
+                part.remove();
+            } else {
+                part.applyVelocity();
+                part.update();
+            }
+            
+            part.setOpacity(part.age/20);
+            part.age--;
+        }
+        
+////////////////
+// ENEMIES ////
+
+        var enemy;
+        while(enemy = enemies.iterate()) {    
+            
+            //reset forces
+            enemy.setForce(0,0);
+            var fx=100*(Math.random()-0.5);
+            var fy=100*(Math.random()-0.8);
+            
+            //collisions with units
+            for (var j=0;j<Nu;j++){		
+                    var collide = units[j].collidesWith(enemy);
+                    if(collide) {
+                        var a = units[j]; 	var b = enemy;
+                        var colx = a.x - b.x;	var coly = a.y - b.y; 
+                        var ncol = sjs.math.hypo(colx,coly);
+                        
+                        if(ncol == 0)
+                            ncol = 1;
+                                                                            
+                        //just add a repulsive force
+                        fx += -800*colx/ncol * a.mass;
+                        fy += -800*coly/ncol * a.mass;
+                    }
+            }
+                        
+            enemy.addForce(fx,fy);
+            
+            enemy.updateUnit(30./1000.);
+            enemy.update();
+        }
+
+//////////////////////////
+// selection rectangle    
+
+        if(input.mousedown) {
+            if(sjs.math.hypo(mx-selDownx,my-selDowny) > 5 ) {
+                
+                selDragging=true;
+                
+                //need to check the four cases                    
+                if(mx > selDownx && my > selDowny){
+                    selRect.setX(selDownx); selRect.setY(selDowny);
+                    selRect.size(mx-selDownx, my-selDowny);
+                }
+                if(mx < selDownx && my > selDowny){
+                    selRect.setX(mx); selRect.setY(selDowny);
+                    selRect.size(selDownx-mx, my-selDowny);
+                }
+                if(mx < selDownx && my < selDowny){
+                    selRect.setX(mx); selRect.setY(my);
+                    selRect.size(selDownx-mx, selDowny-my);
+                }
+                if(mx > selDownx && my < selDowny){
+                    selRect.setX(selDownx); selRect.setY(my);
+                    selRect.size(mx-selDownx, selDowny-my);
+                }
+                selRect.setOpacity(0.5);
+                selRect.update();
+            }         
+        } else {
+            selRect.setOpacity(0);
+            selRect.update();
+        }
+    };
+
+    var ticker = scene.Ticker(30, paint);
+    ticker.run();
+};
+
+</script>
+</html>
