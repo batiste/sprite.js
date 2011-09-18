@@ -43,12 +43,15 @@
 <body style="overflow:hidden">
 
 <p>This demo is gonna produce particles and stop when 2000 particules are on the screen or 50% percent javascript load is reached . <a href="https://github.com/batiste/sprite.js">Get the source</a>.<br>
-<span id="nb"></span> particles, system load <span id="load"></span>% 
-(<span id="fps"></span>FPS)
+<label><input type="checkbox" checked id="useImage" />Use image for particle</label>
+<label><input type="checkbox" id="useRequestAnimation" />Use request animation frame 
+<a href="https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame">ref</a></label>
+<br><span id="nb"></span> particles, system load <span id="load"></span>% 
+(<span id="fps"></span>FPS) 
 <br><a href="?canvas=1" id="canvas-mode">Use canvas engine.</a> 
 <a href="?html=1" id="html-mode">Use HTML engine</a>
-<a href="?webgl=1" id="webgl-mode">Use WebGL engine (experimental)</a></p>
-
+<a href="?webgl=1" id="webgl-mode">Use WebGL engine (experimental)</a>
+</p>
 </body>
 
 <script>
@@ -60,6 +63,21 @@ window.onload = function() {
     var fps = document.getElementById('fps');
     var scene = sjs.Scene({w:window.innerWidth-20, h:window.innerHeight-120});
 
+    var use = document.getElementById('useImage');
+    var useImage = true;
+    use.onclick = function() {
+        useImage = use.checked;
+    }
+    
+    var req = document.getElementById('useRequestAnimation');
+    var useReq = false;
+    req.onclick = function() {
+        useReq = req.checked;
+        ticker.useAnimationRequest = useReq;
+    }
+    if(!sjs.animationRequest)
+        req.disabled = "disabled";
+    
     var canvas = window.location.href.indexOf('canvas') != -1;
     var webgl = window.location.href.indexOf('webgl') != -1;
 
@@ -78,7 +96,11 @@ window.onload = function() {
     var particles = sjs.SpriteList();
 
     function createParticle() {
-        particle = scene.Sprite('particule.png', layer);
+        if(useImage)
+            var particle = scene.Sprite('particule.png', {layer:layer});
+        else
+            var particle = scene.Sprite(false, {color:'#0b0', w:32, h:32, layer:layer});
+
         particle.setX(scene.w / 2);
         particle.setY(scene.h / 3);
         particle.xv = (Math.random() - 0.5) * 2;
@@ -114,7 +136,7 @@ window.onload = function() {
         }
 
     };
-    var ticker = scene.Ticker(20, paint);
+    var ticker = scene.Ticker(paint);
     ticker.run();
 
 };

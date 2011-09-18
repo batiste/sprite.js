@@ -71,14 +71,23 @@ function normalVector(vx, vy, intensity) {
 // global z-index
 var zindex = 1;
 
-function init_transform_property() {
-    var properties = ['transform', 'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform'];
-    var p = false;
-    while (p = properties.shift()) {
-        if (typeof doc.body.style[p] !== 'undefined') {
-            sjs.tproperty = p;
+function has(el, propList) {
+    var prop = false;
+    while (prop = propList.shift()) {
+        if (typeof el[prop] !== 'undefined') {
+            return prop
         }
-    }
+    }  
+}
+
+var browser_specific_runned = false;
+function initBrowserSpecific() {
+    sjs.tproperty = has(doc.body.style, ['transform', 
+        'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform']);       
+    sjs.animationRequest = has(global, ['mozRequestAnimationFrame', 
+        'webkitRequestAnimationFrame', 'oRequestAnimationFrame', 
+        'msRequestAnimationFrame']);
+    browser_specific_runned = true;
 }
 
 function optionValue(options, name, default_value) {
@@ -110,8 +119,8 @@ function Scene(options) {
     if(this.constructor !== arguments.callee)
         return new Scene(options);
 
-    if(!sjs.tproperty)
-        init_transform_property();
+    if(!browser_specific_runned)
+        initBrowserSpecific();
 
     this.autoPause = optionValue(options, 'autoPause', true);
     // main function
@@ -119,6 +128,9 @@ function Scene(options) {
 
     var div = doc.createElement('div');
     div.style.overflow = 'hidden';
+    // image-rendering: -moz-crisp-edges;
+    // ms-interpolation-mode: nearest-neighbor;
+    div.style.imageRendering = '-webkit-optimize-contrast';
     div.style.position = 'relative';
     div.className = 'sjs';
     div.id = 'sjs' + nb_scene;
@@ -1049,19 +1061,26 @@ Cycle.prototype.go = function gotoCycle(n) {
     return this;
 };
 
-function _Ticker(scene, tickDuration, paint) {
+function _Ticker(scene, paint, options) {
+
+    // backward compatiblity from the 1.1.1 API
+    if(typeof paint == "number") {
+        var buf = paint;
+        paint = options;
+        options = {tickDuration:buf}
+    }
 
     this.scene = scene;
 
     if(this.constructor !== arguments.callee)
         return new _Ticker(tickDuration, paint);
-
+    
+    
+    this.tickDuration = optionValue(options, 'tickDuration', 16);
+    this.useAnimationRequest = optionValue(options, 'useAnimationRequest', false);
+    if(!sjs.animationRequest)
+        this.useAnimationRequest = false;
     this.paint = paint;
-    if(tickDuration === undefined)
-        this.tickDuration = 16;
-    else
-        // FF behave weirdly with anything less than 25
-        this.tickDuration = Math.max(tickDuration, 16);
 
     this.start = new Date().getTime();
     this.ticksElapsed = 0;
@@ -1108,12 +1127,15 @@ _Ticker.prototype.run = function() {
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
     this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) / 2 | 0;
-    // We need some pause to let the browser catch up the update. Here at least 25 ms of pause
-    var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 25);
+
     this.fps = Math.round(1000/(this.now - (this.lastPaintAt || 0)));
     this.lastPaintAt = this.now;
-    //window.webkitRequestAnimationFrame(function(){t.run()});
-    this.timeout = setTimeout(function(){t.run()}, _nextPaint);
+    if(this.useAnimationRequest) {
+        window[sjs.animationRequest](function(){t.run()});
+    } else {
+        var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 6);
+        this.timeout = setTimeout(function(){t.run()}, _nextPaint);
+    }
 }
 
 _Ticker.prototype.pause = function() {
