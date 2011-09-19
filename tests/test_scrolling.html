@@ -48,7 +48,7 @@ scene.loadImages(['tiles.png'], function() {
     });
 
     function paint(ticker) {
-        surface.move(-2 * ticker.lastTicksElapsed, -2 * ticker.lastTicksElapsed);
+        surface.move(-1 * ticker.lastTicksElapsed, -1 * ticker.lastTicksElapsed);
         surface.update();
         if(scene.ticker.currentTick % 30 == 0) {
             fps.innerHTML = ticker.fps;
@@ -56,7 +56,7 @@ scene.loadImages(['tiles.png'], function() {
         }
 
     }
-    scene.Ticker(paint).run()
+    scene.Ticker(paint, {useAnimationRequest:true}).run()
 
 });
 
