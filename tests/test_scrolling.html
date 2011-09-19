@@ -46,8 +46,8 @@ scene.loadImages(['tiles.png'], function() {
         }
     });
 
-    function paint() {
-        surface.move(-2, -2);
+    function paint(ticker) {
+        surface.move(-2 * ticker.lastTicksElapsed, -2 * ticker.lastTicksElapsed);
         surface.update();
         if(scene.ticker.currentTick % 30 == 0) {
             fps.innerHTML = scene.ticker.fps;

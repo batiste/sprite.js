@@ -158,7 +158,7 @@ The list of the different methods available on the Scene object:
 
 .. js:class:: Scene.Ticker(paint, options)
 
-    :param function paint: Get's called at every game tick.
+    :param function paint: Get's called at every game tick. The ticker is passed as first paramater.
     :param object options: The possible options, see :ref:`the Ticker section <ticker>`.
 
     Create a Ticker object for this scene or reset the previous one.
@@ -489,7 +489,7 @@ To setup a ticker:
 
 .. code-block:: javascript
 
-    function paint() {
+    function paint(ticker) {
 
         myCycles.next(ticker.lastTicksElapsed);
         // do your animation and physic here
@@ -623,6 +623,8 @@ that will be true if the key is pressed:
     if(input.keyboard.right) {
         sprite.move(5, 0);
     }
+    if(input.keyboard.z)
+        console.log("Key z is down")
 
 Input.keyboard is a memory of which key is down and up. This is a list of the flags available in the keyboard object:
 
