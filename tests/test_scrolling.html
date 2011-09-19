@@ -7,7 +7,7 @@ html, body{margin:0;padding:0}
 </style>
 </head>
 <body>
-<p>Sprite.js, scrolling surface test. <a href="https://github.com/batiste/sprite.js">Github project page</a> (<span id="fps"></span>FPS)</p>
+<p>Sprite.js, scrolling surface test. <a href="https://github.com/batiste/sprite.js">Github project page</a> (<span id="fps"></span>FPS load <span id="load"></span>%)</p>
 
 <script src="../sprite.js"></script>
 <script src="../lib/scrolling.js"></script>
@@ -20,6 +20,7 @@ scene.loadImages(['tiles.png'], function() {
     var offsetx = 0;
     var offsety = 0;
     var fps = document.getElementById('fps');
+    var load = document.getElementById('load');
 
     function random_from_list(list) {
         var index=Math.floor(Math.random() * list.length);
@@ -50,7 +51,8 @@ scene.loadImages(['tiles.png'], function() {
         surface.move(-2 * ticker.lastTicksElapsed, -2 * ticker.lastTicksElapsed);
         surface.update();
         if(scene.ticker.currentTick % 30 == 0) {
-            fps.innerHTML = scene.ticker.fps;
+            fps.innerHTML = ticker.fps;
+            load.innerHTML = ticker.load;
         }
 
     }
