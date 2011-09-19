@@ -39,7 +39,7 @@ var sjs = {
     Cycle: Cycle,
     Input: Input,
     Scene: Scene,
-    SpriteList:List, // backward compatibility
+    SpriteList:List, // backward compatibility 1.1.1
     List:List,
     Sprite:_Sprite,
     overlay:overlay,
@@ -191,12 +191,12 @@ Scene.prototype.reset = function reset() {
     this.Layer("default");
 }
 
-Scene.prototype.Ticker = function Ticker(tickDuration, paint) {
+Scene.prototype.Ticker = function Ticker(paint, options) {
     if(this.ticker) {
         this.ticker.pause();
         this.ticker.paint = function(){}
     }
-    this.ticker = new _Ticker(this, tickDuration, paint);
+    this.ticker = new _Ticker(this, paint, options);
     return this.ticker;
 };
 

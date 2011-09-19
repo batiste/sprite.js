@@ -146,7 +146,7 @@ The list of the different methods available on the Scene object:
 
 .. js:class:: Scene.Layer(name[, options])
 
-    Create a Layer object, see the Layer section.
+    Create a Layer object, see :ref:`the Layer section <layer>`.
 
 .. js:class:: Scene.Sprite([source, layer|options])
 
@@ -154,12 +154,12 @@ The list of the different methods available on the Scene object:
     :param Layer layer: the layer object.
     :param object options: options.
 
-    Create a Sprite object, see the Sprite section.
+    Create a Sprite object, see :ref:`the Sprite section <sprite>`.
 
-.. js:class:: Scene.Ticker(tickDuration, paint)
+.. js:class:: Scene.Ticker(paint, options)
 
-    :param number tickDuration: duration in milliseconds of each game tick.
     :param function paint: Get's called at every game tick.
+    :param object options: The possible options, see :ref:`the Ticker section <ticker>`.
 
     Create a Ticker object for this scene or reset the previous one.
 
@@ -167,12 +167,14 @@ The list of the different methods available on the Scene object:
 
     :param Array triplets: The triplets array.
 
-    Alias for sjs.Cycle, look at the Cycle section.
+    Alias for sjs.Cycle, see :ref:`the Cycle section <cycle>`.
 
 .. js:class:: Scene.Input()       
 
-    Alias for sjs.Input, look at Input section                           
+    Alias for sjs.Input, see :ref:`the Input section <input>`.
 
+
+.. _sprite:
 
 Sprite object public methods and attributes
 ===========================================
@@ -472,6 +474,8 @@ Example of use:
     }
 
 
+.. _ticker:
+
 Ticker object
 ==============
 
@@ -491,13 +495,22 @@ To setup a ticker:
         // do your animation and physic here
 
     }
-    var ticker = scene.Ticker(35, paint); // we want a tick every 35ms
+    var ticker = scene.Ticker(paint);
 
 
-.. js:class:: Scene.Ticker(duration, callback)
+.. js:class:: Scene.Ticker(callback, options)
 
-    :param number duration: The duration of each tick in millisecondes.
-    :param function callback: The function that will be called after each tick.
+    :param function paint: Get's called at every game tick.
+    :param object options: The possible options:
+
+        .. js:attribute:: options.tickDuration
+
+            Duration in milliseconds of each game tick.
+
+        .. js:attribute:: options.useAnimationRequest
+
+            If true the ticker will use a `requestAnimationFrame <https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame>`_ callback instead of a standard setTimeout. 
+
 
 .. js:function:: Ticker.run()
 
@@ -524,6 +537,8 @@ To setup a ticker:
 .. js:attribute:: Ticker.currentTick
 
     The amount of elapsed ticks that have been played since the creation the the ticker.
+
+.. _cycle:
 
 Cycle object
 ============
@@ -594,6 +609,7 @@ Cycle complete reference:
 
     If set to false, the cycle will stop automaticaly after one run. The default value is true.
 
+.. _input:
 
 Input object
 =============
@@ -652,6 +668,8 @@ If you need to know which key has just been pressed or released during the last 
 
     The mouse object contains the position of the mouse and if the mouse is clicked. 
 
+
+.. _layer:
 
 Layer object
 =============
