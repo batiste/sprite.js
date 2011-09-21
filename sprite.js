@@ -1090,11 +1090,12 @@ function _Ticker(scene, paint, options) {
 }
 
 _Ticker.prototype.next = function() {
+    var now = new Date().getTime();
+    this.diff = now - this.now;
+    this.now = now;
     // number of ticks that have elapsed since the last start
-    var ticksElapsed = ((this.now - this.start) / this.tickDuration) | 0;
-    // the diff from last run
-    this.lastTicksElapsed = ticksElapsed - this.ticksSinceLastStart;
-    this.ticksSinceLastStart = ticksElapsed;
+    this.lastTicksElapsed = Math.round(this.diff / this.tickDuration);
+    this.ticksSinceLastStart += this.lastTicksElapsed;
     // add the diff to the current ticks
     this.currentTick += this.lastTicksElapsed;
     return this.lastTicksElapsed;
@@ -1104,7 +1105,6 @@ _Ticker.prototype.run = function() {
     if(this.paused)
         return;
     var t = this;
-    this.now = new Date().getTime();
     var ticksElapsed = this.next();
     // no update needed, this happen on the first run
     if(ticksElapsed == 0) {
@@ -1131,6 +1131,7 @@ _Ticker.prototype.run = function() {
     this.fps = Math.round(1000/(this.now - (this.lastPaintAt || 0)));
     this.lastPaintAt = this.now;
     if(this.useAnimationRequest) {
+        this.tickDuration = 16;
         window[sjs.animationRequest](function(){t.run()});
     } else {
         var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 6);
