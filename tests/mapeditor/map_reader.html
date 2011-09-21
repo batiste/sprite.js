@@ -1,13 +1,16 @@
 <!DOCTYPE html><html>
 <head>
 <title>Read map</title>
+<meta name = "viewport" content = "width=device-width">
 <style>
 html, body{margin:0;padding:0}
-<meta name = "viewport" content = "width=device-width">
+.sjs{
+    border:2px #999 solid;
+}
 </style>
 </head>
 <body>
-
+<p><a href="http://www.mapeditor.org/">Map Editor</a> JSON map reader. Use keyboard to move.</p>
 <script src="../../sprite.js"></script>
 <script src="../../lib/scrolling.js"></script>
 <script>
@@ -63,13 +66,14 @@ scene.loadImages(['tiles.png'], function() {
 
 
     var surface= sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, _x, _y) {
+        _x = _x / 48.0 | 0;
+        _y = _y / 48.0 | 0;
+        layer.clear();
 
         for(var x = 0; x < (layer.w / 48); x++) {
             for(var y = 0; y < (layer.h / 48); y++) {
-                
                 if(grid) {
                     var gid = grid['c'+(_x + x)+';'+(_y + y)];
-                    
                     if(gid) {
                         var tile = getTile(gid);
                         // we need to update the position as the Sprites are shared
