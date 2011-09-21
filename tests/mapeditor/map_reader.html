@@ -1,0 +1,104 @@
+<!DOCTYPE html><html>
+<head>
+<title>Read map</title>
+<style>
+html, body{margin:0;padding:0}
+<meta name = "viewport" content = "width=device-width">
+</style>
+</head>
+<body>
+
+<script src="../../sprite.js"></script>
+<script src="../../lib/scrolling.js"></script>
+<script>
+
+var grid = null;
+var map = null;
+var layers = [];
+var tilesets = [];
+
+function mapCallback(_map) {
+    map = _map;
+    
+    for(index in map.layers) {
+        var layer = map.layers[index];
+        if(layer.type=="tilelayer") {
+            grid = layer.grid;
+            layers.push(layer)
+        }
+    }
+}
+
+function getTile(gid) {
+    gid = gid-1;
+    var layer = layers[0];
+    var tileset = map.tilesets[0];
+
+    var nb_x = tileset.imagewidth / 48. | 0;
+
+    //var nb_y = tileset.imageheight / 48. | 0;
+
+    var x = gid % nb_x;
+    var y = gid / nb_x | 0;
+
+    var sp = scene.Sprite('tiles.png', {w:48, h:48, xoffset:x * 48, yoffset:y * 48});
+    return sp;
+}
+
+
+
+var map_source = document.createElement('script');
+map_source.src = 'map.json';
+document.head.appendChild(map_source);
+
+var scene = sjs.Scene({w:672, h:480, autoPause:false});
+
+scene.loadImages(['tiles.png'], function() {
+
+    var offsetx = 0;
+    var offsety = 0;
+    var fps = document.getElementById('fps');
+    var load = document.getElementById('load');
+    var input = scene.Input();
+
+
+    var surface= sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, _x, _y) {
+
+        for(var x = 0; x < (layer.w / 48); x++) {
+            for(var y = 0; y < (layer.h / 48); y++) {
+                
+                if(grid) {
+                    var gid = grid['c'+(_x + x)+';'+(_y + y)];
+                    
+                    if(gid) {
+                        var tile = getTile(gid);
+                        // we need to update the position as the Sprites are shared
+                        tile.position(48 * x, 48 * y);
+                        tile.canvasUpdate(layer);
+                    }
+                }
+
+            }
+        }
+    });
+
+    function paint(ticker) {
+        if(input.keyboard.up)
+            surface.move(0, -4 * ticker.lastTicksElapsed);
+        if(input.keyboard.down)
+            surface.move(0, 4 * ticker.lastTicksElapsed);
+        if(input.keyboard.left)
+            surface.move(-4 * ticker.lastTicksElapsed, 0);
+        if(input.keyboard.right)
+            surface.move(4 * ticker.lastTicksElapsed, 0);
+        surface.update();
+        if(scene.ticker.currentTick % 30 == 0) {
+
+        }
+
+    }
+    scene.Ticker(paint, {useAnimationRequest:true}).run()
+
+});
+
+</script>
