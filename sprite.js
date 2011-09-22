@@ -1083,6 +1083,7 @@ function _Ticker(scene, paint, options) {
     this.paint = paint;
 
     this.start = new Date().getTime();
+    this.now = this.start;
     this.ticksElapsed = 0;
     // absolute number of ticks that have been played ever
     this.currentTick = 0;
