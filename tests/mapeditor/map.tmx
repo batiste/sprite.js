@@ -1,14 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <map version="1.0" orientation="orthogonal" width="20" height="16" tilewidth="48" tileheight="48">
  <tileset firstgid="1" name="tiles" tilewidth="48" tileheight="48">
-  <image source="../../../../tiles.png" width="1022" height="512"/>
+  <image source="tiles.png" width="1022" height="512"/>
+  <tile id="116">
+   <properties>
+    <property name="collides" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="background" width="20" height="16">
   <data encoding="base64" compression="zlib">
-   eJx1lE1KxEAUhPsKrkS3Km4Et+od1J3ixls0DbpOxguIkp8LiJKZuYAiieOxrIYqpugZFx/d5P3Ve3lJFUKowQw8gR5UIIEWdKDhvSKN3ecF8o3MteSzgfaF3SuzNWRibOTd45aMcb3um+MPwCE4Ymzu4weswK/FR8ZLb0e9PZ93jD8D5+ACjKwzWc5ydol6I/Xu0LZg/CW4AtfUEhkvDcm0LK2m6q2Yr6Ytms1nE1mznNewJWf2PaaP26Lp0jO992fwAl7/eU9eUzN2H8+X7W/gHXzQlgqN6qlnHvX1YPPQDmT7J/gC30V93+Wa5xg296BlvnJ+mrPH74I9sM88KWzu2dz0qU72eQzr3W95noB7cBrWO+w6auvXtXifmnU+b8AtuGOv3m+yU/rK96WYiedQ+KkX6dO/QHsxcA7l3s1s/q5Ze6tvw7+5cUuejr6uYbQ5lfgM/wA8rL3+
+   eJx1lDtOxDAYhH0FKiQEDQ/RQAENj2o7KqADcQhKKwV1slwAgTbZCyBQdvcCIJSwHIuxNKOMzFJ8suX/Nf79J2UIoQJj8AimoAQFqEEDJtyXZGL7WYZ8I3MteNbSPrd9abYJ6Rkbufe4BWNcr/um+B2wC/YYm+7xDZbgx+Ij46W3od4pzxvGn4IzcA461uktZ967gnoj9a7RNmf8JbgC19QSGS8NhWlZWE3VWzJfRVs0m/cmsmber3ZFzuS7Tx+3RdOlM737E3gGL/+8k9dUj93H8yX7K3gD77QVmcZ1sMG+tHavURjmQDOQ7B/gE3xl9bXfBFvM04W/c1AzX94/9VnnJbUdgWOwDe55PgrDnM1Mn+okn4cwzH7N9QAcggtwwjyuoyLSJ5vfU71O6w24BXe8q9+3sFX68vdSTM+1zfx0F+nTv0Bz0bIP+dyNrf+uWXOrb8O/uW5Fnoa+rqGzPuV4D38BAZa6tg==
   </data>
  </layer>
- <objectgroup name="Object Layer 1" width="20" height="16">
-  <object x="37" y="33" width="68" height="45"/>
- </objectgroup>
+ <layer name="front" width="20" height="16">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo4D+QA2I1alonjUQ21DRvAAgDqSiedQGo+FHHQAAPQwCyw==
+  </data>
+ </layer>
+ <layer name="Tile Layer 3" width="20" height="16">
+  <data encoding="base64" compression="zlib">
+   eJxjYKAOEIRiagJqmzcKBhcYjd9RMNAAABqjAEU=
+  </data>
+ </layer>
 </map>

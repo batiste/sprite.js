@@ -15,10 +15,12 @@ html, body{margin:0;padding:0}
 <script src="../../lib/scrolling.js"></script>
 <script>
 
-var grid = null;
 var map = null;
-var layers = [];
-var tilesets = [];
+var tilelayers = [];
+
+var map_source = document.createElement('script');
+map_source.src = 'map.json';
+document.head.appendChild(map_source);
 
 function mapCallback(_map) {
     map = _map;
@@ -26,33 +28,41 @@ function mapCallback(_map) {
     for(index in map.layers) {
         var layer = map.layers[index];
         if(layer.type=="tilelayer") {
-            grid = layer.grid;
-            layers.push(layer)
+            tilelayers.push(layer)
         }
     }
 }
 
-function getTile(gid) {
+function findTileset(gid) {
+    // find the tileset for the gid
+    var tileset = null;
+    for(var i=0; i<map.tilesets.length; i++) {
+        tileset = map.tilesets[i];
+        if(gid < tileset.gid) {
+            tileset = map.tilesets[i-1];
+            break;
+        }
+    }
+    return tileset;
+}
+
+function getSprite(gid) {
+    // return the sprite according to the gid
+    var tileset = findTileset(gid);
     gid = gid-1;
-    var layer = layers[0];
-    var tileset = map.tilesets[0];
+    var tw = tileset.tilewidth;
+    var th = tileset.tileheight;
 
-    var nb_x = tileset.imagewidth / 48. | 0;
-
-    //var nb_y = tileset.imageheight / 48. | 0;
+    var nb_x = tileset.imagewidth / tw | 0;
+    var nb_y = tileset.imageheight / th | 0;
 
     var x = gid % nb_x;
     var y = gid / nb_x | 0;
 
-    var sp = scene.Sprite('tiles.png', {w:48, h:48, xoffset:x * 48, yoffset:y * 48});
+    var sp = scene.Sprite(tileset.image, {w:tw, h:th, xoffset:x * tw, yoffset:y * th});
     return sp;
 }
 
-
-
-var map_source = document.createElement('script');
-map_source.src = 'map.json';
-document.head.appendChild(map_source);
 
 var scene = sjs.Scene({w:672, h:480, autoPause:false});
 
@@ -66,22 +76,25 @@ scene.loadImages(['tiles.png'], function() {
 
 
     var surface= sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, _x, _y) {
+        if(map==null)
+            return;
+
         _x = _x / 48.0 | 0;
         _y = _y / 48.0 | 0;
         layer.clear();
 
         for(var x = 0; x < (layer.w / 48); x++) {
             for(var y = 0; y < (layer.h / 48); y++) {
-                if(grid) {
-                    var gid = grid['c'+(_x + x)+';'+(_y + y)];
+                for(var i in tilelayers) {
+                    var tilelayer = tilelayers[i]; 
+                    var gid = tilelayer.grid['c'+(_x + x)+';'+(_y + y)];
                     if(gid) {
-                        var tile = getTile(gid);
+                        var tile = getSprite(gid);
                         // we need to update the position as the Sprites are shared
                         tile.position(48 * x, 48 * y);
                         tile.canvasUpdate(layer);
                     }
                 }
-
             }
         }
     });
