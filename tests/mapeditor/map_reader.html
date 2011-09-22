@@ -10,7 +10,8 @@ html, body{margin:0;padding:0}
 </style>
 </head>
 <body>
-<p><a href="http://www.mapeditor.org/">Map Editor</a> JSON map reader. Use keyboard to move.</p>
+<p><a href="http://www.mapeditor.org/">Map Editor</a> JSON map reader. Use keyboard to move.
+(<span id="fps"></span>FPS, load <span id="load"></span>%)</p>
 <script src="../../sprite.js"></script>
 <script src="../../lib/scrolling.js"></script>
 <script>
@@ -97,7 +98,8 @@ scene.loadImages(['tiles.png'], function() {
             surface.move(4 * ticker.lastTicksElapsed, 0);
         surface.update();
         if(scene.ticker.currentTick % 30 == 0) {
-
+            fps.innerHTML = ticker.fps;
+            load.innerHTML = ticker.load;
         }
 
     }
