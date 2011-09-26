@@ -614,8 +614,7 @@ Cycle complete reference:
 Input object
 =============
 
-The input object deals with user input. There are a number of flags for keys
-that will be true if the key is pressed:
+The input object remember user inputs within each game tick:
 
 .. code-block:: javascript
 
@@ -626,8 +625,6 @@ that will be true if the key is pressed:
     if(input.keyboard.z)
         console.log("Key z is down")
 
-Input.keyboard is a memory of which key is down and up. This is a list of the flags available in the keyboard object:
-
 .. js:class:: scene.Input()
 
     Creates an Input object for the scene.
@@ -635,6 +632,7 @@ Input.keyboard is a memory of which key is down and up. This is a list of the fl
 
 .. js:attribute:: Input.keyboard
 
+    Input.keyboard is a memory of which key is down and up.
     In addition to the normal keyboard keys, the keyboard object keep track of those special keyboard states:
 
     .. code-block:: javascript
@@ -668,8 +666,21 @@ If you need to know which key has just been pressed or released during the last 
 
 .. js:attribute:: Input.mouse
 
-    The mouse object contains the position of the mouse and if the mouse is clicked. 
+    The mouse object contains the position of the mouse and if the mouse is clicked.
 
+    .. code-block:: javascript
+
+        if(mouse.position.x < scene.w / 2)
+            player.move(-2, 0);
+
+        if(mouse.click)
+            console.log(mouse.click.x, mouse.click.y);
+
+Touch events
+----------------------------
+
+A small swipe update the keyboard in the wanted direction and a tap should
+count as a space button. The mouse position and clicks are also updated by the tap ant touch events.
 
 .. _layer:
 

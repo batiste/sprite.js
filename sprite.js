@@ -1180,14 +1180,12 @@ function _Input(scene) {
     this.mousereleased = false;
     this.keydown = false;
 
-    this.touchable = 'createTouch' in doc;
-    this.touchTap = {};
-    this.touchChange = {};
+    this.touchable = 'ontouchstart' in global;
 
     this.next = function() {
         that.keyboardChange = {};
         that.mousepressed = false;
-        that.mouse.click = false;
+        that.mouse.click = undefined;
         that.mousereleased = false;
     }
 
@@ -1242,93 +1240,98 @@ function _Input(scene) {
     var addEvent = function(name, fct) {
         global.addEventListener(name, fct, false);
     }
-
-    if (this.touchable) {
-        addEvent("touchstart", function(e) {
-            updateKeyChange('space', true); // tap imitates space
-            for(var i = 0; i < e.changedTouches.length; i++) {
-                var touch = e.changedTouches[i];
-                //store initial coordinates to find out swipe directions later
-                that.touchTap[touch.identifier] = {"x" : touch.clientX, "y": touch.clientY};
-            };
-        });
-
-      addEvent("touchend", function(e) {
-            that.keyboard = {}
-            for(var i = 0; i < e.changedTouches.length; i++) {
-                var touch = e.changedTouches[i];
-                that.touchTap[touch.identifier] = null;
-            }
-      });
-
-      addEvent("touchmove", function(e) {
-            e.preventDefault(); // avoid scrolling the page
-            updateKeyChange('space', false); // if it moves: it is not a tap
-            for(var i = 0; i < e.changedTouches.length; i++) {
-                var touch = e.changedTouches[i];
-                var start = that.touchTap[touch.identifier];
-                if (start) {
-                    var deltaX = start["x"] - touch.clientX;
-                    var deltaY = start["y"] - touch.clientY;
-                    //swipe is more vertical than horizontal
-                    if(Math.abs(deltaY) > Math.abs(deltaX)){
-                        if (deltaY > 0){
-                            updateKeyChange('up', true);
-                        } else {
-                            updateKeyChange('down', true);
-                        };
-                    } else {
-                        if (deltaX > 0){
-                            updateKeyChange('left', true);
-                        } else {
-                            updateKeyChange('right', true);
-                        };
-                    };
-                }
-            }
-        });
-    };
-
-
-    addEvent("touchstart", function(event) {
-        that.mousedown = true;
-        that.mouse.down = true;
-    });
-
-    addEvent("touchend", function(event) {
-        that.mousedown = false;
-        that.mouse.down = false;
-    });
-
-    addEvent("touchmove", function(event) {});
-
-    addEvent("mousedown", function(event) {
-        that.mousedown = true;
-        that.mouse.down = true;
-        that.mousepressed = true;
-        // prevent unwanted browser drag and drop behavior
-        event.preventDefault();
-    });
-
-    addEvent("mouseup", function(event) {
-        that.mousedown = false;
-        that.mouse.down = false;
-        that.mousereleased = true;
-    });
-
-    addEvent("click", function(event) {
+    
+    // Mouse like events
+    function clickEvent(event) {
         that.mouse.click = {
             x:event.clientX - that.dom.offsetLeft,
             y:event.clientY - that.dom.offsetTop
         };
-    });
-
-    addEvent("mousemove", function(event) {
+    }
+    
+    function mouseDownEvent(event) {
+        that.mousedown = true;
+        that.mouse.down = true;
+        that.mousepressed = true;
+        // prevent unwanted browser drag and drop behavior
+        event.preventDefault(); 
+    }
+    
+    function mouseUpEvent(event) {
+        that.mousedown = false;
+        that.mouse.down = false;
+        that.mousereleased = true;
+    }
+    
+    function mouseMoveEvent(event) {
         that.mouse.position = {
             x:event.clientX - that.dom.offsetLeft,
             y:event.clientY - that.dom.offsetTop
         };
-    });
+    }
+    
+    function reduceTapEvent(e) {
+        // To simplify I ignore multiple touch events and only return the first event
+        if(e.touches && e.touches.length) { e = e.touches[0]; }
+        else if(e.changedTouches && e.changedTouches.length) { e = e.changedTouches[0];}
+        return e
+    }
+
+    if (this.touchable) {
+        addEvent("touchstart", function(e) {
+            e = reduceTapEvent(e);
+            updateKeyChange('space', true); // tap imitates space
+            // simulate the click
+            clickEvent(e);
+            //store initial coordinates to find out swipe directions later
+            that.touchStart = {"x" : e.clientX, "y": e.clientY};
+
+        });
+
+      addEvent("touchend", function(e) {
+            mouseUpEvent(e);
+            that.keyboard = {}
+            that.touchStart = null;
+      });
+
+      addEvent("touchmove", function(e) {
+            e.preventDefault(); // avoid scrolling the page
+            e = reduceTapEvent(e);
+            updateKeyChange('space', false); // if it moves: it is not a tap
+            mouseMoveEvent(e);
+            if (that.touchStart) {
+                var deltaX = e.clientX - that.touchStart.x;
+                var deltaY = e.clientY - that.touchStart.y;
+                // limit of 3 pixels
+                if (deltaY < 0) {
+                    updateKeyChange('up', true);
+                } else {
+                    updateKeyChange('down', true);
+                };
+                if (deltaX < 0) {
+                    updateKeyChange('left', true);
+                    updateKeyChange('right', false);
+                } else {
+                    updateKeyChange('right', true);
+                    updateKeyChange('left', false);
+                };
+                // increase the control of the swipe in 
+                // the long run.
+                that.touchStart.x += (deltaX / 10);
+                that.touchStart.y += (deltaY / 10);
+            }
+        });
+      
+        addEvent("touchmove", function(e) {
+            e = reduceTapEvent(e);
+            mouseMoveEvent(e);
+        });
+    };
+
+    addEvent("mousedown", mouseDownEvent);
+    addEvent("mouseup", mouseUpEvent);
+    addEvent("click", clickEvent);
+    addEvent("mousemove", mouseMoveEvent);
 
     addEvent("keydown", function(e) {
         that.keydown = true;
@@ -1342,8 +1345,6 @@ function _Input(scene) {
 
     // can be used to avoid key jamming
     addEvent("keypress", function(e) {});
-    // make sure that the keyboard is reseted when
-    // the user leave the page
 }
 
 _Input.prototype.arrows = function arrows() {
