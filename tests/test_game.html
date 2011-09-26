@@ -39,7 +39,8 @@ window.onload = function() {
 
     var p = scene.Sprite('ground.png');
     p.move(150, 400);
-    p.setW(50);
+    p.setW(60);
+    p.rotate(-0.2);
     p.xv = 1.2;
 
     plateforms.push(p);
@@ -49,6 +50,7 @@ window.onload = function() {
     var p = scene.Sprite('ground.png');
     p.move(150, 320);
     p.setW(50);
+    p.rotate(0.2);
     p.xv = 1.5;
 
     plateforms.push(p);
@@ -123,7 +125,7 @@ window.onload = function() {
             p.move(p.xv, 0);
         }
 
-        if(input.keyboard.up && yv >= 0) {
+        if((input.keyboard.up || input.keyboard.space) && yv >= 0) {
             if(has_contact)
                 yv = -7;
             else

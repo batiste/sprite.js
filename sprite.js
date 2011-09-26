@@ -1305,8 +1305,10 @@ function _Input(scene) {
                 // limit of 3 pixels
                 if (deltaY < 0) {
                     updateKeyChange('up', true);
+                    updateKeyChange('down', false);
                 } else {
                     updateKeyChange('down', true);
+                    updateKeyChange('up', false);
                 };
                 if (deltaX < 0) {
                     updateKeyChange('left', true);

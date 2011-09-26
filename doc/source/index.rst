@@ -877,6 +877,10 @@ A node object should implement those 4 methods:
     Return true if the current node cannot be used to find the path.
 
 
+Project that uses sprite.js
+==============================
+
+Webattle.js : https://github.com/medwezys/webattle.js
 
 Troubleshooting
 ====================
