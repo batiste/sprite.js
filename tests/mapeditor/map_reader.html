@@ -18,6 +18,7 @@ html, body{margin:0;padding:0}
 
 var map = null;
 var tilelayers = [];
+var scene = sjs.Scene({w:672, h:480, autoPause:false});
 
 var map_source = document.createElement('script');
 map_source.src = 'map.json';
@@ -32,6 +33,8 @@ function mapCallback(_map) {
             tilelayers.push(layer)
         }
     }
+
+    scene.loadImages(['tiles.png'], main);
 }
 
 function findTileset(gid) {
@@ -45,6 +48,8 @@ function findTileset(gid) {
         }
     }
     return tileset;
+
+
 }
 
 function getSprite(gid) {
@@ -64,10 +69,7 @@ function getSprite(gid) {
     return sp;
 }
 
-
-var scene = sjs.Scene({w:672, h:480, autoPause:false});
-
-scene.loadImages(['tiles.png'], function() {
+function main() {
 
     var offsetx = 0;
     var offsety = 0;
@@ -118,6 +120,6 @@ scene.loadImages(['tiles.png'], function() {
     }
     scene.Ticker(paint, {useAnimationRequest:true}).run()
 
-});
+}
 
 </script>
