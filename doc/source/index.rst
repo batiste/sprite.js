@@ -582,7 +582,7 @@ Cycle complete reference:
 .. js:function:: Cycle.next([ticks, update])
 
     :param number ticks: The number of ticks you want to go forward. The default value is 1.
-    :param boolean update: if true, the sprite's offsets will automaticaly updated.
+    :param boolean update: if true, the sprite's offsets will be automaticaly updated.
 
     Calling the next method doesn't necessarly involve an offset change. It does only when all the ticks on current
     triplet have been consumed.
@@ -593,7 +593,7 @@ Cycle complete reference:
 
 .. js:function:: Cycle.reset(update)
 
-    :param boolean update: if true, the sprite's offsets will automaticaly updated.
+    :param boolean update: if true, the sprite's offsets will be automaticaly updated.
 
     Reset the cycle offsets to the original position.
 
@@ -603,7 +603,7 @@ Cycle complete reference:
 
 .. js:attribute:: Cycle.done
 
-    Can be used to check if the cycle has completed. The value stays false if cycle is repeating.
+    This attribute can checked to know if the cycle has completed. The value stays false if cycle is repeating.
 
 .. js:attribute:: Cycle.repeat
 
