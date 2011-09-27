@@ -54,7 +54,7 @@ Example of a basic use:
         sp.move(100, 100);
         sp.rotate(3.14 / 4);
         sp.scale(2);
-        sp.opacity = 0.8;
+        sp.setOpacity(0.8);
 
         sp.update();
     });
