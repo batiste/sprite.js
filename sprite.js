@@ -1079,9 +1079,9 @@ function _Ticker(scene, paint, options) {
     
     
     this.tickDuration = optionValue(options, 'tickDuration', 16);
-    this.useAnimationFrame = optionValue(options, 'useAnimationFrame', false);
+    this.useAnimationFrame = optionValue(options, 'AnimationFrame', false);
     if(!sjs.AnimationFrame)
-        this.useAnimationRequest = false;
+        this.useAnimationFrame = false;
     this.paint = paint;
 
     this.start = new Date().getTime();
@@ -1133,7 +1133,7 @@ _Ticker.prototype.run = function() {
 
     this.fps = Math.round(1000/(this.now - (this.lastPaintAt || 0)));
     this.lastPaintAt = this.now;
-    if(this.useAnimationRequest) {
+    if(this.useAnimationFrame) {
         this.tickDuration = 16;
         window[sjs.animationRequest](function(){t.run()});
     } else {
