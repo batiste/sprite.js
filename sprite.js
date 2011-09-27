@@ -1079,7 +1079,7 @@ function _Ticker(scene, paint, options) {
     
     
     this.tickDuration = optionValue(options, 'tickDuration', 16);
-    this.useAnimationFrame = optionValue(options, 'AnimationFrame', false);
+    this.useAnimationFrame = optionValue(options, 'useAnimationFrame', false);
     if(!sjs.AnimationFrame)
         this.useAnimationRequest = false;
     this.paint = paint;

@@ -76,7 +76,7 @@ window.onload = function() {
     var useReq = false;
     req.onclick = function() {
         useReq = req.checked;
-        ticker.useAnimationRequest = useReq;
+        ticker.useAnimationFrame = useReq;
     }
     if(!sjs.animationRequest)
         req.disabled = "disabled";
