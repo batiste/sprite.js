@@ -14,6 +14,7 @@ Sprite.js, exploding crates <a href="https://github.com/batiste/sprite.js">Githu
 
 </body>
 <script src="../sprite.js"></script>
+<script src="../lib/collision.js"></script>
 <script>
 
 window.onload = function() {
@@ -49,21 +50,22 @@ scene.loadImages(['crate.png'], function() {
             crates.add(crate);
         }
 
+        var collisions = sjs.collision.find(crates.list, ground);
+
         var crate;
         while(crate = crates.iterate()) {
-            crate.yv += gravity;
-            crate.applyVelocity();
-            if(crate.collidesWith(ground) || crate.collidesWithArray(crates.list)) {
+            if(collisions[crate]) {
                 crate.reverseVelocity();
                 crate.yv = -crate.yv / 2;
                 crate.rv = -crate.rv / 1.1;
-                //crate.applyVelocity();
+            } else {
+                crate.yv += gravity;
+                crate.applyVelocity();
             }
             crate.update();
         }
 
     };
-
 
     var ticker = scene.Ticker(30, paint);
     ticker.run();

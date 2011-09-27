@@ -10,28 +10,19 @@ This is Sprite.js documentation
 Sprite.js is a framework that lets you create animations and games
 using sprites in an efficient way. The goal is to have common
 framework for Desktop and mobile browsers and using the latest technology available on each plateform.
+Sprite.js is tested on WebKit, Firefox, Android phones, Opera and IE9.
 
-Sprite.js has been tested on Chromium, Firefox, Android emulator, Opera and IE9.
+To download the latest version of sprite.js `go to the Github repository <https://github.com/batiste/sprite.js>`_
+or use the `direct link to the library <https://raw.github.com/batiste/sprite.js/master/sprite.js>`_.
 
-To download the latest version of sprite.js, go to the github repository:
-
-https://github.com/batiste/sprite.js
-
-For an example of a game made with sprite.js there is an example game named "The invasion of the evil lords":
-
-http://batiste.dosimple.ch/games/rpg/game.html
-
-For an example of the what the framework offers, have a look at the test files:
-
-http://batiste.dosimple.ch/sprite.js/tests/
-
+To see examples of what the framework has to offers `have a look at the test files <http://batiste.dosimple.ch/sprite.js/tests/>`_.  There is also :ref:`a list of projects that uses sprite.js <examples>`.
 
 .. toctree::
    :maxdepth: 2
 
 
-Example usage
-=================
+How to use sprite.js?
+=======================
 
 
 Example of a basic use:
@@ -176,7 +167,7 @@ The list of the different methods available on the Scene object:
 
 .. _sprite:
 
-Sprite object public methods and attributes
+Sprite object
 ===========================================
 
 
@@ -247,7 +238,7 @@ With a canvas engine, the surface will be automaticaly cleared before each game 
 to draw the sprite on the canvas again. If you don't want to do this you can set the layer autoClear attribute to false.
 
 
-Read only Sprite attributes
+Read only attributes
 ------------------------------
 
 For technichal and performance reasons Sprite's attributes needs to be changed using a setters method. The following
@@ -296,7 +287,7 @@ attributes are *READ ONLY*:
     Background color of the sprite. Use the rgb/hexadecimal CSS notation.
 
 
-Sprite setters
+Setters
 -------------------
 
 If you want to change any of those attributes use the following setters:
@@ -334,7 +325,7 @@ Or one of those helper methods:
     Set the width and height of the visible sprite.
 
 
-Sprite physic
+Physic
 -------------------
 
 Sprites comes with methods that can help you implement a basic physic engine:
@@ -365,7 +356,6 @@ Sprites comes with methods that can help you implement a basic physic engine:
 
     Apply the horizontal xv velocity.
 
-
 .. js:function:: Sprite.applyYVelocity()
 
     Apply the vertical yv velocity.
@@ -377,6 +367,28 @@ Sprites comes with methods that can help you implement a basic physic engine:
 .. js:function:: Sprite.reverseYVelocity()
 
     Apply the vertical yv velocity negatively.
+
+.. js:function:: Sprite.rotateVelocity(angle)
+
+    Rotate the velocity vector according to the provided angle.
+
+.. js:function:: Sprite.pointVelocityTo(x, y)
+    
+    Point the velocity vector in a given direction point. The intensity stay unchanged.
+
+.. js:function:: Sprite.distance(sprite)
+
+    Return the distance between 2 sprite center.
+
+.. js:function:: Sprite.distance(x, y)       
+
+    Return the distance between the sprite center and the point (x, y)
+
+
+
+
+Collision detection
+-------------------------
 
 .. js:function:: Sprite.isPointIn(x, y)
 
@@ -392,13 +404,7 @@ Sprites comes with methods that can help you implement a basic physic engine:
 
     Search in  an array of sprite for a colliding sprite. If found, a sprite is returned.
 
-.. js:function:: Sprite.distance(sprite)
 
-    Return the distance between 2 sprite center.
-
-.. js:function:: Sprite.distance(x, y)       
-
-    Return the distance between the sprite center and the point (x, y)
 
 
 Special effects
@@ -507,7 +513,7 @@ To setup a ticker:
 
             Duration in milliseconds of each game tick.
 
-        .. js:attribute:: options.useAnimationRequest
+        .. js:attribute:: options.useAnimationFrame
 
             If true the ticker will use a `requestAnimationFrame <https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame>`_ callback instead of a standard setTimeout. 
 
@@ -680,7 +686,7 @@ Touch events
 ----------------------------
 
 A small swipe update the keyboard in the wanted direction and a tap should
-count as a space button. The mouse position and clicks are also updated by the tap ant touch events.
+count as a space button. The mouse position and clicks are also updated by the touch events.
 
 .. _layer:
 
@@ -877,10 +883,13 @@ A node object should implement those 4 methods:
     Return true if the current node cannot be used to find the path.
 
 
-Project that uses sprite.js
+.. _examples:
+
+Projects that uses sprite.js
 ==============================
 
-Webattle.js : https://github.com/medwezys/webattle.js
+* `Webattle.js <https://github.com/medwezys/webattle.js>`_ is a multiplayer HTML5 game using nodejs.
+* `"The invasion of the evil lords" <http://batiste.dosimple.ch/games/rpg/game.html>`_. is a demo RPG with different creatures and a boss.
 
 Troubleshooting
 ====================

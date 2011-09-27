@@ -342,6 +342,8 @@ function _Sprite(scene, src, layer) {
     this.opacity = 1;
     this.color = false;
 
+    this.id = new Date().getTime();
+    
     // necessary to get set
     this.layer = null;
 
@@ -720,7 +722,7 @@ _Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
 };
 
 _Sprite.prototype.toString = function () {
-    return String(this.x) + ',' + String(this.y);
+    return "Sprite(" + String(this.id) + ")";
 };
 
 _Sprite.prototype.onload = function(callback) {
@@ -1077,8 +1079,8 @@ function _Ticker(scene, paint, options) {
     
     
     this.tickDuration = optionValue(options, 'tickDuration', 16);
-    this.useAnimationRequest = optionValue(options, 'useAnimationRequest', false);
-    if(!sjs.animationRequest)
+    this.useAnimationFrame = optionValue(options, 'AnimationFrame', false);
+    if(!sjs.AnimationFrame)
         this.useAnimationRequest = false;
     this.paint = paint;
 

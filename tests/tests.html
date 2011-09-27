@@ -282,6 +282,13 @@ window.onload = function() {
         ticker.pause();
     }, 50);
 
+    var obj = {}
+    obj[sp1] = 3;
+    
+    assertEqual(obj[sp1], 3, "Test object hash access with a Sprite 1");
+    sp1.move(10, 5);
+    assertEqual(obj[sp1], 3, "Test object hash access with a Sprite 2");
+
 };
 </script>
 </html>
