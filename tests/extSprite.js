@@ -22,8 +22,8 @@ sjs.Sprite.prototype.updateUnit = function updateUnit(ticks) {
         
         var tn = sjs.math.hypo(tx,ty);
         if( tn > 10){
-            tx = 400*tx/tn;
-            ty = 400*ty/tn;
+            tx = 3 * tx/tn;
+            ty = 3 * ty/tn;
             this.addForce(tx,ty)
         } else {
             
@@ -31,17 +31,6 @@ sjs.Sprite.prototype.updateUnit = function updateUnit(ticks) {
         }
     }
     
-    this.updatePhysic(ticks);
-}
-
-
-//// Add some physics ////
-sjs.Sprite.prototype.setForce = function setForce(fx,fy) {
-    this.fx = fx;
-    this.fy = fy;	
-}
-
-sjs.Sprite.prototype.addForce = function addForce(fx,fy) {
-    this.fx = this.fx + fx;
-    this.fy = this.fy + fy;	
+    this.applyForce(ticks);
+    this.applyVelocity(ticks);
 }

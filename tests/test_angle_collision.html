@@ -28,7 +28,7 @@ var result = document.getElementById('result');
 
 var scene = sjs.Scene({w:600, h:600});
 
-scene.loadImages(['crate.png'], function() {
+scene.loadImages(['img/crate.png'], function() {
 
     var ground = scene.Sprite();
     ground.position(0, 600-32);
@@ -37,14 +37,14 @@ scene.loadImages(['crate.png'], function() {
     ground.update();
 
     var gravity = 0.5;
-    var crates = sjs.SpriteList();
+    var crates = sjs.List();
 
     function paint() {
 
         ground.update();
 
         if(ticker.currentTick % 12 == 0 && crates.list.length < 30) {
-            var crate = scene.Sprite('crate.png');
+            var crate = scene.Sprite('img/crate.png');
             crate.position(50 + Math.random() * 500 | 0, 50);
             crate.rv = Math.random() / 4;
             crates.add(crate);

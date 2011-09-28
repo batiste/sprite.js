@@ -34,7 +34,7 @@ window.onload = function() {
     var scene = sjs.Scene({w:game_width, h:game_height});
     var gravity = 0.5;
 
-    scene.loadImages(['character.png', 'crate.png'], function() {
+    scene.loadImages(['img/character.png', 'img/crate.png'], function() {
 
     var back = scene.Layer('backround');
     var front = scene.Layer('front')
@@ -44,12 +44,12 @@ window.onload = function() {
     score.update();
     score.dom.id = 'score';
 
-    var bottom = scene.Sprite('crate.png', {layer:back, w:game_width, h:64, x:0, y:game_height-64});
+    var bottom = scene.Sprite('img/crate.png', {layer:back, w:game_width, h:64, x:0, y:game_height-64});
     bottom.update();
     var elements = sjs.SpriteList();
     elements.add(bottom);
 
-    var player = scene.Sprite('character.png', front);
+    var player = scene.Sprite('img/character.png', front);
     player.position(40, 200);
     player.size(28, 52);
     player.scale(-1, 1);
@@ -113,7 +113,7 @@ window.onload = function() {
         if(need_to_create_plateform && Math.random() < 0.1) {
             var height = 32 + (Math.random() * 96);
             var width = 64 + (Math.random() * 128);
-            var bottom = scene.Sprite('crate.png', {layer:back, w:width, h:height, x:game_width, y:game_height-height});
+            var bottom = scene.Sprite('img/crate.png', {layer:back, w:width, h:height, x:game_width, y:game_height-height});
             bottom.update();
             elements.add(bottom);
         }

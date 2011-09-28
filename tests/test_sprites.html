@@ -57,7 +57,7 @@ window.onload = function() {
 
     var scene = sjs.Scene({w:300, h:400});
 
-    scene.loadImages(['character.png', 'spritejs.png'], function() {
+    scene.loadImages(['img/character.png', 'img/spritejs.png'], function() {
 
     var canvas = window.location.href.indexOf('canvas') != -1;
     var webgl = window.location.href.indexOf('webgl') != -1;
@@ -75,7 +75,7 @@ window.onload = function() {
     }
 
     for(var i=0; i<32; i++) {
-        var sp = scene.Sprite('character.png', layer);
+        var sp = scene.Sprite('img/character.png', layer);
         sp.size(30, 55);
         sp.setYOffset(2);
         sp.move(6 * i + 10, 70 + ((i%4) * 60));
@@ -84,7 +84,7 @@ window.onload = function() {
 
     var logo = scene.Sprite(false, layer);
     logo.move(120, 170);
-    logo.loadImg('spritejs.png');
+    logo.loadImg('img/spritejs.png');
 
     var cycle = sjs.Cycle([[0, 2, 5],
                                [30, 2, 5],

@@ -372,9 +372,9 @@ Sprites comes with methods that can help you implement a basic physic engine:
 
     Rotate the velocity vector according to the provided angle.
 
-.. js:function:: Sprite.pointVelocityTo(x, y)
+.. js:function:: Sprite.orientVelocity(x, y)
     
-    Point the velocity vector in a given direction point. The intensity stay unchanged.
+    Point the velocity vector in the direction of the point (x, y). The intensity stay unchanged.
 
 .. js:function:: Sprite.distance(sprite)
 

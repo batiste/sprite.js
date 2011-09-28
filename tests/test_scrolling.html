@@ -16,7 +16,7 @@ html, body{margin:0;padding:0}
 
 var scene = sjs.Scene({w:672, h:480, autoPause:false});
 
-scene.loadImages(['tiles.png'], function() {
+scene.loadImages(['img/tiles.png'], function() {
 
     var offsetx = 0;
     var offsety = 0;
@@ -32,7 +32,7 @@ scene.loadImages(['tiles.png'], function() {
 
     var tile_list = [];
     for(var i = 0; i<possible_tiles.length; i++) {
-        var tile = scene.Sprite('tiles.png', {w:48, h:48, x:0, y:0});
+        var tile = scene.Sprite('img/tiles.png', {w:48, h:48, x:0, y:0});
         tile.offset(48 * possible_tiles[i][0], 48 * possible_tiles[i][1]);
         tile_list.push(tile);
     }

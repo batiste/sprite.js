@@ -62,8 +62,8 @@ window.onload = function() {
     var units = sjs.SpriteList();
     
     for (var i=0;i<Nu;i++) {
-        units[i] = scene.Sprite('particule.png', playLayer);
-        units[i].move(0.8*gameWidth*Math.random()+20,20+10*Math.random());
+        units[i] = scene.Sprite('img/particule.png', playLayer);
+        units[i].move(0.8 * gameWidth*Math.random() + 20, 20 + 10*Math.random());
         units[i].size(19, 19);
         units[i].setYOffset(7);
         units[i].setXOffset(6);
@@ -75,7 +75,7 @@ window.onload = function() {
     var enemies = sjs.SpriteList();;
     
     for (var i=0;i<Ne;i++) {
-        var enemy = scene.Sprite('particule2.png', playLayer);
+        var enemy = scene.Sprite('img/particule2.png', playLayer);
         enemy.move(gameWidth*Math.random(),gameHeight -(40 + 10*Math.random()) );
         enemy.size(19, 19);
         enemy.setYOffset(7);
@@ -168,19 +168,19 @@ window.onload = function() {
                             ncol = 1;
                                                                             
                         //just add a repulsive force
-                        fx += 800*colx/ncol * a.mass;
-                        fy += 800*coly/ncol * a.mass;
+                        fx += 5 *colx/ncol * a.mass;
+                        fy += 5 *coly/ncol * a.mass;
                     }
                 }
             }
             
             //collisions with borders
             if( (units[i].x + units[i].w) > gameWidth){
-                fx += -400;
+                fx += -1;
                 units[i].hastarget = false;
             }
             if( (units[i].x - units[i].w/2) < 0){
-                fx += 400;
+                fx += 1;
                 units[i].hastarget = false;
             }            
                                                                             
@@ -249,8 +249,8 @@ window.onload = function() {
             
             //reset forces
             enemy.setForce(0,0);
-            var fx=100*(Math.random()-0.5);
-            var fy=100*(Math.random()-0.8);
+            var fx=1*(Math.random()-0.5);
+            var fy=1*(Math.random()-0.8);
             
             //collisions with units
             for (var j=0;j<Nu;j++){		

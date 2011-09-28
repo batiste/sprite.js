@@ -17,7 +17,7 @@
 window.onload = function() {
 var scene = sjs.Scene({w:600, h:600});
 
-scene.loadImages(['crate.png'], function() {
+scene.loadImages(['img/crate.png'], function() {
 
     if(window.location.href.indexOf('canvas') != -1) {
         document.getElementById('canvas-mode').style.display = 'none';
@@ -35,7 +35,7 @@ scene.loadImages(['crate.png'], function() {
     var crates = [];
 
     for(var i=0; i<120; i++) {
-        var sp = scene.Sprite('crate.png');
+        var sp = scene.Sprite('img/crate.png');
         sp.move(32 + (i % 12) * 35, (i/12.0|0)* 50);
         sp.update();
         crates.push(sp);

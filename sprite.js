@@ -41,7 +41,7 @@ var sjs = {
     Scene: Scene,
     SpriteList:List, // backward compatibility 1.1.1
     List:List,
-    Sprite:_Sprite,
+    Sprite:Sprite,
     overlay:overlay,
     scenes:[],
     math:{hypo:hypo, mod:mod, normalVector:normalVector},
@@ -84,7 +84,7 @@ var browser_specific_runned = false;
 function initBrowserSpecific() {
     sjs.tproperty = has(doc.body.style, ['transform', 
         'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform']);       
-    sjs.animationRequest = has(global, ['mozRequestAnimationFrame', 
+    sjs.animationFrame = has(global, ['mozRequestAnimationFrame', 
         'webkitRequestAnimationFrame', 'oRequestAnimationFrame', 
         'msRequestAnimationFrame']);
     browser_specific_runned = true;
@@ -158,7 +158,7 @@ Scene.prototype.constructor = Scene;
 
 Scene.prototype.Sprite = function SceneSprite(src, layer) {
     /* an actual shortcut for sjs.Sprite */
-    return new _Sprite(this, src, layer);
+    return new Sprite(this, src, layer);
 }
 
 Scene.prototype.Layer = function SceneLayer(name, options) {
@@ -293,7 +293,7 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
     }
 }
 
-function _Sprite(scene, src, layer) {
+function Sprite(scene, src, layer) {
 
     this.scene = scene;
     this._dirty = {};
@@ -312,6 +312,7 @@ function _Sprite(scene, src, layer) {
     this.yv = 0;
     this.rv = 0;
     
+    // newton
     this.mass = 1;
     this.friction = 1;
     // forces
@@ -397,11 +398,11 @@ function _Sprite(scene, src, layer) {
     return this;
 }
 
-_Sprite.prototype.constructor = _Sprite;
+Sprite.prototype.constructor = Sprite;
 
 /* boilerplate setter functions */
 
-_Sprite.prototype.setX = function setX(value) {
+Sprite.prototype.setX = function setX(value) {
     this.x = value;
     // this secessary for the physic
     this._x_rounded = value | 0;
@@ -409,70 +410,70 @@ _Sprite.prototype.setX = function setX(value) {
     return this;
 }
 
-_Sprite.prototype.setY = function setY(value) {
+Sprite.prototype.setY = function setY(value) {
     this.y = value;
     this._y_rounded = value | 0;
     this.changed = true;
     return this;
 }
 
-_Sprite.prototype.setW = function setW(value) {
+Sprite.prototype.setW = function setW(value) {
     this.w = value;
     this._dirty['w'] = true;
     this.changed = true;
     return this;
 }
 
-_Sprite.prototype.setH = function setH(value) {
+Sprite.prototype.setH = function setH(value) {
     this.h = value;
     this._dirty['h'] = true;
     this.changed = true;
     return this;
 }
 
-_Sprite.prototype.setXOffset = function setXoffset(value) {
+Sprite.prototype.setXOffset = function setXoffset(value) {
     this.xoffset = value;
     this._dirty['xoffset'] = true;
     this.changed = true;
     return this;
 }
 
-_Sprite.prototype.setYOffset = function setYoffset(value) {
+Sprite.prototype.setYOffset = function setYoffset(value) {
     this.yoffset = value;
     this._dirty['yoffset'] = true;
     this.changed = true;
     return this;
 }
 
-_Sprite.prototype.setAngle = function setAngle(value) {
+Sprite.prototype.setAngle = function setAngle(value) {
     this.angle = value;
     this._dirty['angle'] = true;
     this.changed = true;
     return this;
 }
 
-_Sprite.prototype.setColor = function setColor(value) {
+Sprite.prototype.setColor = function setColor(value) {
     this.color = value;
     this._dirty['color'] = true;
     this.changed = true;
     return this;
 }
 
-_Sprite.prototype.setOpacity = function setOpacity(value) {
+Sprite.prototype.setOpacity = function setOpacity(value) {
     this.opacity = value;
     this._dirty['opacity'] = true;
     this.changed = true;
     return this;
 }
 
-_Sprite.prototype.setXScale = function setXscale(value) {
+Sprite.prototype.setXScale = function setXscale(value) {
     this.xscale = value;
     this._dirty['xscale'] = true;
     this.changed = true;
     return this;
 }
 
-_Sprite.prototype.setYScale = function setYscale(value) {
+Sprite.prototype.setYScale = function setYscale(value) {
     this.yscale = value;
     this._dirty['yscale'] = true;
     this.changed = true;
@@ -481,12 +482,17 @@ _Sprite.prototype.setYScale = function setYscale(value) {
 
 /* end of boilerplate setters */
 
-_Sprite.prototype.rotate = function (v) {
+Sprite.prototype.rotate = function (v) {
     this.setAngle(this.angle + v);
     return this;
 };
 
-_Sprite.prototype.scale = function (x, y) {
+Sprite.prototype.orient = function orient(x, y) {
+    var a = Math.atan2(y, x);
+    this.setAngle(a);
+};
+
+Sprite.prototype.scale = function (x, y) {
     if(this.xscale != x) {
         this.setXScale(x);
     }
@@ -498,26 +504,37 @@ _Sprite.prototype.scale = function (x, y) {
     return this;
 };
 
-_Sprite.prototype.move = function (x, y) {
+Sprite.prototype.move = function (x, y) {
     this.setX(this.x+x);
     this.setY(this.y+y);
     return this;
 };
 
-_Sprite.prototype.position = function (x, y) {
+Sprite.prototype.position = function (x, y) {
     this.setX(x);
     this.setY(y);
     return this;
 };
 
-_Sprite.prototype.updatePhysic = function updatePhysic(ticks) {
-    //integrate newton's laws of motion 
-    this.xv = this.xv + ticks/this.mass*(this.fx - this.friction*this.xv); 
-    this.yv = this.yv + ticks/this.mass*(this.fy - this.friction*this.yv);
-    this.applyVelocity(ticks);
+Sprite.prototype.setForce = function setForce(fx, fy) {
+    this.fx = fx;
+    this.fy = fy;
 }
 
-_Sprite.prototype.applyVelocity = function (ticks) {
+Sprite.prototype.addForce = function addForce(fx, fy) {
+    this.fx = this.fx + fx;
+    this.fy = this.fy + fy;
+}
+
+Sprite.prototype.applyForce = function applyForce(ticks) {
+    // Integrate newton's laws of motion F = ma => a = F / m
+    this.xv -= this.friction * this.xv * this.mass;
+    this.xv += (this.fx / this.mass);
+    this.yv -= this.friction * this.yv * this.mass;
+    this.yv += (this.fy / this.mass);
+};
+
+Sprite.prototype.applyVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv != 0)
@@ -529,7 +546,7 @@ _Sprite.prototype.applyVelocity = function (ticks) {
     return this;
 };
 
-_Sprite.prototype.reverseVelocity = function (ticks) {
+Sprite.prototype.reverseVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv != 0)
@@ -541,41 +558,41 @@ _Sprite.prototype.reverseVelocity = function (ticks) {
     return this;
 };
 
-_Sprite.prototype.applyXVelocity = function (ticks) {
+Sprite.prototype.applyXVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv != 0)
         this.setX(this.x+this.xv*ticks);
 }
 
-_Sprite.prototype.reverseXVelocity = function (ticks) {
+Sprite.prototype.reverseXVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv != 0)
         this.setX(this.x-this.xv*ticks);
 }
 
-_Sprite.prototype.applyYVelocity = function (ticks) {
+Sprite.prototype.applyYVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.yv != 0)
         this.setY(this.y+this.yv*ticks);
 }
 
-_Sprite.prototype.reverseYVelocity = function (ticks) {
+Sprite.prototype.reverseYVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.yv != 0)
         this.setY(this.y-this.yv*ticks);
 }
 
-_Sprite.prototype.rotateVelocity = function (a) {
+Sprite.prototype.rotateVelocity = function (a) {
     var x = this.xv * Math.cos(a) - this.yv * Math.sin(a);
     this.yv = this.xv * Math.sin(a) + this.yv * Math.cos(a);
     this.xv = x;
 };
 
-_Sprite.prototype.pointVelocityTo = function (x, y) {
+Sprite.prototype.orientVelocity = function (x, y) {
     var intensity = hypo(this.xv, this.yv);
     var v = normalVector(x, y, intensity);
     this.xv = v.x;
@@ -583,19 +600,19 @@ _Sprite.prototype.pointVelocityTo = function (x, y) {
 };
 
 
-_Sprite.prototype.offset = function (x, y) {
+Sprite.prototype.offset = function (x, y) {
     this.setXOffset(x);
     this.setYOffset(y);
     return this;
 };
 
-_Sprite.prototype.size = function (w, h) {
+Sprite.prototype.size = function (w, h) {
     this.setW(w);
     this.setH(h);
     return this;
 };
 
-_Sprite.prototype.remove = function remove() {
+Sprite.prototype.remove = function remove() {
     if(this.cycle)
         this.cycle.removeSprite(this);
     if(this.layer && !this.layer.useCanvas) {
@@ -610,7 +627,7 @@ _Sprite.prototype.remove = function remove() {
     this.img = null;
 };
 
-_Sprite.prototype.webGLUpdate = function webGLUpdate () {
+Sprite.prototype.webGLUpdate = function webGLUpdate () {
     if(!this.texture) {
         this.texture = new webgl.Texture(this);
     }
@@ -618,7 +635,7 @@ _Sprite.prototype.webGLUpdate = function webGLUpdate () {
     return this;
 }
 
-_Sprite.prototype.update = function updateDomProperties () {
+Sprite.prototype.update = function updateDomProperties () {
     // This is the CPU heavy function.
 
     if(this.layer.useWebGL == true) {
@@ -675,7 +692,7 @@ _Sprite.prototype.update = function updateDomProperties () {
     return this;
 };
 
-_Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
+Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
     if(layer)
         var ctx = layer.ctx;
     else
@@ -721,17 +738,17 @@ _Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
     return this;
 };
 
-_Sprite.prototype.toString = function () {
+Sprite.prototype.toString = function () {
     return "Sprite(" + String(this.id) + ")";
 };
 
-_Sprite.prototype.onload = function(callback) {
+Sprite.prototype.onload = function(callback) {
     if(this.imgLoaded && this._callback) {
         this._callback = callback;
     }
 };
 
-_Sprite.prototype.loadImg = function (src, resetSize) {
+Sprite.prototype.loadImg = function (src, resetSize) {
     // the image exact source value will change according to the
     // hostname, this is useful to retain the original source value here.
     this.src = src;
@@ -772,7 +789,7 @@ _Sprite.prototype.loadImg = function (src, resetSize) {
 };
 
 
-_Sprite.prototype.isPointIn = function isPointIn(x, y) {
+Sprite.prototype.isPointIn = function isPointIn(x, y) {
     // Return true if the point is within the sprite surface
     if(this.angle == 0)
         return (x >= this.x && x < this.x+this.w
@@ -788,7 +805,7 @@ sjs.lineSide = function(ax, ay, bx, by, cx, cy) {
     return v > 0;
 }
 
-_Sprite.prototype.isPointInAngle = function pointInAngle(x, y) {
+Sprite.prototype.isPointInAngle = function pointInAngle(x, y) {
     // Return true if the point is within the sprite surface
     // handle the case where the sprite has an angle
     var edges = this.edges();
@@ -809,7 +826,7 @@ _Sprite.prototype.isPointInAngle = function pointInAngle(x, y) {
     return true;
 }
 
-_Sprite.prototype.collidesWith = function collidesWith(sprite) {
+Sprite.prototype.collidesWith = function collidesWith(sprite) {
     // Return true if the current sprite has any collision with the Sprite provided
     if(this.angle != 0 || sprite.angle != 0) {
         return this.collidesWithAngle(sprite);
@@ -831,7 +848,7 @@ _Sprite.prototype.collidesWith = function collidesWith(sprite) {
     return y_inter;
 };
 
-_Sprite.prototype.collidesWithAngle = function collidesWithAngle(sprite) {
+Sprite.prototype.collidesWithAngle = function collidesWithAngle(sprite) {
     var edges = sprite.edges();
     for(var i=0; i<4; i++) {
         if(this.isPointInAngle(edges[i][0], edges[i][1]))
@@ -845,7 +862,7 @@ _Sprite.prototype.collidesWithAngle = function collidesWithAngle(sprite) {
     return false;
 }
 
-_Sprite.prototype.edges = function edges() {
+Sprite.prototype.edges = function edges() {
     // Return the 4 edges coordinate of the rectangle
     var distance = hypo(this.w / 2, this.h / 2);
     var angle = Math.atan2(this.h, this.w);
@@ -862,7 +879,7 @@ _Sprite.prototype.edges = function edges() {
     return points;
 };
 
-_Sprite.prototype.distance = function distance(x, y) {
+Sprite.prototype.distance = function distance(x, y) {
     // Return the distance between this sprite and the point (x, y) or a Sprite
     if(typeof x == "number") {
         return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) +
@@ -873,11 +890,11 @@ _Sprite.prototype.distance = function distance(x, y) {
     }
 }
 
-_Sprite.prototype.center = function center() {
+Sprite.prototype.center = function center() {
     return [this.x + this.w/2, this.y + this.h/2];
 }
 
-_Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
+Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
     // Return a sprite if the current sprite has any collision with the Array provided
     // a sprite cannot collides with itself
     // Make the SpriteList works
@@ -892,7 +909,7 @@ _Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
     return false;
 };
 
-_Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
+Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
     if(!layer)
         layer = this.layer;
     if(v == undefined) {
@@ -920,7 +937,7 @@ _Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
     return [s1, s2];
 }
 
-_Sprite.prototype.explode4 = function explode(x, y, layer) {
+Sprite.prototype.explode4 = function explode(x, y, layer) {
     if(x == undefined)
         x = this.w / 2;
     if(y == undefined)
@@ -1079,8 +1096,8 @@ function _Ticker(scene, paint, options) {
     
     
     this.tickDuration = optionValue(options, 'tickDuration', 16);
-    this.useAnimationFrame = optionValue(options, 'AnimationFrame', false);
-    if(!sjs.AnimationFrame)
+    this.useAnimationFrame = optionValue(options, 'useAnimationFrame', false);
+    if(!sjs.animationFrame)
         this.useAnimationFrame = false;
     this.paint = paint;
 
@@ -1135,7 +1152,7 @@ _Ticker.prototype.run = function() {
     this.lastPaintAt = this.now;
     if(this.useAnimationFrame) {
         this.tickDuration = 16;
-        window[sjs.animationRequest](function(){t.run()});
+        window[sjs.animationFrame](function(){t.run()});
     } else {
         var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 6);
         this.timeout = setTimeout(function(){t.run()}, _nextPaint);
@@ -1494,7 +1511,7 @@ Layer.prototype.clear = function clear() {
 }
 
 Layer.prototype.Sprite = function(src) {
-    return new _Sprite(this.scene, src, this);
+    return new Sprite(this.scene, src, this);
 }
 
 Layer.prototype.remove = function remove() {

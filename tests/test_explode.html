@@ -27,7 +27,7 @@ var result = document.getElementById('result');
 
 var scene = sjs.Scene({w:600, h:600});
 
-scene.loadImages(['crate.png'], function() {
+scene.loadImages(['img/crate.png'], function() {
 
     function hasCollision(crate) {
         if(crate.y + crate.h > 600 - 32)
@@ -52,7 +52,7 @@ scene.loadImages(['crate.png'], function() {
         bg.update();
 
         if(ticker.currentTick % 6 == 0) {
-            var crate = scene.Sprite('crate.png');
+            var crate = scene.Sprite('img/crate.png');
             crate.position(50 + Math.random() * 500 | 0, 50)
             crates.add(crate);
         }
