@@ -1,0 +1,125 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test game like</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+<style>
+body {
+    margin:0;
+}
+.sjs {
+    background:#f1f4fe;
+}
+</style>
+</head>
+<body>
+    
+<span id="debug"></span>	
+    
+</body>
+<script src="../sprite.js"></script>
+<script src="extSprite.js"></script>
+
+<script>
+
+window.onload = function() {
+
+    var gameHeight = window.innerHeight;
+    var gameWidth = window.innerWidth;
+    var scene = sjs.Scene({w:gameWidth, h:gameHeight});
+    
+    var layer = scene.Layer("flock");
+    
+    var birds = sjs.SpriteList();
+  
+
+    var input  = scene.Input();
+    var nbb = 30;
+    
+    for (var i=0;i<nbb;i++) {
+        var bird = scene.Sprite('img/bird.png', layer);
+        bird.move(0.8 * gameWidth * Math.random() + 20, 0.8 * gameHeight * Math.random());
+        bird.size(32, 32);
+        bird.mass = 0.9;
+        bird.friction = 0.2;
+        bird.update();
+        birds.add(bird);
+        
+    }
+    
+    function paint() {
+
+        var mx = input.mouse.position.x;
+        var my = input.mouse.position.y;
+
+        var bird = null;
+        var lastBird = null;
+        while(bird = birds.iterate()) {
+            //reset forces
+            var fx = 0;
+            var fy = 0;
+
+            //collisions with other birds
+            var collide = bird.collidesWithArray(birds);
+            if(collide) {
+                var a = bird;
+                var b = collide;
+                var colx = a.x - b.x;
+                var coly = a.y - b.y;    
+                var ncol = sjs.math.hypo(colx, coly);
+                
+                if(ncol == 0)
+                    ncol = 1;
+                                                                    
+                //just add a repulsive force
+                fx += 0.1 * colx / ncol;
+                fy += 0.1 * coly / ncol;
+                bird.addForce(fx, fy);
+                collide.addForce(-fx, -fy);
+            }
+
+
+            var tx = mx - bird.x;
+            var ty = my - bird.y;
+            var tn = sjs.math.hypo(tx, ty);
+            if(tn > 10 && input.mousedown) {
+                tx = 0.4 * tx / tn;
+                ty = 0.4 * ty / tn;
+                bird.addForce(tx, ty);
+            } else if(lastBird) {
+                var tx = lastBird.x - bird.x;
+                var ty = lastBird.y - bird.y;
+                var tn = sjs.math.hypo(tx, ty);
+                tx = 0.2 * tx / tn;
+                ty = 0.2 * ty / tn;
+                bird.addForce(tx, ty);
+            } else {
+                var tx = (gameWidth / 2) - bird.x;
+                var ty = (gameHeight / 2) - bird.y;
+                var tn = sjs.math.hypo(tx, ty);
+                tx = 0.15 * tx / tn;
+                ty = 0.15 * ty / tn;
+                bird.addForce(tx, ty);
+            }
+            // reduce the force
+            if(Math.abs(bird.fx) > 0.2)
+                bird.fx = bird.fx / 1.2;
+            if(Math.abs(bird.fy) > 0.2)
+                bird.fy = bird.fy / 1.2;
+            // orient the sprite
+            bird.orient(bird.xv, bird.yv);
+            // apply the forces
+            bird.applyForce(1);
+            bird.applyVelocity(1);
+            bird.update();
+            lastBird = bird;  
+        }
+        
+    }
+
+    var ticker = scene.Ticker(30, paint);
+    ticker.run();
+};
+
+</script>
+</html>
