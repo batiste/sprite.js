@@ -33,8 +33,12 @@ function mapCallback(_map) {
             tilelayers.push(layer)
         }
     }
+    var to_load = [];
+    for(var i=0; i<map.tilesets.length; i++) {
+        to_load.push(map.tilesets[i].image);
+    }
 
-    scene.loadImages(['tiles.png'], main);
+    scene.loadImages(to_load, main);
 }
 
 function findTileset(gid) {
@@ -55,15 +59,15 @@ function findTileset(gid) {
 function getSprite(gid) {
     // return the sprite according to the gid
     var tileset = findTileset(gid);
-    gid = gid-1;
+    var localGid = gid - (tileset.firstgid);
     var tw = tileset.tilewidth;
     var th = tileset.tileheight;
 
     var nb_x = tileset.imagewidth / tw | 0;
     var nb_y = tileset.imageheight / th | 0;
 
-    var x = gid % nb_x;
-    var y = gid / nb_x | 0;
+    var x = localGid % nb_x;
+    var y = localGid / nb_x | 0;
 
     var sp = scene.Sprite(tileset.image, {w:tw, h:th, xoffset:x * tw, yoffset:y * th});
     return sp;

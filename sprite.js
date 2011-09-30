@@ -492,7 +492,7 @@ Sprite.prototype.setYScale = function setYscale(value) {
     return this;
 }
 
-/* end of boilerplate setters */
+// End of boilerplate setters, start of helpers
 
 Sprite.prototype.rotate = function (v) {
     this.setAngle(this.angle + v);
@@ -527,6 +527,20 @@ Sprite.prototype.position = function (x, y) {
     this.setY(y);
     return this;
 };
+
+Sprite.prototype.offset = function (x, y) {
+    this.setXOffset(x);
+    this.setYOffset(y);
+    return this;
+};
+
+Sprite.prototype.size = function (w, h) {
+    this.setW(w);
+    this.setH(h);
+    return this;
+};
+
+// Physic
 
 Sprite.prototype.setForce = function setForce(xf, yf) {
     this.xf = xf;
@@ -624,19 +638,6 @@ Sprite.prototype.orientVelocity = function (x, y) {
     this.yv = v.y;
 };
 
-
-Sprite.prototype.offset = function (x, y) {
-    this.setXOffset(x);
-    this.setYOffset(y);
-    return this;
-};
-
-Sprite.prototype.size = function (w, h) {
-    this.setW(w);
-    this.setH(h);
-    return this;
-};
-
 Sprite.prototype.remove = function remove() {
     if(this.cycle)
         this.cycle.removeSprite(this);
@@ -651,6 +652,8 @@ Sprite.prototype.remove = function remove() {
     this.layer = null;
     this.img = null;
 };
+
+// Update methods
 
 Sprite.prototype.webGLUpdate = function webGLUpdate () {
     if(!this.texture) {
@@ -756,12 +759,19 @@ Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
             }
         } else {
             // image with normal size or with
+            try {
             ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h, 0, 0, this.w, this.h);
+            } catch(err) {
+                
+            console.log(this.img, this.xoffset, this.yoffset, this.w, this.h, 0, 0, this.w, this.h)
+            }
         }
     }
     ctx.restore();
     return this;
 };
+
+// Other methods
 
 Sprite.prototype.toString = function () {
     return "Sprite(" + String(this.id) + ")";
@@ -813,6 +823,7 @@ Sprite.prototype.loadImg = function (src, resetSize) {
     return this;
 };
 
+// Collisions
 
 Sprite.prototype.isPointIn = function isPointIn(x, y) {
     // Return true if the point is within the sprite surface
@@ -925,6 +936,8 @@ Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
     }
     return false;
 };
+
+// Fx
 
 Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
     if(!layer)

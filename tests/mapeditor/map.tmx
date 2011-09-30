@@ -8,17 +8,20 @@
    </properties>
   </tile>
  </tileset>
+ <tileset firstgid="211" name="Ground" tilewidth="48" tileheight="48">
+  <image source="ground.png" width="192" height="96"/>
+ </tileset>
  <layer name="background" width="20" height="16">
   <data encoding="base64" compression="zlib">
-   eJx1lDtOxDAYhH0FKiQEDQ/RQAENj2o7KqADcQhKKwV1slwAgTbZCyBQdvcCIJSwHIuxNKOMzFJ8suX/Nf79J2UIoQJj8AimoAQFqEEDJtyXZGL7WYZ8I3MteNbSPrd9abYJ6Rkbufe4BWNcr/um+B2wC/YYm+7xDZbgx+Ij46W3od4pzxvGn4IzcA461uktZ967gnoj9a7RNmf8JbgC19QSGS8NhWlZWE3VWzJfRVs0m/cmsmber3ZFzuS7Tx+3RdOlM737E3gGL/+8k9dUj93H8yX7K3gD77QVmcZ1sMG+tHavURjmQDOQ7B/gE3xl9bXfBFvM04W/c1AzX94/9VnnJbUdgWOwDe55PgrDnM1Mn+okn4cwzH7N9QAcggtwwjyuoyLSJ5vfU71O6w24BXe8q9+3sFX68vdSTM+1zfx0F+nTv0Bz0bIP+dyNrf+uWXOrb8O/uW5Fnoa+rqGzPuV4D38BAZa6tg==
+   eJx1lDtOxDAYhH0FKiQEDQ/RQAENj2o7KqADcQhKKwV1slwAgZLsBRAoy14AhBKWM3AaxtKMdmSW4pMt/6/x7z8pQwgVGIN7MAElKEADWlBzX5La9tMM+UbmmvGso/3N9qXZajIwNnLvcTPGuF73TfFbYBvsMDbd4wvMwbfFR8ZLb0u9E563jD8GJ+AU9KwzWM68dwX1RupdoS3p/wHn4AJcUktkvDQUpmVmNVVvznwVbdFs3pvImnm/uiU5k+8ufdwWTZfO9O4P4BE8/fNOXlM9dh/Pl+zP4AW80lZkGlfBGvvS2b1GYTEHmoFkfwcf4DOrr/062GCePvydg4b58v6pzzovqe0AHIJNcMvzUVjM2dT0qU7yuQuL2W+47oF9cAaOmMd1VET6ZPN7qtdpvQLX4IZ39fsWtkpf/l6KGbh2mZ/uIn36F2guOvYhn7ux9d81a271bfg31y/J09LXNfTWpxzv4S9QTrrM
   </data>
  </layer>
  <layer name="front" width="20" height="16">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo4D+QA2I1alonjUQ21DRvAAgDqSiedQGo+FHHQAAPQwCyw==
+   eJxjYKA9uIxF7AoUU8t8GB4J5g0HoAbE6lQ0zxqIbahoXgAQB1LRPGqD0fCjDgAAg+AMsQ==
   </data>
  </layer>
- <layer name="Tile Layer 3" width="20" height="16">
+ <layer name="Tile Layer 3" width="20" height="16" visible="0">
   <data encoding="base64" compression="zlib">
    eJxjYKAOEIRiagJqmzcKBhcYjd9RMNAAABqjAEU=
   </data>
