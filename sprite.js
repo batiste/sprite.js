@@ -759,12 +759,7 @@ Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
             }
         } else {
             // image with normal size or with
-            try {
             ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h, 0, 0, this.w, this.h);
-            } catch(err) {
-                
-            console.log(this.img, this.xoffset, this.yoffset, this.w, this.h, 0, 0, this.w, this.h)
-            }
         }
     }
     ctx.restore();
