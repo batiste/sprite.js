@@ -396,10 +396,10 @@ function Sprite(scene, src, layer) {
     }
 
     // can be set by the properties
-    if(!this.layer)
+    if(this.layer === undefined)
         this.layer = scene.layers['default'];
 
-    if(!this.layer.useCanvas) {
+    if(this.layer  && !this.layer.useCanvas) {
         var d = doc.createElement('div');
         d.style.position = 'absolute';
         this.dom = d;
@@ -799,7 +799,7 @@ Sprite.prototype.loadImg = function (src, resetSize) {
         spriteList[src].loaded = true;
         there.imgLoaded = true;
         var img = there.img;
-        if(!there.layer.useCanvas)
+        if(there.layer && !there.layer.useCanvas)
             there.dom.style.backgroundImage = 'url('+src+')';
         there.imgNaturalWidth = img.width;
         there.imgNaturalHeight = img.height;

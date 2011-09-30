@@ -191,12 +191,12 @@ window.onload = function() {
 
     sp1.angle += Math.PI / 4.0;
 
-    assertFalse(sjs.lineSide(0, 0, 10, 10, 2, 1), "lineSide");
-    assertTrue(sjs.lineSide(0, 0, 10, 10, 1, 2), "lineSide");
-    assertFalse(sjs.lineSide(10, 10, 0, 0, 1, 2), "lineSide");
-    assertFalse(sjs.lineSide(-5, 5, 5, 5, 4.8, 4.8), "lineSide");
-    assertFalse(sjs.lineSide(-5, 5, 5, 5, 1, 1), "lineSide");
-    assertTrue(sjs.lineSide(-5, 5, 5, 5, 5.1, 5.1), "lineSide");
+    assertFalse(sjs.math.lineSide(0, 0, 10, 10, 2, 1), "lineSide");
+    assertTrue(sjs.math.lineSide(0, 0, 10, 10, 1, 2), "lineSide");
+    assertFalse(sjs.math.lineSide(10, 10, 0, 0, 1, 2), "lineSide");
+    assertFalse(sjs.math.lineSide(-5, 5, 5, 5, 4.8, 4.8), "lineSide");
+    assertFalse(sjs.math.lineSide(-5, 5, 5, 5, 1, 1), "lineSide");
+    assertTrue(sjs.math.lineSide(-5, 5, 5, 5, 5.1, 5.1), "lineSide");
 
 
     sp1.angle = 0;
@@ -304,6 +304,11 @@ window.onload = function() {
     var sp1 = scene.Sprite();
     var sp2 = scene.Sprite();
     assertNotEqual(sp1.id, sp2.id, "Test that it's not possible to create 2 Sprites with equal ids.");
+
+    var sp1 = scene.Sprite(false, false);
+    assertEqual(sp1.layer, null, "Test that it's possible to create a layer less Sprite object 1.");
+    assertEqual(sp1.dom, null, "Test that a layer less Sprite doesn't have dom.");
+
 
 };
 </script>

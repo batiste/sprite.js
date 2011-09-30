@@ -4,16 +4,26 @@
   <image source="tiles.png" width="1022" height="512"/>
   <tile id="116">
    <properties>
-    <property name="collides" value="true"/>
+    <property name="" value=""/>
+   </properties>
+  </tile>
+  <tile id="209">
+   <properties>
+    <property name="test" value="test"/>
    </properties>
   </tile>
  </tileset>
  <tileset firstgid="211" name="Ground" tilewidth="48" tileheight="48">
   <image source="ground.png" width="192" height="96"/>
+  <tile id="0">
+   <properties>
+    <property name="collision" value="true"/>
+   </properties>
+  </tile>
  </tileset>
  <layer name="background" width="20" height="16">
   <data encoding="base64" compression="zlib">
-   eJx1lDtOxDAYhH0FKiQEDQ/RQAENj2o7KqADcQhKKwV1slwAgZLsBRAoy14AhBKWM3AaxtKMdmSW4pMt/6/x7z8pQwgVGIN7MAElKEADWlBzX5La9tMM+UbmmvGso/3N9qXZajIwNnLvcTPGuF73TfFbYBvsMDbd4wvMwbfFR8ZLb0u9E563jD8GJ+AU9KwzWM68dwX1RupdoS3p/wHn4AJcUktkvDQUpmVmNVVvznwVbdFs3pvImnm/uiU5k+8ufdwWTZfO9O4P4BE8/fNOXlM9dh/Pl+zP4AW80lZkGlfBGvvS2b1GYTEHmoFkfwcf4DOrr/062GCePvydg4b58v6pzzovqe0AHIJNcMvzUVjM2dT0qU7yuQuL2W+47oF9cAaOmMd1VET6ZPN7qtdpvQLX4IZ39fsWtkpf/l6KGbh2mZ/uIn36F2guOvYhn7ux9d81a271bfg31y/J09LXNfTWpxzv4S9QTrrM
+   eJyNlL1Ow0AQhN1TUdFQ8SMaKKj4qdJRAR2Ih6C0XFCf7RdAIMd+AQSynRcAoZjQp8vTMJZmlNGJIsWnO93uzc2uNwlJkuSgACVoQAAZmIIaVNwHUtm+i1BuSq0Zz1rGe9sHi1Vk4N2Ue+UuN2QfHIBD3h3r+AEL8Ms3c+qX5rem34bnNfXOwQW4BHN6Gkwz7l1GvyuyzVhPvWtwA27pJeV9ecjMy8zelN6Cejn1UvOi2gqe99FZyZ5IU/fG3CPqKaZ+ruhH+fruz+AFvEbfqadv+fMeLy3H9cb4G3gHH4xlkccd3m/4luqa8A3Ni+bpE3yBb3u/tf0u9QJrjudgi3px/9RnnQd6O6XeHnjk+SRZz1ln/vTOmPOUrGd/yvUYnIArcEYd95ET+VPM69T3GNc7cA8eWKvXm9kqf67T2Z2BaxvlqRb503+B5qJlH+K5K6z/7llzq9+G/+bm/+jUzHUPc+tTjPfwDxOVwQo=
   </data>
  </layer>
  <layer name="front" width="20" height="16">
@@ -21,7 +31,7 @@
    eJxjYKA9uIxF7AoUU8t8GB4J5g0HoAbE6lQ0zxqIbahoXgAQB1LRPGqD0fCjDgAAg+AMsQ==
   </data>
  </layer>
- <layer name="Tile Layer 3" width="20" height="16" visible="0">
+ <layer name="Tile Layer 3" width="20" height="16">
   <data encoding="base64" compression="zlib">
    eJxjYKAOEIRiagJqmzcKBhcYjd9RMNAAABqjAEU=
   </data>
