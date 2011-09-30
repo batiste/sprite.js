@@ -44,7 +44,6 @@ window.onload = function() {
         bird.friction = 0.2;
         bird.update();
         birds.add(bird);
-        
     }
     
     function paint() {
@@ -56,8 +55,8 @@ window.onload = function() {
         var lastBird = null;
         while(bird = birds.iterate()) {
             //reset forces
-            var fx = 0;
-            var fy = 0;
+            var xf = 0;
+            var yf = 0;
 
             //collisions with other birds
             var collide = bird.collidesWithArray(birds);
@@ -72,10 +71,10 @@ window.onload = function() {
                     ncol = 1;
                                                                     
                 //just add a repulsive force
-                fx += 0.1 * colx / ncol;
-                fy += 0.1 * coly / ncol;
-                bird.addForce(fx, fy);
-                collide.addForce(-fx, -fy);
+                xf += 0.1 * colx / ncol;
+                yf += 0.1 * coly / ncol;
+                bird.addForce(xf, yf);
+                collide.addForce(-xf, -yf);
             }
 
 
@@ -102,10 +101,10 @@ window.onload = function() {
                 bird.addForce(tx, ty);
             }
             // reduce the force
-            if(Math.abs(bird.fx) > 0.2)
-                bird.fx = bird.fx / 1.2;
-            if(Math.abs(bird.fy) > 0.2)
-                bird.fy = bird.fy / 1.2;
+            if(Math.abs(bird.xf) > 0.2)
+                bird.xf = bird.xf / 1.2;
+            if(Math.abs(bird.yf) > 0.2)
+                bird.yf = bird.yf / 1.2;
             // orient the sprite
             bird.orient(bird.xv, bird.yv);
             // apply the forces

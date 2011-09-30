@@ -67,8 +67,8 @@ window.onload = function() {
         units[i].size(19, 19);
         units[i].setYOffset(7);
         units[i].setXOffset(6);
-        units[i].mass = 0.1;
-        units[i].friction = 1.2;
+        units[i].mass = 1;
+        units[i].friction = 0.9;
     }
     
     var Ne=15;
@@ -80,8 +80,8 @@ window.onload = function() {
         enemy.size(19, 19);
         enemy.setYOffset(7);
         enemy.setXOffset(6);
-        enemy.mass = 0.1;
-        enemy.friction = 1.2;
+        enemy.mass = 1;
+        enemy.friction = 0.9;
         enemies.add(enemy);
     }
 
@@ -155,7 +155,7 @@ window.onload = function() {
             var fy=0;
             
             //collisions with units
-            for (var j=0;j<Nu;j++){		
+            for (var j=0;j<Nu;j++) {
                 if(i!=j){
                     var collide = units[i].collidesWith(units[j]);
                     if(collide) {
@@ -168,8 +168,8 @@ window.onload = function() {
                             ncol = 1;
                                                                             
                         //just add a repulsive force
-                        fx += 5 *colx/ncol * a.mass;
-                        fy += 5 *coly/ncol * a.mass;
+                        fx += 25 *colx/ncol * a.mass;
+                        fy += 25 *coly/ncol * a.mass;
                     }
                 }
             }
@@ -199,7 +199,7 @@ window.onload = function() {
                 enemy.dom.style.border  = 3*Math.random() + 'px solid #f00';
                 
                 enemy.health -= 1;
-                if(enemy.health <=0 ){
+                if(enemy.health <=0 ) {
                         var _parts = enemy.explode4(10, 10);                        
                         enemies.remove(enemy);
                         enemy.remove();
@@ -249,15 +249,17 @@ window.onload = function() {
             
             //reset forces
             enemy.setForce(0,0);
-            var fx=1*(Math.random()-0.5);
-            var fy=1*(Math.random()-0.8);
+            var fx=20*(Math.random()-0.5);
+            var fy=20*(Math.random()-0.8);
             
             //collisions with units
             for (var j=0;j<Nu;j++){		
                     var collide = units[j].collidesWith(enemy);
                     if(collide) {
-                        var a = units[j]; 	var b = enemy;
-                        var colx = a.x - b.x;	var coly = a.y - b.y; 
+                        var a = units[j];
+                        var b = enemy;
+                        var colx = a.x - b.x;
+                        var coly = a.y - b.y; 
                         var ncol = sjs.math.hypo(colx,coly);
                         
                         if(ncol == 0)
@@ -309,7 +311,7 @@ window.onload = function() {
         }
     };
 
-    var ticker = scene.Ticker(30, paint);
+    var ticker = scene.Ticker(paint);
     ticker.run();
 };
 

@@ -79,6 +79,18 @@ window.onload = function() {
         }
     }
 
+    function assertNotEqual(value1, value2, desc) {
+        if(typeof value1 == "object")
+            value1 = JSON.stringify(value1)
+        if(typeof value2 == "object")
+            value2 = JSON.stringify(value2)
+        if(!(value1 === value2)) {
+            insertResult(desc)
+        } else {
+            insertResult(desc, value1+' equal to '+value2, true);
+        }
+    }
+
     var scene = sjs.Scene();
 
     var sp1 = scene.Sprite();
@@ -288,6 +300,10 @@ window.onload = function() {
     assertEqual(obj[sp1], 3, "Test object hash access with a Sprite 1");
     sp1.move(10, 5);
     assertEqual(obj[sp1], 3, "Test object hash access with a Sprite 2");
+
+    var sp1 = scene.Sprite();
+    var sp2 = scene.Sprite();
+    assertNotEqual(sp1.id, sp2.id, "Test that it's not possible to create 2 Sprites with equal ids.");
 
 };
 </script>

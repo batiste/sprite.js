@@ -44,11 +44,15 @@ var sjs = {
     Sprite:Sprite,
     overlay:overlay,
     scenes:[],
-    math:{hypo:hypo, mod:mod, normalVector:normalVector},
+    math:{hypo:hypo, mod:mod, normalVector:normalVector, lineSide:lineSide},
 };
 
-// math function
+// the cursor use to give unique ids to each sprite. 
+var spriteCursor = 0;
+// number of scene
+var nb_scene = 0;
 
+// math functions
 function mod(n, base) {
     // strictly positive modulo
     return ((n%base)+base)%base;
@@ -68,9 +72,18 @@ function normalVector(vx, vy, intensity) {
     return {x:vx/n, y:vy/n};
 }
 
+function lineSide(ax, ay, bx, by, cx, cy) {
+    // return true if the point C is on the right of the line (A, B)
+    var v = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
+    if(v == 0)
+        return null;
+    return v > 0;
+}
+
 // global z-index
 var zindex = 1;
 
+// browser specific feature detection
 function has(el, propList) {
     var prop = false;
     while (prop = propList.shift()) {
@@ -112,8 +125,6 @@ function overlay(x, y, w, h) {
     return div;
 };
 
-var nb_scene = 0;
-
 function Scene(options) {
 
     if(this.constructor !== arguments.callee)
@@ -128,6 +139,7 @@ function Scene(options) {
 
     var div = doc.createElement('div');
     div.style.overflow = 'hidden';
+    // TODO: detect those features
     // image-rendering: -moz-crisp-edges;
     // ms-interpolation-mode: nearest-neighbor;
     div.style.imageRendering = '-webkit-optimize-contrast';
@@ -316,8 +328,8 @@ function Sprite(scene, src, layer) {
     this.mass = 1;
     this.friction = 1;
     // forces
-    this.fx= 0;
-    this.fy = 0;
+    this.xf= 0;
+    this.yf = 0;
     
     // image
     this.src = null;
@@ -343,7 +355,7 @@ function Sprite(scene, src, layer) {
     this.opacity = 1;
     this.color = false;
 
-    this.id = new Date().getTime();
+    this.id = ++spriteCursor;
     
     // necessary to get set
     this.layer = null;
@@ -516,23 +528,36 @@ Sprite.prototype.position = function (x, y) {
     return this;
 };
 
-Sprite.prototype.setForce = function setForce(fx, fy) {
-    this.fx = fx;
-    this.fy = fy;
+Sprite.prototype.setForce = function setForce(xf, yf) {
+    this.xf = xf;
+    this.yf = yf;
 }
 
-Sprite.prototype.addForce = function addForce(fx, fy) {
-    this.fx = this.fx + fx;
-    this.fy = this.fy + fy;
+Sprite.prototype.addForce = function addForce(xf, yf) {
+    this.xf += xf;
+    this.yf += yf;
 }
 
 Sprite.prototype.applyForce = function applyForce(ticks) {
+    if(ticks === undefined)
+        ticks = 1;
     // Integrate newton's laws of motion F = ma => a = F / m
-    this.xv -= this.friction * this.xv * this.mass;
-    this.xv += (this.fx / this.mass);
-    this.yv -= this.friction * this.yv * this.mass;
-    this.yv += (this.fy / this.mass);
+    this.xv -= this.friction * this.xv * this.mass * ticks;
+    this.xv += (this.xf / this.mass) * ticks;
+    this.yv -= this.friction * this.yv * this.mass * ticks;
+    this.yv += (this.yf / this.mass) * ticks;
 };
+
+
+Sprite.prototype.setVelocity = function (xv, yv) {
+    this.xv = xv;
+    this.yv = yv;
+}
+
+Sprite.prototype.addVelocity = function (xv, yv) {
+    this.xv += xv;
+    this.yv += yv;
+}
 
 Sprite.prototype.applyVelocity = function (ticks) {
     if(ticks === undefined)
@@ -797,14 +822,6 @@ Sprite.prototype.isPointIn = function isPointIn(x, y) {
     return this.isPointInAngle(x, y);
 };
 
-sjs.lineSide = function(ax, ay, bx, by, cx, cy) {
-    // return true if the point is on the right of the line
-    var v = (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
-    if(v == 0)
-        return null;
-    return v > 0;
-}
-
 Sprite.prototype.isPointInAngle = function pointInAngle(x, y) {
     // Return true if the point is within the sprite surface
     // handle the case where the sprite has an angle
@@ -815,7 +832,7 @@ Sprite.prototype.isPointInAngle = function pointInAngle(x, y) {
             j=0;
         // if on the right of the line, the point
         // cannot be in the rectangle
-        if(sjs.lineSide(
+        if(lineSide(
             edges[i][0], edges[i][1],
             edges[j][0], edges[j][1],
             x, y
@@ -891,7 +908,7 @@ Sprite.prototype.distance = function distance(x, y) {
 }
 
 Sprite.prototype.center = function center() {
-    return [this.x + this.w/2, this.y + this.h/2];
+    return {x:this.x + this.w/2, y:this.y + this.h/2};
 }
 
 Sprite.prototype.collidesWithArray = function collidesWithArray(sprites) {
@@ -1502,6 +1519,8 @@ function Layer(scene, name, options) {
         }
     }
 }
+
+Layer.prototype.constructor = Layer;
 
 Layer.prototype.clear = function clear() {
     if(this.useWebGL)
