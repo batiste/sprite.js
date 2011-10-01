@@ -396,7 +396,7 @@ function Sprite(scene, src, layer) {
     }
 
     // can be set by the properties
-    if(this.layer === undefined)
+    if(this.layer === undefined || layer === undefined)
         this.layer = scene.layers['default'];
 
     if(this.layer  && !this.layer.useCanvas) {

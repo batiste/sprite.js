@@ -92,8 +92,10 @@ window.onload = function() {
     }
 
     var scene = sjs.Scene();
-
     var sp1 = scene.Sprite();
+
+    assertEqual(sp1.layer.name, "default", "Assert that the default layer is set");
+
     sp1.size(10, 10);
     sp1.move(10, 10);
 
