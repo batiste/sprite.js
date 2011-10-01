@@ -30,6 +30,8 @@ function main() {
     var load = document.getElementById('load');
     var input = scene.Input();
 
+    var front = scene.Layer("front", {useCanvas:true});
+
     var surface= sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, _x, _y) {
         _x = _x / 48.0 | 0;
         _y = _y / 48.0 | 0;
@@ -52,8 +54,10 @@ function main() {
     });
 
     surface.update();
+    var player = front.Sprite("character.png", {w:24, h:40, layer:front});
 
-    console.log(sjs.map.staticCollision)
+    player.move(surface.w / 2 - player.w/2, surface.h / 2 - player.h/2);
+
 
     function paint(ticker) {
 
@@ -77,6 +81,8 @@ function main() {
             surface.move(mx, my);
             surface.update();
         }
+
+        player.update();
 
         if(scene.ticker.currentTick % 30 == 0) {
             fps.innerHTML = ticker.fps;

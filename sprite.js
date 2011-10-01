@@ -369,7 +369,8 @@ function Sprite(scene, src, layer) {
             // we can receive things like this
             // {x:10, y:10, w:10, h:50, size:[20, 30], layer:var}
             var properties = layer;
-
+        
+            // this is the messy magic options initializer code
             for(p in properties) {
                 var value = properties[p];
                 var target = this[p];
@@ -377,13 +378,12 @@ function Sprite(scene, src, layer) {
                     this[p].apply(this, value);
                 else if(target !== undefined) {
                     // this is necessary to set cache value properly
-                    // this is necessary to set cache value properly
                     var first_char = p.charAt(0);
-                    if((first_char == 'x' || first_char == 'y') && p.length > 1)
+                    if((first_char == 'x' || first_char == 'y') && p.length > 1) {
                         var setF = 'set'+first_char.toUpperCase() + p.charAt(1).toUpperCase() + p.slice(2);
-                    else
+                    } else {
                         var setF = 'set'+first_char.toUpperCase() + p.slice(1);
-
+                    }
                     if(this[setF]) {
                         this[setF].apply(this, [value]);
                     } else {
@@ -1537,8 +1537,12 @@ Layer.prototype.clear = function clear() {
         this.ctx.clearRect(0, 0, this.dom.width, this.dom.height);
 }
 
-Layer.prototype.Sprite = function(src) {
-    return new Sprite(this.scene, src, this);
+Layer.prototype.Sprite = function(src, options) {
+    if(options)
+        options.layer = this;
+    else
+        options = this;
+    return new Sprite(this.scene, src, options);
 }
 
 Layer.prototype.remove = function remove() {

@@ -57,7 +57,6 @@
                 }
             }
         }
-        console.log(staticCollision)
     }
     
     function getTileProperties(gid) {
