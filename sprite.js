@@ -135,7 +135,7 @@ function Scene(options) {
 
     this.autoPause = optionValue(options, 'autoPause', true);
     // main function
-    this.main = false;
+    this.main = optionValue(options, 'main', function(){});
 
     var div = doc.createElement('div');
     div.style.overflow = 'hidden';
@@ -249,7 +249,7 @@ var spriteList = {};
 function error(msg) {alert(msg);}
 
 Scene.prototype.loadImages = function loadImages(images, callback) {
-    /* function used to preload the sprite images */
+    // function used to preload the sprite images
     if(!callback)
         callback = this.main;
 

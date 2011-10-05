@@ -19,8 +19,8 @@ html, body{margin:0;padding:0}
 
 
 var scene = sjs.Scene({w:672, h:480, autoPause:false});
-sjs.map.loadMap('map.json', scene);
-
+scene.main = main;
+sjs.map.loadMap('map2.json', scene);
 
 function main() {
 
@@ -32,32 +32,14 @@ function main() {
 
     var front = scene.Layer("front", {useCanvas:false});
 
-    var surface= sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, _x, _y) {
-        _x = _x / 48.0 | 0;
-        _y = _y / 48.0 | 0;
+    var surface= sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, x, y) {
         layer.clear();
-
-        for(var x = 0; x < (layer.w / 48); x++) {
-            for(var y = 0; y < (layer.h / 48); y++) {
-                for(var i in sjs.map.tilelayers) {
-                    var tilelayer = sjs.map.tilelayers[i]; 
-                    var gid = tilelayer.grid['c'+(_x + x)+';'+(_y + y)];
-                    if(gid) {
-                        var tile = sjs.map.getSprite(gid);
-                        // we need to update the position as the Sprites are shared
-                        tile.position(48 * x, 48 * y);
-                        tile.canvasUpdate(layer);
-                    }
-                }
-            }
-        }
+        sjs.map.paintOn(layer, x, y);
     });
 
     surface.update();
     var player = front.Sprite("character.png", {w:24, h:40, layer:front});
-
     player.move(surface.w / 2 - player.w/2, surface.h / 2 - player.h);
-
 
     function paint(ticker) {
 
@@ -73,9 +55,9 @@ function main() {
         if(input.keyboard.right)
             mx = 4;
 
-        var x = (surface.x + mx + surface.w / 2) / 48.0 | 0;
-        var y = (surface.y + my + surface.h / 2) / 48.0 | 0;
-        var collision = sjs.map.staticCollision['c'+(x)+';'+(y)];
+        var x = (surface.x + mx + surface.w / 2)
+        var y = (surface.y + my + surface.h / 2);
+        var collision = sjs.map.collides(x, y);
 
         if(!collision) {
             surface.move(mx, my);
