@@ -6,10 +6,23 @@
     var _scene = null;
     var staticCollision = {};
     
+    function load(src, callback) {
+        var xobj = new XMLHttpRequest();
+        xobj.onreadystatechange = function () {
+            if (xobj.readyState == 4) {
+                var text = xobj.responseText;
+                callback(text);
+            }
+        }
+        src = src + "?t=" + (new Date()).getTime();
+        xobj.open('GET', src, true);
+        xobj.send(null);
+    }
+        
     function loadMap(src, scene) {
-        var map_source = document.createElement('script');
-        map_source.src = src;
-        document.head.appendChild(map_source);
+        load(src, function(text) {
+            mapCallback(JSON.parse(text));
+        });
         _scene = scene;
     }
 
@@ -43,7 +56,6 @@
         _scene.loadImages(to_load);
        
     }
-    window.mapCallback = mapCallback;
     
     function paintOn(layer, _x, _y) {
         
@@ -78,6 +90,11 @@
         }
     }
     
+    function capitalise(string)
+    {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+    
     // merge the collisions from the different layers
     function buildStaticCollisions() {
         for(var i=0; i<tilelayers.length; i++) {
@@ -85,11 +102,29 @@
             for(index in tilelayer.data) {
                 var gid = tilelayer.data[index];
                 var prop = getTileProperties(gid);
+                var collision = staticCollision[index];
+                if(!collision)
+                    collision = {};
+                
+                var pos = ['left', 'top', 'right', 'bottom'];
+                
                 if(prop.collision) {
-                    staticCollision[index] = true;
+                    collision.whole = true;
                 }
+                
+                for(var p in pos) {
+                    var propName = 'collision'+capitalise(pos[p]);
+                    if(prop[propName])
+                        collision[propName] = parseInt(prop[propName]);
+                    var propName = 'pass'+capitalise(pos[p]);
+                    if(prop[propName])
+                        collision[propName] = parseInt(prop[propName]);
+                }
+                
+                staticCollision[index] = collision;
             }
         }
+        console.log(staticCollision)
     }
     
     // test collision with real world (x, y)
@@ -99,7 +134,59 @@
         if(x < 0 || y < 0 || _x > map.width || _y > map.height)
             return true;
         var index = map.width * (_y | 0) + (_x | 0);
-        return staticCollision[index];
+
+        var collision = staticCollision[String(index)];
+
+        if(!collision)
+            return false;
+        
+        if(collision.passRight) {
+            var col = x % map.tilewidth >=  map.tilewidth - collision.passRight;
+            if(col)
+                return false;
+        }
+        if(collision.passLeft) {
+            var col = x % map.tilewidth <=  collision.passLeft;
+            if(col)
+                return false;
+        }
+        if(collision.passTop) {
+            var col = y % map.tileheight <= collision.passTop;
+            if(col)
+                return false;
+        }
+        if(collision.passBottom) {
+            var col = y % map.tileheight >= map.tileheight - collision.passBottom;
+            if(col)
+                return false;
+        }
+        
+        if(collision.whole) {
+            return true;
+        }
+        
+        if(collision.collisionRight) {
+            var col = x % map.tilewidth >=  map.tilewidth - collision.collisionRight;
+            if(col)
+                return true;
+        }
+        if(collision.collisionLeft) {
+            var col = x % map.tilewidth <=  collision.collisionLeft;
+            if(col)
+                return true;
+        }
+        if(collision.collisionTop) {
+            var col = y % map.tileheight <= collision.collisionTop;
+            if(col)
+                return true;
+        }
+        if(collision.collisionBottom) {
+            var col = y % map.tileheight >= map.tileheight - collision.collisionBottom;
+            if(col)
+                return true;
+        }
+        
+        return false;
     }
     
     function getTileProperties(gid) {

@@ -9,47 +9,57 @@
   </tile>
   <tile id="22">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionLeft" value="20"/>
+    <property name="collisionTop" value="20"/>
    </properties>
   </tile>
   <tile id="23">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionTop" value="20"/>
    </properties>
   </tile>
   <tile id="24">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionTop" value="20"/>
    </properties>
   </tile>
   <tile id="25">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionRight" value="20"/>
+    <property name="collisionTop" value="20"/>
    </properties>
   </tile>
   <tile id="27">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionLeft" value="20"/>
    </properties>
   </tile>
   <tile id="28">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionRight" value="20"/>
    </properties>
   </tile>
   <tile id="31">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionLeft" value="20"/>
+    <property name="collisionTop" value="20"/>
    </properties>
   </tile>
   <tile id="32">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionTop" value="20"/>
    </properties>
   </tile>
   <tile id="33">
    <properties>
+    <property name="collisionRight" value="28"/>
+    <property name="collisionTop" value="20"/>
+   </properties>
+  </tile>
+  <tile id="34">
+   <properties>
     <property name="collision" value="true"/>
+    <property name="collisionRight" value="28"/>
    </properties>
   </tile>
   <tile id="35">
@@ -57,14 +67,19 @@
     <property name="collision" value="true"/>
    </properties>
   </tile>
+  <tile id="36">
+   <properties>
+    <property name="collision" value="left:28"/>
+   </properties>
+  </tile>
   <tile id="43">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionLeft" value="20"/>
    </properties>
   </tile>
   <tile id="46">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionRight" value="20"/>
    </properties>
   </tile>
   <tile id="51">
@@ -74,52 +89,80 @@
   </tile>
   <tile id="52">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionBottom" value="20"/>
+    <property name="collisionLeft" value="20"/>
+   </properties>
+  </tile>
+  <tile id="53">
+   <properties>
+    <property name="collisionLeft" value="15"/>
+    <property name="collisionRight" value="15"/>
+    <property name="passTop" value="28"/>
    </properties>
   </tile>
   <tile id="54">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionBottom" value="20"/>
+    <property name="collisionRight" value="28"/>
    </properties>
   </tile>
   <tile id="55">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collision" value="right:24"/>
    </properties>
   </tile>
   <tile id="57">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collision" value="left:28"/>
    </properties>
   </tile>
   <tile id="64">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionLeft" value="20"/>
+   </properties>
+  </tile>
+  <tile id="67">
+   <properties>
+    <property name="collisionRight" value="20"/>
+   </properties>
+  </tile>
+  <tile id="70">
+   <properties>
+    <property name="collision" value="whole"/>
+    <property name="passLeft" value="28"/>
+    <property name="passTop" value="28"/>
    </properties>
   </tile>
   <tile id="85">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionBottom" value="20"/>
+    <property name="collisionLeft" value="20"/>
+   </properties>
+  </tile>
+  <tile id="86">
+   <properties>
+    <property name="collisionBottom" value="20"/>
    </properties>
   </tile>
   <tile id="87">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionBottom" value="20"/>
    </properties>
   </tile>
   <tile id="88">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionBottom" value="20"/>
+    <property name="collisionRight" value="20"/>
    </properties>
   </tile>
   <tile id="90">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionLeft" value="20"/>
    </properties>
   </tile>
   <tile id="91">
    <properties>
-    <property name="collision" value="true"/>
+    <property name="collisionRight" value="20"/>
    </properties>
   </tile>
   <tile id="116">
@@ -188,12 +231,12 @@
  </tileset>
  <layer name="background" width="20" height="16">
   <data encoding="base64" compression="zlib">
-   eJyNlL1KxEAUhQOWVlaCYOMPNmoh4l+1VhaidoIPYRlSWCe7LyBKNvsCoiTxBQRJXHu7fRrPwDnsYdzC4mOGmTtnzr1zkzxJkgIMwQhMQA4yMAYVKDnPSWnzJkKxPyTlWs391ua57ZWk55mUc8UGraV/sAm2wDbPhjy+wBR8886C+iPzWzH3Cdcr6p2AU3AGOnrqTTOuXUa/M7LCvZZ6V+Aa3NBLyvPykJmXd7tTelPqFdRLzYtyG3K9jdZGrIk0dS7E7lBPe6rnjH4Ur3d/BE/gOXqnlr7lTzWWnmJcL+y/gFfwxr3MYlbBIVhjXWrLa8A71C/qpw++26e9sfrsHOyDdep0yd8+WKZeXD/VWeu56R2ADXDP9UEy77PG/OmeEPOQzHt/zHEX7IELcEwd91EQ+dOe56n3COMtOAJ3zNXzzWyUP9dp7EzPMaxfLshF/vQvUF/UrEPcd0Orv3tW3+rb8G+uW6BTMdY9dFanGK/hL3q8rz4=
+   eJyFlD1KBEEUhBsMjYxEUxUTfxIRNVpRMBA1Ez3IMIHx/FxAlNnZC4iyM15AkFnXM+xprIEqtmwXDD6mee91dfXrt5uFEHJQgBKMQAZSMAQ1qLjOSGXrJkK1M5IwNma+tXVmuYpMuCfhWrXSW/qHDbAJtri3v8cXmIJvnplTvzS/Ne8+Yrym3hE4Biego6eJaca9SyO/K8y11LsC1+CGXhLul4fUvLzbmdKbUi+nXmJedLeC8TaKleyJNLWvr92mnnLq54x+VK93fwRP4Dl6p5a+5U89lp5qXK/Pv4BX8MZcajWr4ACskXW714BnaF40Tx98t097Y83ZKdgz9sPfOVimXtw/9VnxzPTOyDnjgzCfs8b86Zy+5iHMZ3/I7w7YpdYFuI985ET+lPN76j367y04BHfU6qw2ta/8uU7Des1Fx/jlgrvIn/4LNBdj9iGeu4L7uvDbs+ZWvw3/zXULdGrWuofO+hTjPfwBD0yt9w==
   </data>
  </layer>
- <layer name="front" width="20" height="16" visible="0">
+ <layer name="front" width="20" height="16">
   <data encoding="base64" compression="zlib">
-   eJxjYBgFo2AUjIKRCQAFAAAB
+   eJxjYBgYcJlMPd1I/HIoJhd0I2EGBlSzqWEeNQA1zUIGhMKtmwg11LSPHD2UhI0uBXqxASci1eFKs+hiuMwjJ9+EEZC/TKS51EwPgwUAAMAwD8Y=
   </data>
  </layer>
 </map>

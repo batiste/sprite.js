@@ -63,7 +63,7 @@ Example of a basic use:
 Performance and different ways to draw
 =======================================
 
-This library provides 2 rendering engines: HTML and canvas.
+This library provides 3 rendering engines: HTML and canvas and WebGl. WebGl is still in an experimental state.
 
 By default the HTML engine is used. The HTML engine displays sprites using DOM elements when the canvas
 engine draw the sprites on the canvas. Each layer of the application can have a different engine.
@@ -120,7 +120,7 @@ Options details:
 
     Height of the scene.
 
-The list of the different methods available on the Scene object:
+This is the list of the different methods available on the Scene object:
 
 .. js:function:: Scene.loadImages(images, callback)
 
@@ -185,19 +185,12 @@ To create a sprite you should use the Scene.Sprite constructor:
         var foreground = scene.Layer("foreground");
         var player = scene.Sprite("player.png", foreground);
 
-    You can also create the sprite using the Layer directly instead of the Scene:
+    You can create the sprite using the Layer directly instead of the Scene:
 
     .. code-block:: javascript
 
         var foreground = scene.Layer("foreground");
         var player = layer.Sprite("player.png");
-
-    All parameters are optionnal. If the layer is not specified, the default layer will be used. 
-    If you want to set the layer but not any image you can do:
-
-    .. code-block:: javascript
-
-        var sprite = scene.Sprite(false, layer);
 
     You can also init any Sprite properties by passing an options object instead of the Layer object, eg:
 
@@ -205,6 +198,13 @@ To create a sprite you should use the Scene.Sprite constructor:
 
         var options = {layer:layer, x:10, size:[20, 20], y:15};
         var sprite = scene.Sprite("mysprite.png", options);
+
+    All parameters are optionnal. If the layer is not specified, the default layer will be used. 
+    If you want to set the layer but not any image you can do:
+
+    .. code-block:: javascript
+
+        var sprite = scene.Sprite(false, {layer:layer, color:"#f11"});
 
 Important methods
 -------------------

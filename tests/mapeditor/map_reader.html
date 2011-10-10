@@ -10,8 +10,13 @@ html, body{margin:0;padding:0}
 </style>
 </head>
 <body>
-<p><a href="http://www.mapeditor.org/">Map Editor</a> JSON map reader. Use keyboard to move.
+<p>JSON map reader for the JSON exporter from the <a href="http://www.mapeditor.org/">Map Editor 0.8</a> . Use keyboard to move.
 (<span id="fps"></span>FPS, load <span id="load"></span>%)</p>
+
+<p>This map reader handles multiple layer of sprites and collision detection if you set the property collision:true to any sprite in the editor. 
+To run it locally, you need to serve
+the JSON files: python server.py.</p>
+
 <script src="../../sprite.js"></script>
 <script src="../../lib/scrolling.js"></script>
 <script src="mapimport.js"></script>
@@ -20,7 +25,7 @@ html, body{margin:0;padding:0}
 
 var scene = sjs.Scene({w:672, h:480, autoPause:false});
 scene.main = main;
-sjs.map.loadMap('map2.json', scene);
+sjs.map.loadMap('http://127.0.0.1:8000/map.json', scene);
 
 function main() {
 
@@ -55,12 +60,17 @@ function main() {
         if(input.keyboard.right)
             mx = 4;
 
-        var x = (surface.x + mx + surface.w / 2)
-        var y = (surface.y + my + surface.h / 2);
-        var collision = sjs.map.collides(x, y);
+        var x = (surface.x + surface.w / 2);
+        var y = (surface.y + surface.h / 2);
 
-        if(!collision) {
-            surface.move(mx, my);
+        var collisionx = sjs.map.collides(x + mx, y);
+        var collisiony = sjs.map.collides(x, y + my);
+
+        if(!collisionx || !collisiony) {
+            if(!collisionx)
+                surface.move(mx, 0);
+            if(!collisiony)
+                surface.move(0, my);
             surface.update();
         }
 

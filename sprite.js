@@ -44,7 +44,7 @@ var sjs = {
     Sprite:Sprite,
     overlay:overlay,
     scenes:[],
-    math:{hypo:hypo, mod:mod, normalVector:normalVector, lineSide:lineSide},
+    math:{hypo:hypo, mod:mod, normalVector:normalVector, lineSide:lineSide}
 };
 
 // the cursor use to give unique ids to each sprite. 
