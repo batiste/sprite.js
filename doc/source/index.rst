@@ -390,6 +390,11 @@ Sprites comes with methods that can help you implement a basic physic engine:
 Collision detection
 -------------------------
 
+This methods are not included in sprite.js core and needs to be loaded indenpendantly::
+
+    <script src="lib/collision.js"></script>
+
+
 .. js:function:: Sprite.isPointIn(x, y)
 
     Return true if the point (x, y) is within the sprite surface.
