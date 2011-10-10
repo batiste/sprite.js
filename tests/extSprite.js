@@ -1,9 +1,9 @@
 //author: Jonathan Bieler
 
-sjs.Sprite.prototype.targetx=0;
-sjs.Sprite.prototype.targety=0;
-sjs.Sprite.prototype.hastarget=0;
-sjs.Sprite.prototype.selected=0;
+sjs.Sprite.prototype.targetx = 0;
+sjs.Sprite.prototype.targety = 0;
+sjs.Sprite.prototype.hastarget = 0;
+sjs.Sprite.prototype.selected = 0;
 
 sjs.Sprite.prototype.health = 50;
 

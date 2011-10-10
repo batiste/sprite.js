@@ -123,9 +123,8 @@
                 
                 staticCollision[index] = collision;
             }
-        }
-        console.log(staticCollision)
-    }
+        };
+    };
     
     // test collision with real world (x, y)
     function collides(x, y) {
@@ -227,7 +226,7 @@
     }
     
     // TODO: naming
-    sjs.map = {
+    global.sjs.map = {
         loadMap:loadMap, 
         findTileset:findTileset,
         getSprite:getSprite,
