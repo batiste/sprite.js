@@ -47,14 +47,14 @@ window.onload = function() {
 
     function assertTrue(value, desc) {
         if(value) {
-            insertResult(desc)
+            insertResult(desc);
         } else {
             insertResult(desc, value+' is not true', true);
         }
     }
     function assertFalse(value, desc) {
         if(!value) {
-            insertResult(desc)
+            insertResult(desc);
         } else {
             insertResult(desc, value+'" is not false', true);
         }
@@ -62,7 +62,7 @@ window.onload = function() {
 
     function assertGreater(v1, v2, desc) {
         if(v1 > v2) {
-            insertResult(desc)
+            insertResult(desc);
         } else {
             insertResult(desc, v1+'" is not greater than "'+v2+'"', true);
         }
@@ -70,11 +70,11 @@ window.onload = function() {
 
     function assertEqual(value1, value2, desc) {
         if(typeof value1 == "object")
-            value1 = JSON.stringify(value1)
+            value1 = JSON.stringify(value1);
         if(typeof value2 == "object")
-            value2 = JSON.stringify(value2)
+            value2 = JSON.stringify(value2);
         if(value1 === value2) {
-            insertResult(desc)
+            insertResult(desc);
         } else {
             insertResult(desc, value1+' not equal to '+value2, true);
         }
@@ -82,11 +82,11 @@ window.onload = function() {
 
     function assertNotEqual(value1, value2, desc) {
         if(typeof value1 == "object")
-            value1 = JSON.stringify(value1)
+            value1 = JSON.stringify(value1);
         if(typeof value2 == "object")
-            value2 = JSON.stringify(value2)
+            value2 = JSON.stringify(value2);
         if(!(value1 === value2)) {
-            insertResult(desc)
+            insertResult(desc);
         } else {
             insertResult(desc, value1+' equal to '+value2, true);
         }

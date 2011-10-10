@@ -21,7 +21,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-/* Sprite.js v1.1.1
+/* Sprite.js v1.2.0
  *
  * coding guideline
  *
@@ -49,8 +49,12 @@ var sjs = {
 
 // the cursor use to give unique ids to each sprite. 
 var spriteCursor = 0;
-// number of scene
+// number of scene.
 var nb_scene = 0;
+// a global cache to load each sprite only one time.
+var spriteList = {};
+// global z-index
+var zindex = 1;
 
 // math functions
 function mod(n, base) {
@@ -79,9 +83,6 @@ function lineSide(ax, ay, bx, by, cx, cy) {
         return null;
     return v > 0;
 }
-
-// global z-index
-var zindex = 1;
 
 // browser specific feature detection
 function has(el, propList) {
@@ -241,12 +242,6 @@ Scene.prototype.dialog = function dialog(options) {
     div.style.zIndex = String(zindex);
     this.dom.appendChild(div);
 }
-
-// a global cache to load each sprite only one time
-var spriteList = {};
-
-// the shameful error function
-function error(msg) {alert(msg);}
 
 Scene.prototype.loadImages = function loadImages(images, callback) {
     // function used to preload the sprite images
