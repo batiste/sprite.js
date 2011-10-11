@@ -28,7 +28,7 @@ var result = document.getElementById('result');
 
 var scene = sjs.Scene({w:600, h:600});
 
-scene.loadImages(['img/crate.png'], function() {
+scene.loadImages(['img/crate.png', 'img/ball.png'], function() {
 
     var ground = scene.Sprite();
     ground.position(0, 600-32);
@@ -44,7 +44,12 @@ scene.loadImages(['img/crate.png'], function() {
         ground.update();
 
         if(ticker.currentTick % 12 == 0 && crates.list.length < 30) {
-            var crate = scene.Sprite('img/crate.png');
+            if(Math.random() > 0.6) {
+                var crate = scene.Sprite('img/ball.png');
+                crate.type = 'circle';
+            } else {
+                var crate = scene.Sprite('img/crate.png');
+            }
             crate.position(50 + Math.random() * 500 | 0, 50);
             crate.rv = Math.random() / 4;
             crates.add(crate);
@@ -55,9 +60,12 @@ scene.loadImages(['img/crate.png'], function() {
         var crate;
         while(crate = crates.iterate()) {
             if(collisions[crate]) {
-                crate.reverseVelocity();
-                crate.yv = -crate.yv / 2;
+
+                crate.reverseVelocity();                
+                crate.yv = -crate.yv / 1.5;
                 crate.rv = -crate.rv / 1.1;
+
+
             } else {
                 crate.yv += gravity;
                 crate.applyVelocity();

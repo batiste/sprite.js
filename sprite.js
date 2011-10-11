@@ -1,5 +1,6 @@
 /*
-Copyright (c) 2011 Batiste Bieler, https://github.com/batiste/sprite.js
+Copyright (c) 2011 Batiste Bieler and contributors, 
+https://github.com/batiste/sprite.js
 
 Permission is hereby granted, free of charge, to any person obtaining
 a copy of this software and associated documentation files (the
@@ -26,7 +27,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  * coding guideline
  *
  * CamelCase everywhere (I don't like it but it seems to the standard these days).
- * Private attributes should start with an underline.
  * Tabs have to be 4 spaces (python style).
  * If you contribute don't forget to add your name in the AUTHORS file.
  */
@@ -320,7 +320,7 @@ function Sprite(scene, src, layer) {
     this.rv = 0;
    
     // shape: rectangle, circle
-    this.shape = "rectangle";
+    this.type = "rectangle";
     
     // newton
     this.mass = 1;
