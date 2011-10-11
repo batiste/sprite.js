@@ -26,7 +26,21 @@ the JSON files: python server.py.</p>
 
 var scene = sjs.Scene({w:672, h:480, autoPause:false});
 scene.main = main;
-sjs.map.loadMap('http://127.0.0.1:8000/map.json', scene);
+var local = true;
+switch(window.location.protocol) {
+   case 'http:':
+   case 'https:':
+     local = false;
+     break;
+   case 'file:':
+     local = true;
+     break;
+}
+
+if(local)
+    sjs.map.loadMap('http://127.0.0.1:8000/map.json', scene);
+else
+    sjs.map.loadMap('map.json', scene);
 
 function main() {
 
