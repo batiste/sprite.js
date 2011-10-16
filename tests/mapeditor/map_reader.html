@@ -77,8 +77,10 @@ function main() {
             surface.update();
         }
 
-        player_walk_down.next();
-        player_walk_down.update();
+        if(input.arrows()) {
+            player_walk_down.next();
+            player_walk_down.update();
+        }
         player.update();
 
         if(scene.ticker.currentTick % 30 == 0) {
