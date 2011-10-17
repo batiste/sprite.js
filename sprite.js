@@ -914,7 +914,6 @@ function Cycle(triplets) {
         this.changingTicks.push(this.cycleDuration);
     }
     this.currentTripletIndex = undefined;
-    this.changingTicks.pop();
     // suppose to be private
     this.sprites = [];
     // if set to false, the animation will stop automaticaly after one run
