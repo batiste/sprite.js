@@ -324,9 +324,9 @@ function Sprite(scene, src, layer) {
     
     // newton
     this.mass = 1;
-    this.friction = 1;
+    this.friction = 0.05;
     // forces
-    this.xf= 0;
+    this.xf = 0;
     this.yf = 0;
     
     // image
@@ -560,6 +560,9 @@ Sprite.prototype.applyForce = function applyForce(ticks) {
     this.yv += (this.yf / this.mass) * ticks;
 };
 
+Sprite.prototype.velocity = function () {
+    return hypo(this.xv, this.yv);
+}
 
 Sprite.prototype.setVelocity = function (xv, yv) {
     this.xv = xv;
