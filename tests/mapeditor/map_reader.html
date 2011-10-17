@@ -58,7 +58,7 @@ function main() {
     });
 
     surface.update();
-    var player = front.Sprite("character.png", {w:24, h:52, layer:front});
+    var player = front.Sprite("character.png", {w:24, h:42, layer:front});
     var player_walk_down = sjs.Cycle([[0,0,10],[24, 0, 10], [48, 0, 10], [72, 0, 10]]);
     player_walk_down.addSprite(player);
     player.move(surface.w / 2 - player.w/2, surface.h / 2 - player.h);
@@ -103,7 +103,7 @@ function main() {
         }
 
     }
-    scene.Ticker(paint, {useAnimationRequest:true}).run()
+    scene.Ticker(paint, {useAnimationRequest:true}).run();
 
 }
 
