@@ -31,7 +31,7 @@ the JSON files: python server.py.</p>
 <script>
 
 
-var scene = sjs.Scene({w:600, h:400, autoPause:false});
+var scene = sjs.Scene({w:640, h:480, autoPause:false});
 
 var scaleSceneDom = document.getElementById('scaleScene');
 var dropped = document.getElementById('dropped');
@@ -76,7 +76,6 @@ function main() {
     //scene.scale(2, 2);
 
     var surface= sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, x, y) {
-        layer.clear();
         sjs.map.paintOn(layer, x, y);
     });
 
