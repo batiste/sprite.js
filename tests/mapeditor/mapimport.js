@@ -235,8 +235,51 @@
         return {x:x, y:y};
     }
     
+    function findPath(x1, y1, x2, y2) {
+        x1 = (x1 / map.tilewidth | 0) * map.tilewidth;
+        y1 = (y1 / map.tileheight | 0) * map.tileheight;
+        x2 = (x2 / map.tilewidth | 0) * map.tilewidth;
+        y2 = (y2 / map.tileheight | 0) * map.tileheight;
+        var start = new Node(x1 + map.tilewidth / 2, y1 + map.tileheight / 2);
+        var end = new Node(x2 + map.tilewidth / 2, y2 + map.tileheight / 2);
+        return sjs.path.find(start, end);
+    }
+    
+    function Node(x, y, parent) {
+        this.parent = parent;
+        this.x = x;
+        this.y = y;
+    }
+
+    Node.prototype.neighbors = function() {
+        return [
+            new Node(this.x-map.tilewidth, this.y, this), 
+            new Node(this.x+map.tilewidth, this.y, this),
+            new Node(this.x, this.y + map.tileheight, this),
+            new Node(this.x, this.y - map.tileheight, this)
+        ];
+    }
+
+    Node.prototype.distance = function(node) {
+        return sjs.math.hypo(this.x - node.x, this.y-node.y);
+    }
+
+    Node.prototype.disabled = function() {
+        
+        return collides(this.x, this.y)
+            || collides(this.x + 12, this.y)
+            || collides(this.x, this.y + 12)
+            || collides(this.x, this.y - 12)
+            || collides(this.x - 12, this.y);
+    }
+
+    Node.prototype.equals = function(node) {
+        return this.x == node.x && this.y == node.y;
+    }
+    
     // TODO: naming
     global.sjs.map = {
+        findPath:findPath,
         loadMap:loadMap,
         align:align,
         findTileset:findTileset,

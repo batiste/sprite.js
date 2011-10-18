@@ -10,7 +10,7 @@ html, body{margin:0;padding:0}
 </style>
 </head>
 <body>
-<p>JSON map reader for the JSON exporter from the <a href="http://www.mapeditor.org/">Map Editor 0.8</a> . Use keyboard to move.
+<p>JSON map reader for the JSON exporter from the <a href="http://www.mapeditor.org/">Map Editor 0.8</a> . Use keyboard or mouse to move.
 (<span id="fps"></span>FPS, load <span id="load"></span>%)</p>
 
 <p>This map reader handles multiple layer of sprites and collision detection if you set the property collision:true to any sprite in the editor. 
@@ -20,6 +20,7 @@ the JSON files: python server.py.</p>
 <script src="../../sprite.js"></script>
 <script src="../../lib/scrolling.js"></script>
 <script src="../../lib/collision.js"></script>
+<script src="../../lib/path.js"></script>
 <script src="mapimport.js"></script>
 <script>
 
@@ -62,6 +63,15 @@ function main() {
     var player_walk_down = sjs.Cycle([[0,0,10],[24, 0, 10], [48, 0, 10], [72, 0, 10]]);
     player_walk_down.addSprite(player);
     player.move(surface.w / 2 - player.w/2, surface.h / 2 - player.h);
+    var target = null;
+
+    function reduceTo(v, max) {
+        if(v > max)
+            return max;
+        if(v < -max)
+            return -max;
+        return v;
+    }
 
     function paint(ticker) {
 
@@ -69,13 +79,13 @@ function main() {
         var my = 0;
 
         if(input.keyboard.up)
-            my = -4;
+            my = -4 * ticker.lastTicksElapsed;
         if(input.keyboard.down)
-            my = 4;
+            my = 4 * ticker.lastTicksElapsed;
         if(input.keyboard.left)
-            mx = -4;
+            mx = -4 * ticker.lastTicksElapsed;
         if(input.keyboard.right)
-            mx = 4;
+            mx = 4 * ticker.lastTicksElapsed;
 
         var x = (surface.x + surface.w / 2);
         var y = (surface.y + surface.h / 2);
@@ -85,8 +95,22 @@ function main() {
 
         if(input.mousereleased) {
             var mp = input.mouse.click;
-            var start = sjs.map.align(x, y);
-            var end = sjs.map.align(mp.x + surface.x, mp.y + surface.y);
+            target = sjs.map.findPath(x, y, mp.x + surface.x, mp.y + surface.y);
+        }
+
+        if(target) {
+            var target_x = target.x - x;
+            var target_y = target.y - y;
+            var move_x = reduceTo(target_x, 8);
+            var move_y = reduceTo(target_y, 8);
+
+            surface.move(move_x, move_y);
+
+            if(Math.abs(move_x) < 8 && Math.abs(move_y) < 8)
+                target = target.parent;
+
+            player_walk_down.next();
+            player_walk_down.update();
         }
 
         if(!collisionx || !collisiony) {
@@ -112,5 +136,6 @@ function main() {
     scene.Ticker(paint, {useAnimationRequest:true}).run();
 
 }
+
 
 </script>
