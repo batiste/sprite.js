@@ -59,6 +59,9 @@
     
     function paintOn(layer, _x, _y) {
         
+        var x_offset = _x % map.tilewidth;
+        var y_offset = _y % map.tileheight;
+        
         _x = _x / map.tilewidth | 0;
         _y = _y / map.tileheight | 0;
         
@@ -70,7 +73,7 @@
                     if(gid) {
                         var tile = getSprite(gid);
                         // we need to update the position as the Sprites are shared
-                        tile.position(map.tilewidth * x, map.tileheight * y);
+                        tile.position(map.tilewidth * x - x_offset, map.tileheight * y - y_offset);
                         tile.canvasUpdate(layer);
                     }
                 }
@@ -225,9 +228,17 @@
         return sp;
     }
     
+    function align(x, y) {
+        // return the cell coordinates according to relative coordinates
+        x = x / map.tilewidth | 0;
+        y = y / map.tileheight | 0;
+        return {x:x, y:y};
+    }
+    
     // TODO: naming
     global.sjs.map = {
-        loadMap:loadMap, 
+        loadMap:loadMap,
+        align:align,
         findTileset:findTileset,
         getSprite:getSprite,
         tilelayers:tilelayers,

@@ -24,7 +24,7 @@ the JSON files: python server.py.</p>
 <script>
 
 
-var scene = sjs.Scene({w:672, h:480, autoPause:false});
+var scene = sjs.Scene({w:800, h:600, autoPause:false});
 scene.main = main;
 var local = true;
 switch(window.location.protocol) {
@@ -82,6 +82,12 @@ function main() {
 
         var collisionx = sjs.map.collides(x + mx, y);
         var collisiony = sjs.map.collides(x, y + my);
+
+        if(input.mousereleased) {
+            var mp = input.mouse.click;
+            var start = sjs.map.align(x, y);
+            var end = sjs.map.align(mp.x + surface.x, mp.y + surface.y);
+        }
 
         if(!collisionx || !collisiony) {
             if(!collisionx)
