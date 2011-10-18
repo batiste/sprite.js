@@ -49,6 +49,7 @@ are on the screen or 50% percent javascript load is reached . <a href="https://g
 <a href="https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame">ref</a></label>
 <br><span id="nb"></span> particles, system load <span id="load"></span>% 
 (<span id="fps"></span>FPS) 
+(<span id="dropped"></span> dropped frames) 
 <br><a href="?canvas=1" id="canvas-mode">Use canvas engine.</a> 
 <a href="?html=1" id="html-mode">Use HTML engine</a>
 <a href="?webgl=1" id="webgl-mode">Use WebGL engine (experimental)</a>
@@ -65,6 +66,7 @@ window.onload = function() {
     var l = document.getElementById('load');
     var nb = document.getElementById('nb');
     var fps = document.getElementById('fps');
+    var dropped = document.getElementById('dropped');
     var scene = sjs.Scene({w:window.innerWidth-20, h:window.innerHeight-120});
 
     var use = document.getElementById('useImage');
@@ -137,6 +139,7 @@ window.onload = function() {
             l.innerHTML = ticker.load;
             nb.innerHTML = particles.list.length;
             fps.innerHTML = ticker.fps;
+            dropped.innerHTML = ticker.droppedFrames;
         }
 
     };

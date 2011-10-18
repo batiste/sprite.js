@@ -104,8 +104,11 @@ function initBrowserSpecific() {
     browser_specific_runned = true;
 }
 
-function optionValue(options, name, default_value) {
+function optionValue(options, name, default_value, type) {
     if(options && options[name] !== undefined) {
+        if(type == 'int') {
+            return options[name] | 0;
+        }
         return options[name];
     }
     return default_value
@@ -151,8 +154,8 @@ function Scene(options) {
     nb_scene = nb_scene + 1;
     var parent = optionValue(options, 'parent', doc.body);
     parent.appendChild(div);
-    this.w = optionValue(options, 'w', 480);
-    this.h = optionValue(options, 'h', 320);
+    this.w = optionValue(options, 'w', 480, 'int');
+    this.h = optionValue(options, 'h', 320, 'int');
     this.dom = div;
     this.dom.style.width = this.w + 'px';
     this.dom.style.height = this.h + 'px';
@@ -161,6 +164,9 @@ function Scene(options) {
     this.useCanvas = optionValue(options, "useCanvas",
         window.location.href.indexOf('canvas') != -1)
 
+    this.xscale = 1;
+    this.yscale = 1;
+    
     // needs to be done after this.useCanvas
     this.Layer("default");
     sjs.scenes.push(this);
@@ -185,6 +191,17 @@ Scene.prototype.Cycle = function SceneCycle(triplets) {
 
 Scene.prototype.Input = function SceneInput() {
     return Input(this);
+}
+
+Scene.prototype.scale = function SceneScale(x, y) {
+    this.xscale = x;
+    this.yscale = y;
+    this.dom.style[sjs.tproperty+"-origin"] = "0 0";
+    this.dom.style[sjs.tproperty] = "scale("+x+","+y+")";
+}
+
+Scene.prototype.toString = function SceneToString() {
+    return String(this.id);
 }
 
 Scene.prototype.reset = function reset() {
@@ -1033,6 +1050,7 @@ function _Ticker(scene, paint, options) {
     // absolute number of ticks that have been played ever
     this.currentTick = 0;
     this.ticksSinceLastStart = 0;
+    this.droppedFrames = 0;
 }
 
 _Ticker.prototype.next = function() {
@@ -1041,6 +1059,7 @@ _Ticker.prototype.next = function() {
     this.now = now;
     // number of ticks that have elapsed since the last start
     this.lastTicksElapsed = Math.round(this.diff / this.tickDuration);
+    this.droppedFrames += Math.max(0, this.lastTicksElapsed - 1);
     this.ticksSinceLastStart += this.lastTicksElapsed;
     // add the diff to the current ticks
     this.currentTick += this.lastTicksElapsed;
@@ -1186,11 +1205,12 @@ function _Input(scene) {
         global.addEventListener(name, fct, false);
     }
     
+    
     // Mouse like events
     function clickEvent(event) {
         that.mouse.click = {
-            x:event.clientX - that.dom.offsetLeft,
-            y:event.clientY - that.dom.offsetTop
+            x:(event.clientX - that.dom.offsetLeft) / scene.xscale,
+            y:(event.clientY - that.dom.offsetTop) / scene.yscale
         };
     }
     
@@ -1210,8 +1230,8 @@ function _Input(scene) {
     
     function mouseMoveEvent(event) {
         that.mouse.position = {
-            x:event.clientX - that.dom.offsetLeft,
-            y:event.clientY - that.dom.offsetTop
+            x:(event.clientX - that.dom.offsetLeft) / scene.xscale,
+            y:(event.clientY - that.dom.offsetTop) / scene.yscale
         };
     }
     

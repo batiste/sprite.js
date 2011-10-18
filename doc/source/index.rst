@@ -120,6 +120,11 @@ Options details:
 
     Height of the scene.
 
+.. js:attribute:: Scene.options.autoPause
+
+    Pause to the scene when the user quit the current window. The default is true.
+
+
 This is the list of the different methods available on the Scene object:
 
 .. js:function:: Scene.loadImages(images, callback)

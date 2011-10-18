@@ -65,8 +65,8 @@
         _x = _x / map.tilewidth | 0;
         _y = _y / map.tileheight | 0;
         
-        for(var x = 0; x < (layer.w / map.tilewidth); x++) {
-            for(var y = 0; y < (layer.h / map.tileheight); y++) {
+        for(var x = 0; x < (1 + layer.w / map.tilewidth); x++) {
+            for(var y = 0; y < (1 + layer.h / map.tileheight); y++) {
                 for(var i in tilelayers) {
                     var tilelayer = tilelayers[i];
                     var gid = tilelayer.getGid(_x + x, _y + y);

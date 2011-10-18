@@ -3,19 +3,25 @@
 <title>Read map</title>
 <meta name = "viewport" content = "width=device-width">
 <style>
-html, body{margin:0;padding:0}
+html, body{margin:1em;padding:0;font-size:0.8em;}
 .sjs{
     border:2px #999 solid;
 }
 </style>
 </head>
 <body>
-<p>JSON map reader for the JSON exporter from the <a href="http://www.mapeditor.org/">Map Editor 0.8</a> . Use keyboard or mouse to move.
-(<span id="fps"></span>FPS, load <span id="load"></span>%)</p>
+<p>(<span id="fps"></span>FPS,
+load <span id="load"></span>%,
+<span id="dropped"></span> dropped frames) 
+
+JSON map reader for the JSON exporter from the <a href="http://www.mapeditor.org/">Map Editor 0.8</a> . Use keyboard or mouse to move.
+</p>
 
 <p>This map reader handles multiple layer of sprites and collision detection if you set the property collision:true to any sprite in the editor. 
 To run it locally, you need to serve
 the JSON files: python server.py.</p>
+
+<p><label><input type="checkbox" id="scaleScene" />Scale the scene 2X</label></p>
 
 <script src="../../sprite.js"></script>
 <script src="../../lib/scrolling.js"></script>
@@ -25,7 +31,23 @@ the JSON files: python server.py.</p>
 <script>
 
 
-var scene = sjs.Scene({w:800, h:600, autoPause:false});
+var scene = sjs.Scene({w:600, h:400, autoPause:false});
+
+var scaleSceneDom = document.getElementById('scaleScene');
+var dropped = document.getElementById('dropped');
+var fps = document.getElementById('fps');
+var load = document.getElementById('load');
+
+var scaleScene = false;
+scaleSceneDom.onclick = function() {
+    scaleScene = scaleSceneDom.checked;
+    if(scaleScene) {
+        scene.scale(2, 2);
+    } else {
+        scene.scale(1, 1);
+    }
+}
+
 scene.main = main;
 var local = true;
 switch(window.location.protocol) {
@@ -47,11 +69,11 @@ function main() {
 
     var offsetx = 0;
     var offsety = 0;
-    var fps = document.getElementById('fps');
-    var load = document.getElementById('load');
+
     var input = scene.Input();
 
     var front = scene.Layer("front", {useCanvas:false});
+    //scene.scale(2, 2);
 
     var surface= sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, x, y) {
         layer.clear();
@@ -77,15 +99,16 @@ function main() {
 
         var mx = 0;
         var my = 0;
+        var pixels = 4 * ticker.lastTicksElapsed;
 
         if(input.keyboard.up)
-            my = -4 * ticker.lastTicksElapsed;
+            my = -pixels;
         if(input.keyboard.down)
-            my = 4 * ticker.lastTicksElapsed;
+            my = pixels;
         if(input.keyboard.left)
-            mx = -4 * ticker.lastTicksElapsed;
+            mx = -pixels;
         if(input.keyboard.right)
-            mx = 4 * ticker.lastTicksElapsed;
+            mx = pixels;
 
         var x = (surface.x + surface.w / 2);
         var y = (surface.y + surface.h / 2);
@@ -98,18 +121,24 @@ function main() {
             target = sjs.map.findPath(x, y, mp.x + surface.x, mp.y + surface.y);
         }
 
+        if(input.arrows()) {
+            target = null;
+            player_walk_down.next(ticker.lastTicksElapsed);
+            player_walk_down.update();
+        }
+
         if(target) {
             var target_x = target.x - x;
             var target_y = target.y - y;
-            var move_x = reduceTo(target_x, 8);
-            var move_y = reduceTo(target_y, 8);
+            var move_x = reduceTo(target_x, pixels);
+            var move_y = reduceTo(target_y, pixels);
 
             surface.move(move_x, move_y);
 
-            if(Math.abs(move_x) < 8 && Math.abs(move_y) < 8)
+            if(Math.abs(move_x) < pixels && Math.abs(move_y) < pixels)
                 target = target.parent;
 
-            player_walk_down.next();
+            player_walk_down.next(ticker.lastTicksElapsed);
             player_walk_down.update();
         }
 
@@ -121,15 +150,13 @@ function main() {
             surface.update();
         }
 
-        if(input.arrows()) {
-            player_walk_down.next();
-            player_walk_down.update();
-        }
+
         player.update();
 
-        if(scene.ticker.currentTick % 30 == 0) {
+        if(scene.ticker.currentTick % 20 == 0) {
             fps.innerHTML = ticker.fps;
             load.innerHTML = ticker.load;
+            dropped.innerHTML = ticker.droppedFrames;
         }
 
     }
