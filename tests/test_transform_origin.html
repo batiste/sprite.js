@@ -1,0 +1,30 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test</title>
+</head>
+<body>
+
+</body>
+<script src="../sprite.js"></script>
+<script>
+window.onload = function() {
+
+    var game_height = 200;
+    var game_width = 200;
+    var scene = sjs.Scene({w:game_width, h:game_height});
+    var layer = scene.Layer("name", {useCanvas:true});
+
+    scene.loadImages(['img/ground.png'], function() {
+        var s = scene.Sprite('img/ground.png');
+        s.move(20, 20);
+        s.transformOrigin(0, 0);
+        s.scale(2);
+        s.update();
+
+        s.move(0, 60);
+        s.canvasUpdate(layer);
+    });
+
+};
+</script>
+</html>

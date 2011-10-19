@@ -366,6 +366,9 @@ function Sprite(scene, src, layer) {
     this.xscale = 1;
     this.yscale = 1;
     this.angle = 0;
+    
+    this.xTransformOrigin = null;
+    this.yTransformOrigin = null;
 
     this.opacity = 1;
     this.color = false;
@@ -503,6 +506,14 @@ Sprite.prototype.setXScale = function setXscale(value) {
 Sprite.prototype.setYScale = function setYscale(value) {
     this.yscale = value;
     this._dirty['yscale'] = true;
+    this.changed = true;
+    return this;
+}
+
+Sprite.prototype.transformOrigin = function transformOrigin(x, y) {
+    this.xTransformOrigin = x;
+    this.yTransformOrigin = y;
+    this._dirty['transform'] = true;
     this.changed = true;
     return this;
 }
@@ -721,6 +732,10 @@ Sprite.prototype.update = function updateDomProperties () {
     if(this._dirty['color'])
         style.backgroundColor = this.color;
 
+    if(this._dirty['transform']) {
+        style[sjs.tproperty+'-origin'] = this.xTransformOrigin + " " + this.yTransformOrigin;
+    }
+    
     // those transformation have pretty bad perfs implication on Opera,
     // don't update those values if nothing changed
     if(this._dirty['xscale'] || this._dirty['yscale'] || this._dirty['angle']) {
@@ -744,13 +759,23 @@ Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
     else
         var ctx = this.layer.ctx;
     ctx.save();
+    
+    if(this.xTransformOrigin === null) {
+        // 50% 505 in CSS
+        var transx = this.w/2 | 0;
+        var transy = this.h/2 | 0;
+    } else {
+        var transx = this.xTransformOrigin;
+        var transy = this.yTransformOrigin;
+    }
+    
     // rounding the coordinates yield a big performance improvement
-    ctx.translate(this.x + this.w/2 | 0, this.y + this.h/2 | 0);
+    ctx.translate(this.x + transx, this.y + transy);
     ctx.rotate(this.angle);
     if(this.xscale != 1 || this.yscale != 1)
         ctx.scale(this.xscale, this.yscale);
     ctx.globalAlpha = this.opacity;
-    ctx.translate(-this.w/2 | 0, -this.h/2 | 0);
+    ctx.translate(-transx, -transy);
     // handle background colors.
     if(this.color) {
         ctx.fillStyle = this.color;
