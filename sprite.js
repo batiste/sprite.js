@@ -903,8 +903,8 @@ Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
             v = this.w / 2;
     }
     v = v | 0;
-    var s1 = layer.scene.Sprite(this.src, layer)
-        s2 = layer.scene.Sprite(this.src, layer);
+    var s1 = layer.scene.Sprite(this.src, layer);
+    var s2 = layer.scene.Sprite(this.src, layer);
     if(horizontal) {
         s1.size(this.w, v);
         s1.position(this.x, this.y);
