@@ -289,7 +289,7 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
 
     function _loadImg(src) {
         spriteList[src].loading = true;
-        img = new Image();
+        img = doc.createElement('img');
         spriteList[src].img = img;
         img.addEventListener('load', function() {
             spriteList[src].loaded = true;
@@ -724,7 +724,7 @@ Sprite.prototype.update = function updateDomProperties () {
         style.top=(this.y | 0)+'px';
 
     // cache rounded positions, it's used to avoid unecessary update
-    this._x_before = this._x_rounded
+    this._x_before = this._x_rounded;
     this._y_before = this._y_rounded;
 
     if(!this.changed)
@@ -753,9 +753,9 @@ Sprite.prototype.update = function updateDomProperties () {
     // don't update those values if nothing changed
     if(this._dirty.xscale || this._dirty.yscale || this._dirty.angle) {
         trans = "";
-        if(this.angle!=0)
+        if(this.angle!==0)
             trans += 'rotate('+this.angle+'rad) ';
-        if(this.xscale!=1 || this.yscale!=1) {
+        if(this.xscale!==1 || this.yscale!==1) {
             trans += ' scale('+this.xscale+', '+this.yscale+')';
         }
         style[sjs.tproperty] = trans;
@@ -843,7 +843,7 @@ Sprite.prototype.loadImg = function (src, resetSize) {
     // check if the image is already in the cache
     if(!spriteList[src]) {
         // if not we create the image in the cache
-        this.img = new Image();
+        this.img = doc.createElement('img');
         spriteList[src] = {src:src, img:this.img, loaded:false, loading:true};
         _loaded = false;
     } else {
@@ -878,7 +878,7 @@ Sprite.prototype.loadImg = function (src, resetSize) {
 
 Sprite.prototype.distance = function distance(x, y) {
     // Return the distance between this sprite and the point (x, y) or a Sprite
-    if(typeof x == "number") {
+    if(typeof x === "number") {
         return Math.sqrt(Math.pow(this.x + this.w/2 - x, 2) +
             Math.pow(this.y + this.h/2 - y, 2));
     } else {
@@ -896,7 +896,7 @@ Sprite.prototype.center = function center() {
 Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
     if(!layer)
         layer = this.layer;
-    if(v == undefined) {
+    if(v === undefined) {
         if(horizontal)
             v = this.h / 2;
         else
@@ -922,9 +922,9 @@ Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
 };
 
 Sprite.prototype.explode4 = function explode(x, y, layer) {
-    if(x == undefined)
+    if(x === undefined)
         x = this.w / 2;
-    if(y == undefined)
+    if(y === undefined)
         y = this.h / 2;
     x = x | 0;
     y = y | 0;
@@ -956,10 +956,11 @@ Sprite.prototype.explode4 = function explode(x, y, layer) {
 
 Cycle = function Cycle(triplets) {
 
-    if(this.constructor !== Cycle)
+    if(this.constructor !== Cycle) {
         return new Cycle(triplets);
+    }
 
-    var i;
+    var i, triplet;
     
     // Cycle for the Sprite image.
     // A cycle is a list of triplet (x offset, y offset, game tick duration)
@@ -969,7 +970,7 @@ Cycle = function Cycle(triplets) {
     // this array knows on which ticks in the animation
     // an image change is needed
     this.changingTicks = [0];
-    for(i=0, triplet; triplet=triplets[i]; i++) {
+    for(i=0; triplet=triplets[i]; i++) {
         this.cycleDuration = this.cycleDuration + triplet[2];
         this.changingTicks.push(this.cycleDuration);
     }
@@ -994,8 +995,8 @@ Cycle.prototype.toString = function () {
 };
 
 Cycle.prototype.update = function update() {
-    var sprites = this.sprites, i;
-    for(i=0, sp; sp = sprites[i]; i++) {
+    var sprites = this.sprites, i, sp;
+    for(i=0; sp = sprites[i]; i++) {
         sp.update();
     }
     return this;
@@ -1003,16 +1004,16 @@ Cycle.prototype.update = function update() {
 
 Cycle.prototype.addSprites = function addSprites(sprites) {
     this.sprites = this.sprites.concat(sprites);
-    var j;
-    for(j=0, sp; sp = sprites[j]; j++) {
+    var j, sp;
+    for(j=0; sp = sprites[j]; j++) {
         sp.cycle = this;
     }
     return this;
 };
 
 Cycle.prototype.removeSprite = function removeSprite(sprite) {
-    var j;
-    for(j=0, sp; sp = this.sprites[j]; j++) {
+    var j, sp;
+    for(j=0; sp = this.sprites[j]; j++) {
         if(sprite == sp) {
             sp.cycle = null;
             this.sprites.splice(j, 1);
@@ -1031,7 +1032,7 @@ Cycle.prototype.next = function (ticks, update) {
         }
     }
     // search if we are in a new triplet
-    var newTripletIndex = undefined, i, j;
+    var newTripletIndex, i, j, sprite;
     for(i=0; i < this.changingTicks.length - 1; i++) {
         if(this.tick >= this.changingTicks[i] && this.tick <= this.changingTicks[i+1]) {
             newTripletIndex = i;
@@ -1039,7 +1040,7 @@ Cycle.prototype.next = function (ticks, update) {
         }
     }
     if(newTripletIndex !== undefined && newTripletIndex !== this.currentTickIndex) {
-        for(j=0, sprite; sprite = this.sprites[j]; j++) {
+        for(j=0; sprite = this.sprites[j]; j++) {
             sprite.setXOffset(this.triplets[i][0]);
             sprite.setYOffset(this.triplets[i][1]);
             if(update)
@@ -1054,10 +1055,10 @@ Cycle.prototype.next = function (ticks, update) {
 };
 
 Cycle.prototype.reset = function resetCycle(update) {
-    var j;
+    var j, sprite;
     this.tick = 0;
     this.done = false;
-    for(j=0, sprite; sprite = this.sprites[j]; j++) {
+    for(j=0; sprite = this.sprites[j]; j++) {
         sprite.setXOffset(this.triplets[0][0]);
         sprite.setYOffset(this.triplets[0][1]);
         if(update)
@@ -1067,8 +1068,8 @@ Cycle.prototype.reset = function resetCycle(update) {
 };
 
 Cycle.prototype.go = function gotoCycle(n) {
-    var j;
-    for(j=0, sprite; sprite = this.sprites[j]; j++) {
+    var j, sprite;
+    for(j=0; sprite = this.sprites[j]; j++) {
         sprite.setXOffset(this.triplets[n][0]);
         sprite.setYOffset(this.triplets[n][1]);
     }
