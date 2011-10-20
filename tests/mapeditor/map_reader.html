@@ -30,6 +30,13 @@ the JSON files: python server.py.</p>
 <script src="mapimport.js"></script>
 <script>
 
+var swish_sound_1 = new Audio("swish-1.ogg");
+swish_sound_1.addEventListener("ended", function() {swish_sound_1.playing=false});
+swish_sound_1.addEventListener("play", function() {swish_sound_1.playing=true});
+function swish() {
+    if(!swish_sound_1.playing)
+        swish_sound_1.play();
+}
 
 var scene = sjs.Scene({w:640, h:480, autoPause:false});
 
@@ -80,9 +87,24 @@ function main() {
     });
 
     surface.update();
-    var player = front.Sprite("character.png", {w:24, h:42, layer:front});
+    var player = front.Sprite("character.png?gsf", {w:24, h:48, layer:front});
     var player_walk_down = sjs.Cycle([[0,0,10],[24, 0, 10], [48, 0, 10], [72, 0, 10]]);
+    var player_walk_up = sjs.Cycle([[0,96,10],[24, 96, 10], [48, 96, 10], [72, 96, 10]]);
+    var player_walk_left = sjs.Cycle([[0,144,10],[24, 144, 10], [48, 144, 10], [72, 144, 10]]);
+    var player_walk_right = sjs.Cycle([[0,48,10],[24, 48, 10], [48, 48, 10], [72, 48, 10]]);
+
+    var player_attack_right = sjs.Cycle([[0,192, 2],[48, 192, 4], [0, 240, 3], [48, 240, 3], [0, 288, 4], [48, 288, 5]]);
+    var player_attack_left = sjs.Cycle([[144, 192, 2],[96, 192, 4], [144, 240, 3], [96, 240, 3], [144, 288, 4], [96, 288, 5]]);
+
     player_walk_down.addSprite(player);
+    player_walk_left.addSprite(player);
+    player_walk_right.addSprite(player);
+    player_walk_up.addSprite(player);
+    player_attack_right.addSprite(player);
+    player_attack_left.addSprite(player);
+
+    var current_player_anim = player_walk_down;
+
     player.move(surface.w / 2 - player.w/2, surface.h / 2 - player.h);
     var target = null;
 
@@ -99,6 +121,9 @@ function main() {
         var mx = 0;
         var my = 0;
         var pixels = 4 * ticker.lastTicksElapsed;
+        if(input.keyboard.enter || input.keyboard.space) {
+            var pixels = 2 * ticker.lastTicksElapsed;
+        }
 
         if(input.keyboard.up)
             my = -pixels;
@@ -108,6 +133,43 @@ function main() {
             mx = -pixels;
         if(input.keyboard.right)
             mx = pixels;
+
+        function getAnimation(move_x, move_y) {
+
+            if(input.keyboard.enter || input.keyboard.space) {
+                player.setW(48);
+                if(current_player_anim.tick==1)
+                    swish();
+                if(move_x < 0) {
+                    current_player_anim = player_attack_left;
+                    player.position(surface.w / 2 - 40, surface.h / 2 - player.h);
+                } else {
+                    current_player_anim = player_attack_right;
+                    player.position(surface.w / 2 - 12, surface.h / 2 - player.h);
+                }
+                current_player_anim.next(ticker.lastTicksElapsed);
+                return current_player_anim;
+            } else {
+                player.position(surface.w / 2 - 12, surface.h / 2 - player.h);
+                player.setW(24);
+            }
+
+            if(move_y < 0)
+                current_player_anim = player_walk_up;
+            if(move_x > 0)
+                current_player_anim = player_walk_right;
+            if(move_x < 0)
+                current_player_anim = player_walk_left;
+            if(move_y > 0)
+                current_player_anim = player_walk_down;
+
+            if(move_y == 0 && move_x == 0) {
+                current_player_anim = player_walk_down;
+                current_player_anim.go(0);
+                return;
+            }
+            current_player_anim.next(ticker.lastTicksElapsed);
+        }
 
         var x = (surface.x + surface.w / 2);
         var y = (surface.y + surface.h / 2);
@@ -122,24 +184,22 @@ function main() {
 
         if(input.arrows()) {
             target = null;
-            player_walk_down.next(ticker.lastTicksElapsed);
-            player_walk_down.update();
         }
 
         if(target) {
             var target_x = target.x - x;
             var target_y = target.y - y;
-            var move_x = reduceTo(target_x, pixels);
-            var move_y = reduceTo(target_y, pixels);
+            mx = reduceTo(target_x, pixels);
+            my = reduceTo(target_y, pixels);
 
-            surface.move(move_x, move_y);
+            surface.move(mx, my);
 
-            if(Math.abs(move_x) < pixels && Math.abs(move_y) < pixels)
+            if(Math.abs(mx) < pixels && Math.abs(my) < pixels)
                 target = target.parent;
 
-            player_walk_down.next(ticker.lastTicksElapsed);
-            player_walk_down.update();
         }
+
+        getAnimation(mx, my);
 
         if(!collisionx || !collisiony) {
             if(!collisionx)
