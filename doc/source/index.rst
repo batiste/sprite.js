@@ -17,6 +17,9 @@ or use the `direct link to the library <https://raw.github.com/batiste/sprite.js
 
 To see examples of what the framework has to offers `have a look at the test files <http://batiste.dosimple.ch/sprite.js/tests/>`_.  There is also :ref:`a list of projects that uses sprite.js <examples>`.
 
+This documentation doesn't document all Sprite.js features but only the ones that are considered stable.
+
+
 .. toctree::
    :maxdepth: 2
 
@@ -800,7 +803,7 @@ is provided for you to determine what to draw on this layer. The layer object ha
     :param Scene scene: The scene that will hold the surface.
     :param number w: the width of the surface.
     :param number h: the height of the surface.
-    :param function h: the callback the surface will call when a piece of surface needs to be painted.
+    :param function redrawCallback: the callback the surface will call when a piece of surface needs to be painted.
 
 .. js:function:: redrawCallback(layer, x, y)
 
