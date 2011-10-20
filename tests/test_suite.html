@@ -26,6 +26,8 @@
 
 <h1>Sprite.js test suites</h1>
 
+<p id="infos"></p>
+
 <div id="result" style="font-size:0.90em"></div>
 
 </body>
@@ -36,13 +38,20 @@
 window.onload = function() {
 
     var result = document.getElementById('result');
+    var infos = document.getElementById('infos');
     result.style['height'] = (window.window.innerHeight - 100) + 'px';
+    var test_runned = 0;
+    var failed_test = 0;
 
     function insertResult(desc, message, fail) {
-        if(fail)
+        test_runned ++;
+        if(fail) {
+            failed_test ++;
             result.innerHTML += '<div class="result fail">' + desc + ' failed.<br><strong>Because</strong><br>' + message + '</div>';
-        else
+        } else {
             result.innerHTML += '<div class="result">' + desc + '</div>';
+        }
+        infos.innerHTML = test_runned + " test runned. " + failed_test + " test failed.";
     }
 
     function assertTrue(value, desc) {
@@ -115,7 +124,7 @@ window.onload = function() {
     sp3.size(10, 10);
     sp3.move(21, 10);
 
-    assertTrue(sp1.collidesWith(sp1), "collidesWith test1");
+    assertTrue(sp1.collidesWith(sp1), "A sprite should collides with itself");
     assertTrue(sp1.collidesWith(sp2), "collidesWith test2");
     assertTrue(sp2.collidesWith(sp1), "collidesWith test3");
 

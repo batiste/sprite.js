@@ -35,7 +35,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 (function (global) {
 "use strict";
-var doc = global.document,
+var sjs, Sprite, Scene, Layer, Ticker, Ticker_, Cycle, Input, _Input, List,
+doc = global.document,
 // the cursor use to give unique ids to each sprite. 
 spriteCursor = 0,
 // number of scene.
@@ -123,7 +124,7 @@ function overlay(x, y, w, h) {
     return div;
 }
 
-function Scene(options) {
+Scene = function Scene(options) {
 
     if(this.constructor !== Scene) {
         return new Scene(options);
@@ -158,7 +159,7 @@ function Scene(options) {
     this.layers = {};
     this.ticker = null;
     this.useCanvas = optionValue(options, "useCanvas",
-        global.location.href.indexOf('canvas') !== -1)
+        global.location.href.indexOf('canvas') !== -1);
 
     this.xscale = 1;
     this.yscale = 1;
@@ -167,38 +168,38 @@ function Scene(options) {
     this.Layer("default");
     sjs.scenes.push(this);
     return this;
-}
+};
 
 Scene.prototype.constructor = Scene;
 
 Scene.prototype.Sprite = function SceneSprite(src, layer) {
     // A shortcut for sjs.Sprite
     return new Sprite(this, src, layer);
-}
+};
 
 Scene.prototype.Layer = function SceneLayer(name, options) {
     return new Layer(this, name, options);
-}
+};
 
 // just for convenience
 Scene.prototype.Cycle = function SceneCycle(triplets) {
     return new Cycle(triplets);
-}
+};
 
 Scene.prototype.Input = function SceneInput() {
     return new Input(this);
-}
+};
 
 Scene.prototype.scale = function SceneScale(x, y) {
     this.xscale = x;
     this.yscale = y;
     this.dom.style[sjs.tproperty+"-origin"] = "0 0";
     this.dom.style[sjs.tproperty] = "scale("+x+","+y+")";
-}
+};
 
 Scene.prototype.toString = function () {
     return "Scene(" + String(this.id) + ")";
-}
+};
 
 Scene.prototype.reset = function reset() {
     var l;
@@ -217,7 +218,7 @@ Scene.prototype.reset = function reset() {
     }
     this.layers = {};
     this.Layer("default");
-}
+};
 
 Scene.prototype.Ticker = function Ticker(paint, options) {
     if(this.ticker) {
@@ -226,7 +227,7 @@ Scene.prototype.Ticker = function Ticker(paint, options) {
     }
     this.ticker = new Ticker_(this, paint, options);
     return this.ticker;
-}
+};
 
 Scene.prototype.dialogEvent = function dialogEvent(div, el, event, callback) {
     var that = this, ev;
@@ -236,7 +237,7 @@ Scene.prototype.dialogEvent = function dialogEvent(div, el, event, callback) {
         callback();
     };
     el.addEventListener("click", ev, false);
-}
+};
 
 Scene.prototype.dialog = function dialog(options) {
     var div = doc.createElement("div"), html, buttons, b, button, callback, i, dummy;
@@ -257,7 +258,7 @@ Scene.prototype.dialog = function dialog(options) {
     zindex += 1;
     div.style.zIndex = String(zindex);
     this.dom.appendChild(div);
-}
+};
 
 Scene.prototype.loadImages = function loadImages(images, callback) {
     // function used to preload the sprite images
@@ -312,13 +313,15 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
     }
 
     for(src in spriteList) {
-        if(!spriteList[src].loading) {
-            _loadImg(src);
+        if(spriteList.hasOwnProperty(src)) {
+            if(!spriteList[src].loading) {
+                _loadImg(src);
+            }
         }
     }
-}
+};
 
-function Sprite(scene, src, layer) {
+Sprite = function Sprite(scene, src, layer) {
 
     this.scene = scene;
     this._dirty = {};
@@ -379,7 +382,7 @@ function Sprite(scene, src, layer) {
     // necessary to get set
     this.layer = null;
 
-    var value, target, setF, first_char, d, p;
+    var value, target, setF, first_char, d, p, properties;
     
     // if it doesn't seems to kouak like a Layer object
     if(layer) {
@@ -389,28 +392,30 @@ function Sprite(scene, src, layer) {
         } else {
             // we can receive things like this
             // {x:10, y:10, w:10, h:50, size:[20, 30], layer:var}
-            var properties = layer;
+            properties = layer;
         
             // this is the messy magic options initializer code
             for(p in properties) {
-                value = properties[p];
-                target = this[p];
-                if(typeof target === "function") {
-                    this[p].apply(this, value);
-                }
-                else if(target !== undefined) {
-                    // this is necessary to set cache value properly
-                    first_char = p.charAt(0);
-                    if((first_char === 'x' || first_char === 'y') && p.length > 1) {
-                        setF = 'set'+first_char.toUpperCase() + p.charAt(1).toUpperCase() + p.slice(2);
-                    } else {
-                        setF = 'set'+first_char.toUpperCase() + p.slice(1);
+                if (properties.hasOwnProperty(p)) {
+                    value = properties[p];
+                    target = this[p];
+                    if(typeof target === "function") {
+                        this[p].apply(this, value);
                     }
-                    if(this[setF]) {
-                        this[setF].apply(this, [value]);
-                    } else {
-                        // necessary for layer option
-                        this[p] = value;
+                    else if(target !== undefined) {
+                        // this is necessary to set cache value properly
+                        first_char = p.charAt(0);
+                        if((first_char === 'x' || first_char === 'y') && p.length > 1) {
+                            setF = 'set'+first_char.toUpperCase() + p.charAt(1).toUpperCase() + p.slice(2);
+                        } else {
+                            setF = 'set'+first_char.toUpperCase() + p.slice(1);
+                        }
+                        if(this[setF]) {
+                            this[setF].apply(this, [value]);
+                        } else {
+                            // necessary for layer option
+                            this[p] = value;
+                        }
                     }
                 }
             }
@@ -432,7 +437,7 @@ function Sprite(scene, src, layer) {
         this.loadImg(src);
     }
     return this;
-}
+};
 
 Sprite.prototype.constructor = Sprite;
 
@@ -444,77 +449,77 @@ Sprite.prototype.setX = function setX(value) {
     this._x_rounded = value | 0;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.setY = function setY(value) {
     this.y = value;
     this._y_rounded = value | 0;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.setW = function setW(value) {
     this.w = value;
     this._dirty.w = true;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.setH = function setH(value) {
     this.h = value;
     this._dirty.h = true;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.setXOffset = function setXoffset(value) {
     this.xoffset = value;
     this._dirty.xoffset = true;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.setYOffset = function setYoffset(value) {
     this.yoffset = value;
     this._dirty.yoffset = true;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.setAngle = function setAngle(value) {
     this.angle = value;
     this._dirty.angle = true;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.setColor = function setColor(value) {
     this.color = value;
     this._dirty.color = true;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.setOpacity = function setOpacity(value) {
     this.opacity = value;
     this._dirty.opacity = true;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.setXScale = function setXscale(value) {
     this.xscale = value;
     this._dirty.xscale = true;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.setYScale = function setYscale(value) {
     this.yscale = value;
     this._dirty.yscale = true;
     this.changed = true;
     return this;
-}
+};
 
 Sprite.prototype.transformOrigin = function transformOrigin(x, y) {
     this.xTransformOrigin = x;
@@ -522,67 +527,68 @@ Sprite.prototype.transformOrigin = function transformOrigin(x, y) {
     this._dirty.transform = true;
     this.changed = true;
     return this;
-}
+};
 
 // End of boilerplate setters, start of helpers
 
 Sprite.prototype.rotate = function (v) {
     this.setAngle(this.angle + v);
     return this;
-}
+};
 
 Sprite.prototype.orient = function orient(x, y) {
     var a = Math.atan2(y, x);
     this.setAngle(a);
-}
+};
 
 Sprite.prototype.scale = function (x, y) {
     if(this.xscale !== x) {
         this.setXScale(x);
     }
-    if(y === undefined)
+    if(y === undefined) {
         y = x;
+    }
     if(this.yscale !== y) {
         this.setYScale(y);
     }
     return this;
-}
+};
 
 Sprite.prototype.move = function (x, y) {
     this.setX(this.x+x);
     this.setY(this.y+y);
     return this;
-}
+};
 
 Sprite.prototype.position = function (x, y) {
     this.setX(x);
     this.setY(y);
     return this;
-}
+};
 
 Sprite.prototype.offset = function (x, y) {
     this.setXOffset(x);
     this.setYOffset(y);
     return this;
-}
+};
 
 Sprite.prototype.size = function (w, h) {
     this.setW(w);
     this.setH(h);
     return this;
-}
+};
 
 // Physic
 
 Sprite.prototype.setForce = function setForce(xf, yf) {
     this.xf = xf;
     this.yf = yf;
-}
+};
 
 Sprite.prototype.addForce = function addForce(xf, yf) {
     this.xf += xf;
     this.yf += yf;
-}
+};
 
 Sprite.prototype.applyForce = function applyForce(ticks) {
     if(ticks === undefined) {
@@ -593,21 +599,21 @@ Sprite.prototype.applyForce = function applyForce(ticks) {
     this.xv += (this.xf / this.mass) * ticks;
     this.yv -= this.friction * this.yv * this.mass * ticks;
     this.yv += (this.yf / this.mass) * ticks;
-}
+};
 
 Sprite.prototype.velocity = function () {
     return hypo(this.xv, this.yv);
-}
+};
 
 Sprite.prototype.setVelocity = function (xv, yv) {
     this.xv = xv;
     this.yv = yv;
-}
+};
 
 Sprite.prototype.addVelocity = function (xv, yv) {
     this.xv += xv;
     this.yv += yv;
-}
+};
 
 Sprite.prototype.applyVelocity = function (ticks) {
     if(ticks === undefined)
@@ -619,7 +625,7 @@ Sprite.prototype.applyVelocity = function (ticks) {
     if(this.rv !== 0)
         this.setAngle(this.angle+this.rv*ticks);
     return this;
-}
+};
 
 Sprite.prototype.reverseVelocity = function (ticks) {
     if(ticks === undefined)
@@ -631,48 +637,48 @@ Sprite.prototype.reverseVelocity = function (ticks) {
     if(this.rv !== 0)
         this.setAngle(this.angle-this.rv*ticks);
     return this;
-}
+};
 
 Sprite.prototype.applyXVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv !== 0)
         this.setX(this.x+this.xv*ticks);
-}
+};
 
 Sprite.prototype.reverseXVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.xv !== 0)
         this.setX(this.x-this.xv*ticks);
-}
+};
 
 Sprite.prototype.applyYVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.yv !== 0)
         this.setY(this.y+this.yv*ticks);
-}
+};
 
 Sprite.prototype.reverseYVelocity = function (ticks) {
     if(ticks === undefined)
         ticks = 1;
     if(this.yv !== 0)
         this.setY(this.y-this.yv*ticks);
-}
+};
 
 Sprite.prototype.rotateVelocity = function (a) {
     var x = this.xv * Math.cos(a) - this.yv * Math.sin(a);
     this.yv = this.xv * Math.sin(a) + this.yv * Math.cos(a);
     this.xv = x;
-}
+};
 
 Sprite.prototype.orientVelocity = function (x, y) {
     var intensity = hypo(this.xv, this.yv), v;
     v = normalVector(x, y, intensity);
     this.xv = v.x;
     this.yv = v.y;
-}
+};
 
 Sprite.prototype.remove = function remove() {
     if(this.cycle)
@@ -687,7 +693,7 @@ Sprite.prototype.remove = function remove() {
     //delete this.layer.sprites[this.layerIndex];
     this.layer = null;
     this.img = null;
-}
+};
 
 // Update methods
 
@@ -697,7 +703,7 @@ Sprite.prototype.webGLUpdate = function webGLUpdate () {
     }
     this.texture.render(this.x, this.y);
     return this;
-}
+};
 
 Sprite.prototype.update = function updateDomProperties () {
     // This is the CPU heavy function.
@@ -758,7 +764,7 @@ Sprite.prototype.update = function updateDomProperties () {
     this.changed = false;
     this._dirty = {};
     return this;
-}
+};
 
 Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
     var ctx, transx, transy, repeat_w, repeat_y;
@@ -815,19 +821,19 @@ Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
     }
     ctx.restore();
     return this;
-}
+};
 
 // Other methods
 
 Sprite.prototype.toString = function () {
     return "Sprite(" + String(this.id) + ")";
-}
+};
 
 Sprite.prototype.onload = function(callback) {
     if(this.imgLoaded && this._callback) {
         this._callback = callback;
     }
-}
+};
 
 Sprite.prototype.loadImg = function (src, resetSize) {
     // the image exact source value will change according to the
@@ -868,7 +874,7 @@ Sprite.prototype.loadImg = function (src, resetSize) {
         this.img.src = src;
     }
     return this;
-}
+};
 
 Sprite.prototype.distance = function distance(x, y) {
     // Return the distance between this sprite and the point (x, y) or a Sprite
@@ -879,11 +885,11 @@ Sprite.prototype.distance = function distance(x, y) {
         return Math.sqrt(Math.pow(this.x + (this.w / 2) - (x.x + (x.w / 2)), 2) +
             Math.pow(this.y + (this.h / 2) - (x.y + (x.h / 2)), 2));
     }
-}
+};
 
 Sprite.prototype.center = function center() {
     return {x:this.x + this.w/2, y:this.y + this.h/2};
-}
+};
 
 // Fx
 
@@ -913,7 +919,7 @@ Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
         s2.setXOffset(v);
     }
     return [s1, s2];
-}
+};
 
 Sprite.prototype.explode4 = function explode(x, y, layer) {
     if(x == undefined)
@@ -946,13 +952,15 @@ Sprite.prototype.explode4 = function explode(x, y, layer) {
     s4.offset(0, y);
 
     return [s1, s2, s3, s4];
-}
+};
 
-function Cycle(triplets) {
+Cycle = function Cycle(triplets) {
 
     if(this.constructor !== Cycle)
         return new Cycle(triplets);
 
+    var i;
+    
     // Cycle for the Sprite image.
     // A cycle is a list of triplet (x offset, y offset, game tick duration)
     this.triplets = triplets;
@@ -961,7 +969,7 @@ function Cycle(triplets) {
     // this array knows on which ticks in the animation
     // an image change is needed
     this.changingTicks = [0];
-    for(var i=0, triplet; triplet=triplets[i]; i++) {
+    for(i=0, triplet; triplet=triplets[i]; i++) {
         this.cycleDuration = this.cycleDuration + triplet[2];
         this.changingTicks.push(this.cycleDuration);
     }
@@ -973,43 +981,45 @@ function Cycle(triplets) {
     this.tick = 0;
     this.done = false;
     this.id = ++nb_cycle;
-}
+};
 
 Cycle.prototype.addSprite = function addSprite(sprite) {
     this.sprites.push(sprite);
     sprite.cycle = this;
     return this;
-}
+};
 
 Cycle.prototype.toString = function () {
     return "Cycle(" + String(this.id) + ")";
-}
+};
 
 Cycle.prototype.update = function update() {
-    var sprites = this.sprites;
-    for(var i=0, sp; sp = sprites[i]; i++) {
+    var sprites = this.sprites, i;
+    for(i=0, sp; sp = sprites[i]; i++) {
         sp.update();
     }
     return this;
-}
+};
 
 Cycle.prototype.addSprites = function addSprites(sprites) {
     this.sprites = this.sprites.concat(sprites);
-    for(var j=0, sp; sp = sprites[j]; j++) {
+    var j;
+    for(j=0, sp; sp = sprites[j]; j++) {
         sp.cycle = this;
     }
     return this;
-}
+};
 
 Cycle.prototype.removeSprite = function removeSprite(sprite) {
-    for(var j=0, sp; sp = this.sprites[j]; j++) {
+    var j;
+    for(j=0, sp; sp = this.sprites[j]; j++) {
         if(sprite == sp) {
             sp.cycle = null;
             this.sprites.splice(j, 1);
         }
     }
     return this;
-}
+};
 
 Cycle.prototype.next = function (ticks, update) {
     if(this.tick > this.cycleDuration) {
@@ -1021,15 +1031,15 @@ Cycle.prototype.next = function (ticks, update) {
         }
     }
     // search if we are in a new triplet
-    var newTripletIndex = undefined;
-    for(var i=0; i < this.changingTicks.length - 1; i++) {
+    var newTripletIndex = undefined, i, j;
+    for(i=0; i < this.changingTicks.length - 1; i++) {
         if(this.tick >= this.changingTicks[i] && this.tick <= this.changingTicks[i+1]) {
             newTripletIndex = i;
             break;
         }
     }
     if(newTripletIndex !== undefined && newTripletIndex !== this.currentTickIndex) {
-        for(var j=0, sprite; sprite = this.sprites[j]; j++) {
+        for(j=0, sprite; sprite = this.sprites[j]; j++) {
             sprite.setXOffset(this.triplets[i][0]);
             sprite.setYOffset(this.triplets[i][1]);
             if(update)
@@ -1041,29 +1051,31 @@ Cycle.prototype.next = function (ticks, update) {
     ticks = ticks || 1; // default tick: 1
     this.tick = this.tick + ticks;
     return this;
-}
+};
 
 Cycle.prototype.reset = function resetCycle(update) {
+    var j;
     this.tick = 0;
     this.done = false;
-    for(var j=0, sprite; sprite = this.sprites[j]; j++) {
+    for(j=0, sprite; sprite = this.sprites[j]; j++) {
         sprite.setXOffset(this.triplets[0][0]);
         sprite.setYOffset(this.triplets[0][1]);
         if(update)
             sprite.update();
     }
     return this;
-}
+};
 
 Cycle.prototype.go = function gotoCycle(n) {
-    for(var j=0, sprite; sprite = this.sprites[j]; j++) {
+    var j;
+    for(j=0, sprite; sprite = this.sprites[j]; j++) {
         sprite.setXOffset(this.triplets[n][0]);
         sprite.setYOffset(this.triplets[n][1]);
     }
     return this;
-}
+};
 
-function Ticker_(scene, paint, options) {
+Ticker_ = function Ticker_(scene, paint, options) {
 
     // backward compatiblity from the 1.1.1 API
     if(typeof paint == "number") {
@@ -1091,7 +1103,7 @@ function Ticker_(scene, paint, options) {
     this.currentTick = 0;
     this.ticksSinceLastStart = 0;
     this.droppedFrames = 0;
-}
+};
 
 Ticker_.prototype.next = function() {
     var now = new Date().getTime();
@@ -1104,7 +1116,7 @@ Ticker_.prototype.next = function() {
     // add the diff to the current ticks
     this.currentTick += this.lastTicksElapsed;
     return this.lastTicksElapsed;
-}
+};
 
 Ticker_.prototype.run = function() {
     if(this.paused)
@@ -1142,12 +1154,12 @@ Ticker_.prototype.run = function() {
         var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 6);
         this.timeout = setTimeout(function(){t.run()}, _nextPaint);
     }
-}
+};
 
 Ticker_.prototype.pause = function() {
     global.clearTimeout(this.timeout);
     this.paused = true;
-}
+};
 
 Ticker_.prototype.resume = function() {
     this.start = new Date().getTime();
@@ -1155,7 +1167,7 @@ Ticker_.prototype.resume = function() {
     this.ticksSinceLastStart = 0;
     this.paused = false;
     this.run();
-}
+};
 
 
 var inputSingleton = false;
@@ -1163,9 +1175,9 @@ function Input(scene){
     if(!inputSingleton)
         inputSingleton = new _Input(scene);
     return inputSingleton
-}
+};
 
-function _Input(scene) {
+_Input = function _Input(scene) {
 
     if(scene)
         this.dom = scene.dom;
@@ -1352,12 +1364,12 @@ function _Input(scene) {
 
     // can be used to avoid key jamming
     addEvent("keypress", function(e) {});
-}
+};
 
 _Input.prototype.arrows = function arrows() {
     /* Return true if any arrow key is pressed */
     return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
-}
+};
 
 // Add an automatic pause to all the scenes when the user
 // quit the current window.
@@ -1394,8 +1406,10 @@ global.addEventListener("blur", function (e) {
     }
 }, false);
 
-function Layer(scene, name, options) {
+Layer = function Layer(scene, name, options) {
 
+    var domElement, needToCreate, domH, domW;
+    
     if(!this || this.constructor !== Layer)
         return new Layer(scene, name, options);
 
@@ -1426,11 +1440,11 @@ function Layer(scene, name, options) {
     else
         error('Layer '+ name + ' already exist.');
 
-    var domElement = doc.getElementById(name);
+    domElement = doc.getElementById(name);
     if(!domElement)
-        var needToCreate = true;
+        needToCreate = true;
     else
-        var needToCreate = false;
+        needToCreate = false;
 
     if(this.useCanvas) {
         if (domElement && domElement.nodeName.toLowerCase() !== "canvas") {
@@ -1446,11 +1460,11 @@ function Layer(scene, name, options) {
     }
 
     if(!needToCreate) {
-        var domH = domElement.height || domElement.style.height;
-        var domW = domElement.width || domElement.style.width;
+        domH = domElement.height || domElement.style.height;
+        domW = domElement.width || domElement.style.width;
     } else {
-        var domH = false;
-        var domW = false;
+        domH = false;
+        domW = false;
     }
 
     if(options.parent)
@@ -1487,7 +1501,7 @@ function Layer(scene, name, options) {
             this.ctx = domElement.getContext('2d');
         }
     }
-}
+};
 
 Layer.prototype.constructor = Layer;
 
@@ -1496,7 +1510,7 @@ Layer.prototype.clear = function clear() {
         this.ctx.clear(this.ctx.COLOR_BUFFER_BIT | this.ctx.DEPTH_BUFFER_BIT);
     else
         this.ctx.clearRect(0, 0, this.dom.width, this.dom.height);
-}
+};
 
 Layer.prototype.Sprite = function(src, options) {
     if(options)
@@ -1504,35 +1518,35 @@ Layer.prototype.Sprite = function(src, options) {
     else
         options = this;
     return new Sprite(this.scene, src, options);
-}
+};
 
 Layer.prototype.remove = function remove() {
     this.parent.removeChild(this.dom);
     delete this.scene.layers[this.name];
-}
+};
 
 Layer.prototype.addSprite = function addSprite(sprite) {
     var index = Math.random() * 11;
     this.sprites[index] = sprite;
     return index
-}
+};
 
 Layer.prototype.setColor = function setColor(color) {
     this.dom.style.backgroundColor = color;
-}
+};
 
 Layer.prototype.onTop = function onTop(color) {
     zindex += 1;
     this.dom.style.zIndex = String(zindex);
-}
+};
 
-function List(list) {
+List = function List(list) {
     if(this.constructor !== List)
         return new List(list);
     this.list = list || [];
     this.length = this.list.length;
     this.index = -1;
-}
+};
 
 List.prototype.add = function add(sprite) {
     if(sprite.length)
@@ -1540,7 +1554,7 @@ List.prototype.add = function add(sprite) {
     else
         this.list.push(sprite);
     this.length = this.list.length;
-}
+};
 
 List.prototype.remove = function remove(toRemove) {
     for(var i=0, el; el = this.list[i]; i++) {
@@ -1553,7 +1567,7 @@ List.prototype.remove = function remove(toRemove) {
             return true;
         }
     }
-}
+};
 
 List.prototype.iterate = function iterate() {
     this.index += 1;
@@ -1562,7 +1576,7 @@ List.prototype.iterate = function iterate() {
         return false;
     }
     return this.list[this.index];
-}
+};
 
 var sjs = {
     Cycle: Cycle,
@@ -1574,7 +1588,7 @@ var sjs = {
     overlay: overlay,
     scenes: [],
     math:{hypo: hypo, mod: mod, normalVector: normalVector, lineSide: lineSide}
-}
+};
 
 global.sjs = sjs;
 
