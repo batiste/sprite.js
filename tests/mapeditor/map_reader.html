@@ -31,7 +31,7 @@ the JSON files: python server.py.</p>
 <script>
 
 
-
+sjs.debug = true;
 var scene = sjs.Scene({w:640, h:480, autoPause:false});
 
 
@@ -195,6 +195,7 @@ function paint(ticker) {
         var obj = sjs.map.eventObjects[i];
         if(sjs.collision.isPointInRectangle(x, y, obj)) {
             if(obj.event == "teleport") {
+                target = null;
                 ticker.pause();
                 sjs.map.loadMap(obj.map, scene);
             }

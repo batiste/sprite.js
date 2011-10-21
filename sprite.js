@@ -50,7 +50,11 @@ browser_specific_runned = false,
 zindex = 1;
 
 function error(msg) {
-    console.log("Sprite.js: " + msg)
+    console.log("Sprite.js error: " + msg)
+}
+
+function warning(msg) {
+    console.log("Sprite.js warning: " + msg)
 }
 
 // math functions
@@ -1375,7 +1379,8 @@ _Input = function _Input(scene) {
 
     // can be used to avoid key jamming
     addEvent("keypress", function(e) {});
-    addEvent("contextmenu", function(e) {e.preventDefault()});
+    if(!sjs.debug)
+        addEvent("contextmenu", function(e) {e.preventDefault()});
 };
 
 _Input.prototype.arrows = function arrows() {
@@ -1450,6 +1455,8 @@ Layer = function Layer(scene, name, options) {
     if(this.scene.layers[name] === undefined) {
         this.scene.layers[name] = this;
     } else {
+        if(sjs.debug)
+            warning("A layer named "+name+" already exist.");
         // if the user try to create a Layer that already exists,
         // we send back the same.
         return this.scene.layers[name];
@@ -1594,6 +1601,7 @@ List.prototype.iterate = function iterate() {
 };
 
 var sjs = {
+    debug:false,
     Cycle: Cycle,
     Input: Input,
     Scene: Scene,
