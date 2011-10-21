@@ -191,7 +191,8 @@ Scene.prototype.Cycle = function SceneCycle(triplets) {
 };
 
 Scene.prototype.Input = function SceneInput() {
-    return new Input(this);
+    this.input = new Input(this);
+    return this.input;
 };
 
 Scene.prototype.scale = function SceneScale(x, y) {
@@ -1143,7 +1144,8 @@ Ticker_.prototype.run = function() {
 
     this.paint(this);
     // reset the keyboard change
-    Input(this.scene).next();
+    if(this.scene.input)
+        this.scene.input.next();
 
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
@@ -1283,6 +1285,10 @@ _Input = function _Input(scene) {
         that.mousedown = false;
         that.mouse.down = false;
         that.mousereleased = true;
+        that.mouse.click = {
+            x:(event.clientX - that.dom.offsetLeft) / scene.xscale,
+            y:(event.clientY - that.dom.offsetTop) / scene.yscale
+        };
     }
     
     function mouseMoveEvent(event) {
@@ -1369,6 +1375,7 @@ _Input = function _Input(scene) {
 
     // can be used to avoid key jamming
     addEvent("keypress", function(e) {});
+    addEvent("contextmenu", function(e) {e.preventDefault()});
 };
 
 _Input.prototype.arrows = function arrows() {

@@ -155,8 +155,8 @@ function paint(ticker) {
     var x = (surface.x + surface.w / 2);
     var y = (surface.y + surface.h / 2);
 
-    if(input.mousereleased) {
-        var mp = input.mouse.click;
+    if(input.mousepressed) {
+        var mp = input.mouse.position;
         target = sjs.map.findPath(x, y, mp.x + surface.x, mp.y + surface.y);
     }
 
