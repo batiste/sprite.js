@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="12" height="12" tilewidth="48" tileheight="48">
+ <tileset firstgid="1" source="tileset.tsx"/>
+ <tileset firstgid="211" source="ground.tsx"/>
+ <layer name="Tile Layer 1" width="12" height="12">
+  <data encoding="base64" compression="zlib">
+   eJyNkdEJwDAIRM0IHdY12uUixEzTFhQekpR+HEa9nBejIqI/MT/qE30r/R69jvP54Iq8ao/IMzrygXpqk6fgeqChVvnp+wjfBm9VP2E4O3QUc+diRupyVwoN7pL+XfY7t3hf+qy8vqi1DZd/VT3ybsYXNzo7Xfo=
+  </data>
+ </layer>
+ <objectgroup name="Object Layer 1" width="12" height="12">
+  <object name="player start" type="playerStart" x="36" y="258" width="85" height="53"/>
+  <object name="map 1" type="teleport" x="-27" y="208" width="43" height="152">
+   <properties>
+    <property name="map" value="map.json"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>

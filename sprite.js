@@ -49,6 +49,10 @@ browser_specific_runned = false,
 // global z-index
 zindex = 1;
 
+function error(msg) {
+    console.log("Sprite.js: " + msg)
+}
+
 // math functions
 function mod(n, base) {
     // strictly positive modulo
@@ -1090,7 +1094,6 @@ Ticker_ = function Ticker_(scene, paint, options) {
     if(this.constructor !== Ticker_)
         return new Ticker_(tickDuration, paint);
     
-    
     this.tickDuration = optionValue(options, 'tickDuration', 16);
     this.useAnimationFrame = optionValue(options, 'useAnimationFrame', false);
     if(!sjs.animationFrame)
@@ -1159,6 +1162,7 @@ Ticker_.prototype.run = function() {
 
 Ticker_.prototype.pause = function() {
     global.clearTimeout(this.timeout);
+    window[sjs.animationFrame] = undefined;
     this.paused = true;
 };
 
@@ -1436,11 +1440,14 @@ Layer = function Layer(scene, name, options) {
     this.useWebGL = options.useWebGL;
 
     this.name = name;
-    if(this.scene.layers[name] === undefined)
+    if(this.scene.layers[name] === undefined) {
         this.scene.layers[name] = this;
-    else
-        error('Layer '+ name + ' already exist.');
-
+    } else {
+        // if the user try to create a Layer that already exists,
+        // we send back the same.
+        return this.scene.layers[name];
+    }
+    
     domElement = doc.getElementById(name);
     if(!domElement)
         needToCreate = true;

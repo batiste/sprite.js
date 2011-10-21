@@ -1,10 +1,9 @@
 
 (function(global) {
 
-    var map = null;
-    var tilelayers = [];
-    var _scene = null;
-    var staticCollision = {};
+    var map, tilelayers, tilelayers, _scene, staticCollision, tileProp, playerStart, eventObjects;
+    eventObjects = [];
+    tilelayers = [];
     
     function load(src, callback) {
         var xobj = new XMLHttpRequest();
@@ -20,6 +19,13 @@
     }
         
     function loadMap(src, scene) {
+        tileProp = {};
+        map = null;
+        tilelayers = [];
+        _scene = null;
+        staticCollision = {};
+        sjs.map.eventObjects = [];
+        
         load(src, function(text) {
             mapCallback(JSON.parse(text));
         });
@@ -44,6 +50,10 @@
                 layer.getGid = _getGid;
                 tilelayers.push(layer);
             }
+
+            if(layer.type=="objectgroup") {
+                objectGroup(layer);
+            }
         }
         buildTileProperties();
         buildStaticCollisions();
@@ -55,6 +65,22 @@
 
         _scene.loadImages(to_load);
        
+    }
+
+
+
+    function objectGroup(group) {
+        for(index in group.objects) {
+            var object = group.objects[index];
+            if(object.type=="playerStart") {
+                playerStart = {x:object.x, y:object.y};
+                sjs.map.playerStart = playerStart;
+            }
+            if(object.type=="teleport") {
+                var shape = {x:object.x, y:object.y, w:object.width, h:object.height, type:"rectangle", event:"teleport", map:object.properties.map};
+                sjs.map.eventObjects.push(shape);
+            }
+        }
     }
     
     function paintOn(layer, _x, _y) {
@@ -82,7 +108,7 @@
     }
     
     // just merge all the tile props into a big object
-    var tileProp = {}
+
     function buildTileProperties() {
         for(var i=0; i<map.tilesets.length; i++) {
             var tileset = map.tilesets[i];
@@ -279,6 +305,8 @@
     
     // TODO: naming
     global.sjs.map = {
+        eventObjects:[],
+        playerStart:playerStart,
         findPath:findPath,
         loadMap:loadMap,
         align:align,

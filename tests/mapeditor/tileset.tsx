@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.0" orientation="orthogonal" width="20" height="16" tilewidth="48" tileheight="48">
  <tileset firstgid="1" name="tiles" tilewidth="48" tileheight="48">
   <image source="tiles.png" width="1022" height="512"/>
   <tile id="0">
@@ -205,11 +204,6 @@
     <property name="collision" value="true"/>
    </properties>
   </tile>
-  <tile id="192">
-   <properties>
-    <property name="collisionBottom" value="20"/>
-   </properties>
-  </tile>
   <tile id="193">
    <properties>
     <property name="collision" value="true"/>
@@ -221,40 +215,4 @@
    </properties>
   </tile>
  </tileset>
- <tileset firstgid="211" name="Ground" tilewidth="48" tileheight="48">
-  <image source="ground.png" width="192" height="96"/>
-  <tile id="0">
-   <properties>
-    <property name="collision" value="true"/>
-   </properties>
-  </tile>
-  <tile id="1">
-   <properties>
-    <property name="test" value="hello"/>
-   </properties>
-  </tile>
- </tileset>
- <layer name="background" width="20" height="16">
-  <data encoding="base64" compression="zlib">
-   eJyNk2sOgyAQBrl1T6D1DFrPQOsZUK5VmrjJ5GOh/JhEEnb2hVMIYfrDXHgWFoddWAfo+Q8hDuD56cwgdRjp98dZuODjOaN2q2crvJxZGYx/3Hc9r/X7LnycWRmMYz8Tej3lm3kU9Rnsz5v7gv1wtsxJD/uLjm+/Y6Pko48e9ue5DtyhU+vTHDpXe7eMpVPrs/eQHI+RJdbmF0NdX+/d7k4s96d9tf5Rb+8p1PtTX+sfXUO99+Sc6bpkXy24dz2ba775AgcNzrQ=
-  </data>
- </layer>
- <layer name="front" width="20" height="16">
-  <data encoding="base64" compression="zlib">
-   eJy1lFsKwjAQRWcLLsc1uJ6mS7DQbx+gbsAHqBsQ3ULoT1fjBDJwvY6JPx04NDTpmZsEGkUkTkSpvPlIY3alZw9r2gxWUJZK57g5Vw+IfLqtdspeGQo+c7IvZLAa5abc/8j3KxNXU5gz30pZKxtlK9/nZvubQV/eM/qOyjlzqeQLuV/NdyKfZRwIu1vvbMz3UObKU3nRmuQYM+b0PHwfC2fdSHh3yz48e+vdUqYrjJOvAw/7MCPuZ6R3iQPgZfO8+L3kbJYLqblq/wXsMdU/iXkDJS6QnA==
-  </data>
- </layer>
- <objectgroup name="Object Layer 1" width="20" height="16">
-  <object name="start" type="playerStart" x="397" y="145" width="59" height="30"/>
-  <object name="map 2" type="teleport" x="935" y="-17" width="59" height="795">
-   <properties>
-    <property name="map" value="map2.json"/>
-   </properties>
-  </object>
-  <object name="into house" type="teleport" x="148" y="447" width="36" height="36">
-   <properties>
-    <property name="map" value="house.json"/>
-   </properties>
-  </object>
- </objectgroup>
-</map>
+
