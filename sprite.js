@@ -202,7 +202,7 @@ Scene.prototype.Input = function SceneInput() {
 Scene.prototype.scale = function SceneScale(x, y) {
     this.xscale = x;
     this.yscale = y;
-    this.dom.style[sjs.tproperty+"-origin"] = "0 0";
+    this.dom.style[sjs.tproperty+"Origin"] = "0 0";
     this.dom.style[sjs.tproperty] = "scale("+x+","+y+")";
 };
 
@@ -755,7 +755,7 @@ Sprite.prototype.update = function updateDomProperties () {
         style.backgroundColor = this.color;
 
     if(this._dirty.transform) {
-        style[sjs.tproperty+'-origin'] = this.xTransformOrigin + " " + this.yTransformOrigin;
+        style[sjs.tproperty+'Origin'] = this.xTransformOrigin + " " + this.yTransformOrigin;
     }
     
     // those transformation have pretty bad perfs implication on Opera,
