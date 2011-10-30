@@ -202,7 +202,7 @@ Scene.prototype.Input = function SceneInput() {
 Scene.prototype.scale = function SceneScale(x, y) {
     this.xscale = x;
     this.yscale = y;
-    this.dom.style[sjs.tproperty+"-origin"] = "0 0";
+    this.dom.style[sjs.tproperty+"Origin"] = "0 0";
     this.dom.style[sjs.tproperty] = "scale("+x+","+y+")";
 };
 
@@ -383,6 +383,8 @@ Sprite = function Sprite(scene, src, layer) {
     this.xTransformOrigin = null;
     this.yTransformOrigin = null;
 
+    this.backgroundRepeat = null;
+
     this.opacity = 1;
     this.color = false;
 
@@ -535,6 +537,12 @@ Sprite.prototype.transformOrigin = function transformOrigin(x, y) {
     this.yTransformOrigin = y;
     this._dirty.transform = true;
     this.changed = true;
+    return this;
+};
+
+Sprite.prototype.setBackgroundRepeat = function setBackgroundRepeat(value) {
+    this._dirty.backgroundRepeat = true;
+    this.backgroundRepeat = value;
     return this;
 };
 
@@ -755,7 +763,11 @@ Sprite.prototype.update = function updateDomProperties () {
         style.backgroundColor = this.color;
 
     if(this._dirty.transform) {
-        style[sjs.tproperty+'-origin'] = this.xTransformOrigin + " " + this.yTransformOrigin;
+        style[sjs.tproperty+'Origin'] = this.xTransformOrigin + " " + this.yTransformOrigin;
+    }
+
+    if(this._dirty.backgroundRepeat) {
+        style.backgroundRepeat = this.backgroundRepeat;
     }
     
     // those transformation have pretty bad perfs implication on Opera,

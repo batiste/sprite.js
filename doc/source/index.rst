@@ -311,6 +311,7 @@ If you want to change any of those attributes use the following setters:
 .. js:function:: Sprite.setAngle(radian)
 .. js:function:: Sprite.setColor('#333')
 .. js:function:: Sprite.setOpacity(0.5)
+.. js:function:: Sprite.setBackgroundRepeat("repeat-y")
 
 Or one of those helper methods:
 
