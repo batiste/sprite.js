@@ -16,19 +16,19 @@
          "name":"Object Layer 1",
          "objects":[
                 {
-                 "height":38,
+                 "height":27,
                  "name":"start",
                  "properties":
                     {
 
                     },
                  "type":"playerStart",
-                 "width":46,
-                 "x":47,
-                 "y":231
+                 "width":32,
+                 "x":55,
+                 "y":273
                 }, 
                 {
-                 "height":37,
+                 "height":50,
                  "name":"back",
                  "properties":
                     {
@@ -37,7 +37,7 @@
                  "type":"teleport",
                  "width":42,
                  "x":50,
-                 "y":306
+                 "y":325
                 }],
          "opacity":1,
          "type":"objectgroup",

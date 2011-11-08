@@ -32,7 +32,7 @@ the JSON files: python server.py.</p>
 
 
 sjs.debug = true;
-var scene = sjs.Scene({w:640, h:480, autoPause:false});
+var scene = sjs.Scene({w:800, h:600, autoPause:false});
 
 
 var dropped = document.getElementById('dropped');
@@ -92,6 +92,7 @@ function main() {
 
     if(surface)
         surface.remove();
+
     surface = sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, x, y) {
         sjs.map.paintOn(layer, x, y);
     });
@@ -102,6 +103,36 @@ function main() {
 
     scene.Ticker(paint, {useAnimationRequest:true}).run();
 
+}
+
+function getAnimation(move_x, move_y) {
+
+    if(input.keyboard.enter || input.keyboard.space) {
+
+        if(move_x < 0) {
+            current_player_anim = player_attack_left;
+        } else {
+            current_player_anim = player_attack_right;
+        }
+        current_player_anim.next(ticker.lastTicksElapsed);
+        return current_player_anim;
+    }
+
+    if(move_y < 0)
+        current_player_anim = player_walk_up;
+    if(move_x > 0)
+        current_player_anim = player_walk_right;
+    if(move_x < 0)
+        current_player_anim = player_walk_left;
+    if(move_y > 0)
+        current_player_anim = player_walk_down;
+
+    if(move_y == 0 && move_x == 0) {
+        current_player_anim = player_walk_down;
+        current_player_anim.go(0);
+        return;
+    }
+    current_player_anim.next(scene.ticker.lastTicksElapsed);
 }
 
 function paint(ticker) {
@@ -122,35 +153,7 @@ function paint(ticker) {
     if(input.keyboard.right)
         mx = pixels;
 
-    function getAnimation(move_x, move_y) {
 
-        if(input.keyboard.enter || input.keyboard.space) {
-
-            if(move_x < 0) {
-                current_player_anim = player_attack_left;
-            } else {
-                current_player_anim = player_attack_right;
-            }
-            current_player_anim.next(ticker.lastTicksElapsed);
-            return current_player_anim;
-        }
-
-        if(move_y < 0)
-            current_player_anim = player_walk_up;
-        if(move_x > 0)
-            current_player_anim = player_walk_right;
-        if(move_x < 0)
-            current_player_anim = player_walk_left;
-        if(move_y > 0)
-            current_player_anim = player_walk_down;
-
-        if(move_y == 0 && move_x == 0) {
-            current_player_anim = player_walk_down;
-            current_player_anim.go(0);
-            return;
-        }
-        current_player_anim.next(ticker.lastTicksElapsed);
-    }
 
     var x = (surface.x + surface.w / 2);
     var y = (surface.y + surface.h / 2);

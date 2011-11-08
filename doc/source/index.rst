@@ -902,6 +902,7 @@ A node object should implement those 4 methods:
 Projects that uses sprite.js
 ==============================
 
+* `Steam <http://batiste.dosimple.ch/games/steam9/>`_ is a plateform game involving physic puzzle.
 * `Webattle.js <https://github.com/medwezys/webattle.js>`_ is a multiplayer HTML5 game using nodejs.
 * `"The invasion of the evil lords" <http://batiste.dosimple.ch/games/rpg/game.html>`_. is a demo RPG with different creatures and a boss.
 

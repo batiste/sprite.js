@@ -34,9 +34,9 @@
 
                     },
                  "type":"playerStart",
-                 "width":59,
-                 "x":397,
-                 "y":145
+                 "width":54,
+                 "x":499,
+                 "y":358
                 }, 
                 {
                  "height":795,
@@ -47,8 +47,8 @@
                     },
                  "type":"teleport",
                  "width":59,
-                 "x":935,
-                 "y":-17
+                 "x":911,
+                 "y":-14
                 }, 
                 {
                  "height":36,
@@ -58,9 +58,21 @@
                      "map":"house.json"
                     },
                  "type":"teleport",
-                 "width":36,
+                 "width":37,
                  "x":148,
                  "y":447
+                }, 
+                {
+                 "height":25,
+                 "name":"house",
+                 "properties":
+                    {
+
+                    },
+                 "type":"position",
+                 "width":32,
+                 "x":151,
+                 "y":497
                 }],
          "opacity":1,
          "type":"objectgroup",

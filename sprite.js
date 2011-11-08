@@ -38,11 +38,11 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 "use strict";
 var sjs, Sprite, Scene, Layer, Ticker, Ticker_, Cycle, Input, _Input, List,
 doc = global.document,
-// the cursor use to give unique ids to each sprite.
-spriteCursor = 0,
-// number of scene.
+// number of sprites
+nb_sprite = 0,
+// number of scenes
 nb_scene = 0,
-// number of cycle.
+// number of cycle
 nb_cycle = 0,
 // a global cache to load each sprite only one time.
 spriteList = {},
@@ -389,7 +389,7 @@ Sprite = function Sprite(scene, src, layer) {
     this.opacity = 1;
     this.color = false;
 
-    this.id = ++spriteCursor;
+    this.id = ++nb_sprite;
 
     // necessary to get set
     this.layer = null;

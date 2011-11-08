@@ -16,19 +16,19 @@
          "name":"Object Layer 1",
          "objects":[
                 {
-                 "height":53,
+                 "height":64,
                  "name":"player start",
                  "properties":
                     {
 
                     },
                  "type":"playerStart",
-                 "width":85,
-                 "x":36,
-                 "y":258
+                 "width":83,
+                 "x":44,
+                 "y":271
                 }, 
                 {
-                 "height":152,
+                 "height":165,
                  "name":"map 1",
                  "properties":
                     {
@@ -36,8 +36,8 @@
                     },
                  "type":"teleport",
                  "width":43,
-                 "x":-27,
-                 "y":208
+                 "x":-9,
+                 "y":210
                 }],
          "opacity":1,
          "type":"objectgroup",

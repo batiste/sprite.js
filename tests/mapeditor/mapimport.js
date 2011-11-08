@@ -18,16 +18,19 @@
         xobj.send(null);
     }
         
-    function loadMap(src, scene) {
+    function loadMap(src, scene, callback) {
         tileProp = {};
         map = null;
         tilelayers = [];
         _scene = null;
         staticCollision = {};
         sjs.map.eventObjects = [];
+        sjs.map.positions = [];
         
         load(src, function(text) {
             mapCallback(JSON.parse(text));
+            if(callback)
+                callback();
         });
         _scene = scene;
     }
@@ -67,18 +70,20 @@
        
     }
 
-
-
     function objectGroup(group) {
         for(index in group.objects) {
             var object = group.objects[index];
             if(object.type=="playerStart") {
-                playerStart = {x:object.x, y:object.y};
+                var playerStart = {x:object.x, y:object.y};
                 sjs.map.playerStart = playerStart;
             }
             if(object.type=="teleport") {
                 var shape = {x:object.x, y:object.y, w:object.width, h:object.height, type:"rectangle", event:"teleport", map:object.properties.map};
                 sjs.map.eventObjects.push(shape);
+            }
+            if(object.type == "position") {
+                var position = {x:object.x, y:object.y};
+                sjs.map.positions[position.name] = position;
             }
         }
     }
@@ -306,6 +311,7 @@
     // TODO: naming
     global.sjs.map = {
         eventObjects:[],
+        positions:{},
         playerStart:playerStart,
         findPath:findPath,
         loadMap:loadMap,

@@ -245,8 +245,8 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="20" height="16">
-  <object name="start" type="playerStart" x="397" y="145" width="59" height="30"/>
-  <object name="map 2" type="teleport" x="935" y="-17" width="59" height="795">
+  <object name="start" type="playerStart" x="499" y="358" width="59" height="30"/>
+  <object name="map 2" type="teleport" x="911" y="-14" width="59" height="795">
    <properties>
     <property name="map" value="map2.json"/>
    </properties>
