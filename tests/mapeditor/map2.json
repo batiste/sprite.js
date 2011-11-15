@@ -38,6 +38,25 @@
                  "width":43,
                  "x":-9,
                  "y":210
+                }, 
+                {
+                 "height":88,
+                 "name":"The farmer",
+                 "properties":
+                    {
+                     "1) You pigs are ugly!":"Not as ugly as you are, but much more delicious!",
+                     "1.1) You are ugly, and old!":"I see I touched a sensitive point.",
+                     "1.2) Can I have some of this bacon then?":"It's 1 gold for 10 slices",
+                     "2) Is that your pigs?":"Yes, do you want to buy some bacon?",
+                     "2.1) Yes please.":"It's 1 gold for 20 slices.",
+                     "2.2) No I am a vegetarian.":"Too bad.",
+                     "start":"Hello good sir, I am the pig farmer. What can I do fo you?",
+                     "title":"The farmer"
+                    },
+                 "type":"dialog",
+                 "width":42,
+                 "x":278,
+                 "y":232
                 }],
          "opacity":1,
          "type":"objectgroup",

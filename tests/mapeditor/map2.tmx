@@ -14,5 +14,17 @@
     <property name="map" value="map.json"/>
    </properties>
   </object>
+  <object name="The farmer" type="dialog" x="278" y="232" width="42" height="88">
+   <properties>
+    <property name="1) You pigs are ugly!" value="Not as ugly as you are, but much more delicious!"/>
+    <property name="1.1) You are ugly, and old!" value="I see I touched a sensitive point."/>
+    <property name="1.2) Can I have some of this bacon then?" value="It's 1 gold for 10 slices"/>
+    <property name="2) Is that your pigs?" value="Yes, do you want to buy some bacon?"/>
+    <property name="2.1) Yes please." value="It's 1 gold for 20 slices."/>
+    <property name="2.2) No I am a vegetarian." value="Too bad."/>
+    <property name="start" value="Hello good sir, I am the pig farmer. What can I do fo you?"/>
+    <property name="title" value="The farmer"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

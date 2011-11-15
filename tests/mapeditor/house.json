@@ -38,6 +38,33 @@
                  "width":42,
                  "x":50,
                  "y":325
+                }, 
+                {
+                 "height":77,
+                 "name":"",
+                 "properties":
+                    {
+                     "1)I need a sword made of solid gold":"I sell only wodden sword. And you already have one. Try space bar to use it.",
+                     "2)I want a job":"Go away",
+                     "start":"I am the shop owner, don't touch anything.",
+                     "title":"The shop owner"
+                    },
+                 "type":"dialog",
+                 "width":66,
+                 "x":133,
+                 "y":2
+                }, 
+                {
+                 "height":1,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "type":"",
+                 "width":22,
+                 "x":170,
+                 "y":24
                 }],
          "opacity":1,
          "type":"objectgroup",

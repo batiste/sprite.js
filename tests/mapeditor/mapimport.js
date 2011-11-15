@@ -85,6 +85,10 @@
                 var position = {x:object.x, y:object.y};
                 sjs.map.positions[position.name] = position;
             }
+            if(object.type == "dialog") {
+                var shape = {x:object.x, y:object.y, w:object.width, h:object.height, type:"rectangle", event:"dialog", dialog:object.properties};
+                sjs.map.eventObjects.push(shape);
+            }
         }
     }
     

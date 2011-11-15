@@ -13,5 +13,14 @@
     <property name="map" value="map.json"/>
    </properties>
   </object>
+  <object type="dialog" x="133" y="2" width="66" height="77">
+   <properties>
+    <property name="1)I need a sword made of solid gold" value="I sell only wodden sword. And you already have one. Try space bar to use it."/>
+    <property name="2)I want a job" value="Go away"/>
+    <property name="start" value="I am the shop owner, don't touch anything."/>
+    <property name="title" value="The shop owner"/>
+   </properties>
+  </object>
+  <object x="170" y="24" width="22" height="1"/>
  </objectgroup>
 </map>

@@ -7,6 +7,11 @@
     <property name="test" value="toto"/>
    </properties>
   </tile>
+  <tile id="16">
+   <properties>
+    <property name="collision" value="true"/>
+   </properties>
+  </tile>
   <tile id="22">
    <properties>
     <property name="collisionLeft" value="20"/>
@@ -245,15 +250,24 @@
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="20" height="16">
-  <object name="start" type="playerStart" x="499" y="358" width="59" height="30"/>
+  <object name="start" type="playerStart" x="411" y="349" width="54" height="30"/>
   <object name="map 2" type="teleport" x="911" y="-14" width="59" height="795">
    <properties>
     <property name="map" value="map2.json"/>
    </properties>
   </object>
-  <object name="into house" type="teleport" x="148" y="447" width="36" height="36">
+  <object name="into house" type="teleport" x="148" y="447" width="37" height="36">
    <properties>
     <property name="map" value="house.json"/>
+   </properties>
+  </object>
+  <object name="house" type="position" x="151" y="497" width="32" height="25"/>
+  <object name="The old mayor" type="dialog" x="567" y="289" width="41" height="72">
+   <properties>
+    <property name="1) I am hungry" value="Go east, you will find bacon."/>
+    <property name="2) Is there anything funny to do around here?" value="Not really. This demo is really limited. You can play with you sword and talk to a few people."/>
+    <property name="start" value="Welcome the sprite.js RPG demo. What can I do for you?"/>
+    <property name="title" value="The mayor"/>
    </properties>
   </object>
  </objectgroup>

@@ -35,8 +35,8 @@
                     },
                  "type":"playerStart",
                  "width":54,
-                 "x":499,
-                 "y":358
+                 "x":411,
+                 "y":349
                 }, 
                 {
                  "height":795,
@@ -73,6 +73,21 @@
                  "width":32,
                  "x":151,
                  "y":497
+                }, 
+                {
+                 "height":72,
+                 "name":"The old mayor",
+                 "properties":
+                    {
+                     "1) I am hungry":"Go east, you will find bacon.",
+                     "2) Is there anything funny to do around here?":"Not really. This demo is really limited. You can play with you sword and talk to a few people.",
+                     "start":"Welcome the sprite.js RPG demo. What can I do for you?",
+                     "title":"The mayor"
+                    },
+                 "type":"dialog",
+                 "width":41,
+                 "x":567,
+                 "y":289
                 }],
          "opacity":1,
          "type":"objectgroup",
@@ -124,6 +139,10 @@
                  "collision":"true"
                 },
              "151":
+                {
+                 "collision":"true"
+                },
+             "16":
                 {
                  "collision":"true"
                 },

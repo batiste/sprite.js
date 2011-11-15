@@ -3,25 +3,61 @@
 <title>Read map</title>
 <meta name = "viewport" content = "width=device-width">
 <style>
-html, body{margin:1em;padding:0;font-size:0.8em;}
+html, body{margin:0px;padding:0;font-size:12px;font-family:sans-serif;}
+
 .sjs{
-    border:2px #999 solid;
+    border:0px #999 solid;
 }
+
+.dialog {
+    padding:1em;
+    background:#333;
+    border:3px #fff solid;
+    border-radius:5px;
+    color:#fff;
+    font-weight:bold;
+}
+
+.dialog button{
+    clear:both;
+    display:block;
+    border:3px #fff solid;
+    border-radius:5px;
+    padding:0.5em;
+    background:#555;
+    color:#fff;
+    margin:0.5em;
+}
+
+.dialog button:hover, .dialog button:focus, .dialog button.selected {
+    border:3px #22F solid;
+    background:#000;
+    color:#fff;
+}
+
+#infos {
+    position:absolute;
+    z-index:500;
+    color:#fff;
+    background:#333;
+    opacity:0.5;
+}
+
+#infos a {
+    color:#fff;
+}
+
 </style>
 </head>
 <body>
+<div id="infos">
 <p>(<span id="fps"></span>FPS,
 load <span id="load"></span>%,
 <span id="dropped"></span> dropped frames) 
-
-JSON map reader for the JSON exporter from the <a href="http://www.mapeditor.org/">Map Editor 0.8</a> . Use keyboard or mouse to move.
+Maps created with <a href="http://www.mapeditor.org/">Map Editor 0.8</a>.
 </p>
 
-<p>This map reader handles multiple layer of sprites and collision detection if you set the property collision:true to any sprite in the editor. 
-To run it locally, you need to serve
-the JSON files: python server.py.</p>
-
-<audio id="a1" src="swish-1.ogg"></audio>
+</div>
 
 <script src="../../sprite.js"></script>
 <script src="../../lib/scrolling.js"></script>
@@ -30,9 +66,14 @@ the JSON files: python server.py.</p>
 <script src="mapimport.js"></script>
 <script>
 
+window.innerwidth
 
 sjs.debug = true;
-var scene = sjs.Scene({w:800, h:600, autoPause:false});
+
+var w = Math.min(window.innerWidth, 800);
+var h = Math.min(window.innerHeight, 600);
+
+var scene = sjs.Scene({w:w, h:h, autoPause:false});
 
 
 var dropped = document.getElementById('dropped');
@@ -52,14 +93,29 @@ switch(window.location.protocol) {
      break;
 }
 
+var visualObjects;
+function loadCallback() {
+    // setup objects
+    visualObjects = [];
+
+    for(var i=0; i<sjs.map.eventObjects.length; i++) {
+        var obj = sjs.map.eventObjects[i];
+        if(obj.event == "dialog") {
+            var arrow = front.Sprite("arrow.png", {w:24, h:28, x:obj.x, y:obj.y-28});
+            obj.sprite = arrow;
+            visualObjects.push(obj);
+        }
+    }
+}
+
 if(local)
-    sjs.map.loadMap('http://127.0.0.1:8000/map.json', scene);
+    sjs.map.loadMap('http://127.0.0.1:8000/map.json', scene, loadCallback);
 else
-    sjs.map.loadMap('map.json', scene);
+    sjs.map.loadMap('map.json', scene, loadCallback);
 
 var input = scene.Input();
 var front = scene.Layer("front", {useCanvas:false});
-var player = front.Sprite("character.png?gsdsf", {w:48, h:46, layer:front});
+var player = front.Sprite("character.png", {w:48, h:46, layer:front});
 var player_walk_down = sjs.Cycle([[0,0,10],[48, 0, 10], [96, 0, 10], [144, 0, 10]]);
 var player_walk_up = sjs.Cycle([[0,96,10],[48, 96, 10], [96, 96, 10], [144, 96, 10]]);
 var player_walk_left = sjs.Cycle([[0,144,10],[48, 144, 10], [96, 144, 10], [144, 144, 10]]);
@@ -114,7 +170,7 @@ function getAnimation(move_x, move_y) {
         } else {
             current_player_anim = player_attack_right;
         }
-        current_player_anim.next(ticker.lastTicksElapsed);
+        current_player_anim.next(scene.ticker.lastTicksElapsed);
         return current_player_anim;
     }
 
@@ -135,7 +191,85 @@ function getAnimation(move_x, move_y) {
     current_player_anim.next(scene.ticker.lastTicksElapsed);
 }
 
+var game_mode = 'play';
+
+function startDialog(dialog, branch) {
+
+    // filter the dialog branches
+    validDialogs = [];
+    if(branch) {
+        for (var index in dialog) {
+            var prefix = index.split(')')[0];
+            // eg: if branch is "1.1", we want "1.1.12 and "1.1.2"
+            if(prefix.indexOf(branch) == 0 && prefix.length == (branch.length + 2)) {
+                var after = index.split(')')[1];
+                validDialogs.push({question:after, answer:dialog[index], branch:prefix});
+            }
+        }
+    } else {
+        for (var index in dialog) {
+            var prefix = index.split(')')[0];
+            if(prefix.length == 1) {
+                var after = index.split(')')[1];
+                validDialogs.push({question:after, answer:dialog[index], branch:prefix});
+            }
+        }
+    }
+    validDialogs.push({question:"Bye!", answer:false, branch:false});
+
+    game_mode = 'dialog';
+    var div = document.createElement("div");
+    div.className = "dialog";
+    div.style.top = '100px';
+    div.style.left = '100px';
+    div.style.width = (scene.w - 240) + 'px';
+    if(dialog.answer) {
+        div.innerHTML = '<p>'+dialog.title + ' : ' + dialog.answer+'</p>';
+    } else if(dialog.start) {
+        div.innerHTML = '<p>'+dialog.title + ' : ' + dialog.start+'</p>';
+    }
+    var choices = {};
+    for (var i = 0; i<validDialogs.length; i++) {
+        var button = document.createElement("button");
+        button.innerHTML = validDialogs[i].question;
+        button.id = 'b'+i;
+        div.appendChild(button);
+        choices[button.id] = {
+            dom:div,
+            branch:validDialogs[i].branch,
+            answer:validDialogs[i].answer
+        };
+    }
+
+    div.style.position = "absolute";
+    div.style.zIndex = String(1000);
+
+    var ev = function (e) {
+        var target = e.target;
+        var choice = choices[target.id];
+
+        e.stopPropagation();
+        e.preventDefault();
+        div.removeEventListener("click", event, false);
+        scene.dom.removeChild(div);
+
+        if(choice && choice.answer) {
+            dialog.answer = choice.answer;
+            return startDialog(dialog, choice.branch);
+        }
+
+        dialog.answer = false;
+        scene.ticker.resume();
+        game_mode = 'play';
+    };
+    div.addEventListener("click", ev, false);
+    scene.dom.appendChild(div);
+}
+
 function paint(ticker) {
+
+    if (game_mode == 'dialog')
+        return;
 
     var mx = 0;
     var my = 0;
@@ -153,10 +287,26 @@ function paint(ticker) {
     if(input.keyboard.right)
         mx = pixels;
 
-
-
     var x = (surface.x + surface.w / 2);
     var y = (surface.y + surface.h / 2);
+
+    // collision with map objects
+    for(var i=0; i<sjs.map.eventObjects.length; i++) {
+        var obj = sjs.map.eventObjects[i];
+        if(sjs.collision.isPointInRectangle(x, y, obj)) {
+            if(obj.event == "teleport") {
+                target = null;
+                ticker.pause();
+                sjs.map.loadMap(obj.map, scene, loadCallback);
+                return;
+            }
+            if(obj.event == "dialog" && input.keyboard.space) {
+                ticker.pause();
+                startDialog(obj.dialog);
+                return;
+            }
+        }
+    }
 
     if(input.mousepressed) {
         var mp = input.mouse.position;
@@ -172,7 +322,6 @@ function paint(ticker) {
                 surface.move(mx, 0);
             if(!collisiony)
                 surface.move(0, my);
-            surface.update();
         }
     }
 
@@ -183,27 +332,24 @@ function paint(ticker) {
         my = reduceTo(target_y, pixels);
 
         surface.move(mx, my);
-        surface.update();
 
         if(Math.abs(mx) < pixels && Math.abs(my) < pixels)
             target = target.parent;
 
     }
 
+    surface.update();
+
+    for(var i=0; i<visualObjects.length; i++) {
+        var obj = visualObjects[i];
+        var _x = obj.x - surface.x + obj.w / 2 - obj.sprite.w / 2;
+        obj.sprite.position(_x, obj.y-surface.y-obj.sprite.h + (5 * Math.cos(scene.ticker.currentTick / 8.0)));
+        obj.sprite.canvasUpdate(surface.front);
+    }
+
     getAnimation(mx, my);
     player.update();
 
-    // collision with map objects
-    for(var i=0; i<sjs.map.eventObjects.length; i++) {
-        var obj = sjs.map.eventObjects[i];
-        if(sjs.collision.isPointInRectangle(x, y, obj)) {
-            if(obj.event == "teleport") {
-                target = null;
-                ticker.pause();
-                sjs.map.loadMap(obj.map, scene);
-            }
-        }
-    }
 
     if(scene.ticker.currentTick % 20 == 0) {
         fps.innerHTML = ticker.fps;

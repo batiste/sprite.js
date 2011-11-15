@@ -1173,7 +1173,7 @@ Ticker_.prototype.run = function () {
     this.lastPaintAt = this.now;
     if (this.useAnimationFrame) {
         this.tickDuration = 16;
-        window[sjs.animationFrame](function () {t.run()});
+        global[sjs.animationFrame](function () {t.run()});
     } else {
         var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 6);
         this.timeout = setTimeout(function () {t.run()}, _nextPaint);
@@ -1182,7 +1182,7 @@ Ticker_.prototype.run = function () {
 
 Ticker_.prototype.pause = function () {
     global.clearTimeout(this.timeout);
-    window[sjs.animationFrame] = undefined;
+    global[sjs.animationFrame] = undefined;
     this.paused = true;
 };
 
@@ -1214,7 +1214,7 @@ _Input = function _Input(scene) {
     // record the current keyboard state
     this.keyboard = {};
     this.mouse = {position: {}, click: undefined};
-    // recor the keyboard changes since the last next call
+    // record the keyboard changes since the last call
     this.keyboardChange = {};
     this.mousedown = false;
     that.mousepressed = false;
