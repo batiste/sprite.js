@@ -88,6 +88,22 @@
                  "width":41,
                  "x":567,
                  "y":289
+                }, 
+                {
+                 "gid":142,
+                 "height":0,
+                 "name":"Monster1",
+                 "properties":
+                    {
+                     "killable":"true",
+                     "life":"2",
+                     "move":"1.2",
+                     "name":"pig"
+                    },
+                 "type":"entity",
+                 "width":0,
+                 "x":820,
+                 "y":348
                 }],
          "opacity":1,
          "type":"objectgroup",

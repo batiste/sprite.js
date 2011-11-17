@@ -270,5 +270,13 @@
     <property name="title" value="The mayor"/>
    </properties>
   </object>
+  <object name="Monster1" type="entity" gid="142" x="820" y="348">
+   <properties>
+    <property name="killable" value="true"/>
+    <property name="life" value="2"/>
+    <property name="move" value="1.2"/>
+    <property name="name" value="pig"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

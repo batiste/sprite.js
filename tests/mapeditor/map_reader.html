@@ -93,19 +93,10 @@ switch(window.location.protocol) {
      break;
 }
 
-var visualObjects;
-function loadCallback() {
-    // setup objects
-    visualObjects = [];
 
-    for(var i=0; i<sjs.map.eventObjects.length; i++) {
-        var obj = sjs.map.eventObjects[i];
-        if(obj.event == "dialog") {
-            var arrow = front.Sprite("arrow.png", {w:24, h:28, x:obj.x, y:obj.y-28});
-            obj.sprite = arrow;
-            visualObjects.push(obj);
-        }
-    }
+function loadCallback() {
+    // possibility to setup or reset stuff after the map is loaded
+
 }
 
 if(local)
@@ -290,24 +281,6 @@ function paint(ticker) {
     var x = (surface.x + surface.w / 2);
     var y = (surface.y + surface.h / 2);
 
-    // collision with map objects
-    for(var i=0; i<sjs.map.eventObjects.length; i++) {
-        var obj = sjs.map.eventObjects[i];
-        if(sjs.collision.isPointInRectangle(x, y, obj)) {
-            if(obj.event == "teleport") {
-                target = null;
-                ticker.pause();
-                sjs.map.loadMap(obj.map, scene, loadCallback);
-                return;
-            }
-            if(obj.event == "dialog" && input.keyboard.space) {
-                ticker.pause();
-                startDialog(obj.dialog);
-                return;
-            }
-        }
-    }
-
     if(input.mousepressed) {
         var mp = input.mouse.position;
         target = sjs.map.findPath(x, y, mp.x + surface.x, mp.y + surface.y);
@@ -340,11 +313,67 @@ function paint(ticker) {
 
     surface.update();
 
-    for(var i=0; i<visualObjects.length; i++) {
-        var obj = visualObjects[i];
-        var _x = obj.x - surface.x + obj.w / 2 - obj.sprite.w / 2;
-        obj.sprite.position(_x, obj.y-surface.y-obj.sprite.h + (5 * Math.cos(scene.ticker.currentTick / 8.0)));
-        obj.sprite.canvasUpdate(surface.front);
+    var move_trigger = scene.ticker.currentTick % 300;
+
+    // Deal with active objects
+    for(var i=0; i<sjs.map.activeObjects.length; i++) {
+
+        var obj = sjs.map.activeObjects[i];
+
+        // collision
+        if(sjs.collision.isPointInRectangle(x, y, obj)) {
+            if(obj.class == "teleport") {
+                target = null;
+                ticker.pause();
+                sjs.map.loadMap(obj.map, scene, loadCallback);
+                return;
+            }
+            if(obj.class == "dialog" && input.keyboard.space) {
+                ticker.pause();
+                startDialog(obj.dialog);
+                return;
+            }
+
+            if(obj.class == "entity" && input.keyboard.space) {
+                sjs.map.activeObjects.splice(i, 1);
+                continue;
+            }
+
+        }
+
+        // display
+        if(obj.class == "dialog") {
+            var _x = obj.x - surface.x + obj.w / 2 - obj.sprite.w / 2;
+            obj.sprite.position(_x, obj.y - surface.y - obj.sprite.h + (5 * Math.cos(scene.ticker.currentTick / 8.0)));
+            obj.sprite.canvasUpdate(surface.front);
+        }
+
+
+        if(obj.class == "entity") {
+
+            if(sjs.map.collides(obj.x + 24, obj.y + 24)) {
+                obj.xv = -obj.xv;
+                obj.yv = -obj.yv;
+            }
+
+            if(move_trigger < 10) {
+                obj.xv = 1.5 * (Math.random() - 0.5);
+                obj.yv = 1.5 * (Math.random() - 0.5);
+            }
+
+            if(move_trigger > 200) {
+                obj.x = obj.x + obj.xv;
+                obj.y = obj.y + obj.yv;
+            }
+
+            var _x = obj.x - surface.x;
+            var _y = obj.y - surface.y;
+
+            obj.sprite.position(_x | 0, _y | 0);
+            obj.sprite.canvasUpdate(surface.front);
+        }
+
+
     }
 
     getAnimation(mx, my);

@@ -4,7 +4,7 @@
  <tileset firstgid="211" source="ground.tsx"/>
  <layer name="Tile Layer 1" width="12" height="12">
   <data encoding="base64" compression="zlib">
-   eJyNkdEJwDAIRM0IHdY12uUixEzTFhQekpR+HEa9nBejIqI/MT/qE30r/R69jvP54Iq8ao/IMzrygXpqk6fgeqChVvnp+wjfBm9VP2E4O3QUc+diRupyVwoN7pL+XfY7t3hf+qy8vqi1DZd/VT3ybsYXNzo7Xfo=
+   eJyNkdEJwDAIRNMROqwr9LfLRYiZphROeEhS+nEY9XJejLXW7CfmR32i76Xf1evCJdzKq/ZQnjGQD9RTmzwDN4QDtcpP36d8O7xV/YTjHNAxzJ2LGanLXRk0uEv6j7bfuet96bPy+qJ2bLj8q+qRdzO+eACE/F2O
   </data>
  </layer>
  <objectgroup name="Object Layer 1" width="12" height="12">
@@ -24,6 +24,41 @@
     <property name="2.2) No I am a vegetarian." value="Too bad."/>
     <property name="start" value="Hello good sir, I am the pig farmer. What can I do fo you?"/>
     <property name="title" value="The farmer"/>
+   </properties>
+  </object>
+  <object type="entity" gid="142" x="373" y="234">
+   <properties>
+    <property name="move" value="true"/>
+   </properties>
+  </object>
+  <object type="entity" gid="142" x="276" y="169">
+   <properties>
+    <property name="move" value="true"/>
+   </properties>
+  </object>
+  <object type="entity" gid="142" x="400" y="328">
+   <properties>
+    <property name="move" value="true"/>
+   </properties>
+  </object>
+  <object type="entity" gid="142" x="302" y="407">
+   <properties>
+    <property name="move" value="true"/>
+   </properties>
+  </object>
+  <object type="entity" gid="142" x="171" y="340">
+   <properties>
+    <property name="move" value="true"/>
+   </properties>
+  </object>
+  <object type="entity" gid="142" x="125" y="180">
+   <properties>
+    <property name="move" value="true"/>
+   </properties>
+  </object>
+  <object type="entity" gid="142" x="227" y="456">
+   <properties>
+    <property name="move" value="true"/>
    </properties>
   </object>
  </objectgroup>
