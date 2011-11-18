@@ -14,7 +14,7 @@
     <property name="map" value="map.json"/>
    </properties>
   </object>
-  <object name="The farmer" type="dialog" x="278" y="232" width="42" height="88">
+  <object name="The farmer" type="dialog" x="276" y="234" width="45" height="88">
    <properties>
     <property name="1) You pigs are ugly!" value="Not as ugly as you are, but much more delicious!"/>
     <property name="1.1) You are ugly, and old!" value="I see I touched a sensitive point."/>
@@ -41,7 +41,7 @@
     <property name="move" value="true"/>
    </properties>
   </object>
-  <object type="entity" gid="142" x="302" y="407">
+  <object type="entity" gid="142" x="367" y="371">
    <properties>
     <property name="move" value="true"/>
    </properties>
@@ -57,6 +57,11 @@
    </properties>
   </object>
   <object type="entity" gid="142" x="227" y="456">
+   <properties>
+    <property name="move" value="true"/>
+   </properties>
+  </object>
+  <object type="entity" gid="142" x="406" y="379">
    <properties>
     <property name="move" value="true"/>
    </properties>

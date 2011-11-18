@@ -107,8 +107,8 @@
                     },
                  "type":"entity",
                  "width":0,
-                 "x":302,
-                 "y":407
+                 "x":367,
+                 "y":371
                 }, 
                 {
                  "gid":142,
@@ -148,6 +148,19 @@
                  "width":0,
                  "x":227,
                  "y":456
+                }, 
+                {
+                 "gid":142,
+                 "height":0,
+                 "name":"",
+                 "properties":
+                    {
+                     "move":"true"
+                    },
+                 "type":"entity",
+                 "width":0,
+                 "x":406,
+                 "y":379
                 }],
          "opacity":1,
          "type":"objectgroup",

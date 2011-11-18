@@ -12,14 +12,16 @@ html, body{margin:0px;padding:0;font-size:12px;font-family:sans-serif;}
 .dialog {
     padding:1em;
     background:#333;
-    border:3px #fff solid;
-    border-radius:5px;
+    border:3px #ddd solid;
+    border-top:0;
+    border-radius:0 0 5px 5px;
     color:#fff;
     font-weight:bold;
 }
 
 .dialog button{
     clear:both;
+    font-weight:bold;
     display:block;
     border:3px #fff solid;
     border-radius:5px;
@@ -55,9 +57,14 @@ html, body{margin:0px;padding:0;font-size:12px;font-family:sans-serif;}
 load <span id="load"></span>%,
 <span id="dropped"></span> dropped frames) 
 Maps created with <a href="http://www.mapeditor.org/">Map Editor 0.8</a>.
+Sound loop by <a href="http://opengameart.org/users/elerya">elerya</a>.
 </p>
 
 </div>
+
+<audio src="swish-1.ogg" id="sw1"></audio>
+<audio src="pig.ogg" id="pig1"></audio>
+<audio src="abeth.ogg" loop autoplay></audio>
 
 <script src="../../sprite.js"></script>
 <script src="../../lib/scrolling.js"></script>
@@ -66,7 +73,8 @@ Maps created with <a href="http://www.mapeditor.org/">Map Editor 0.8</a>.
 <script src="mapimport.js"></script>
 <script>
 
-window.innerwidth
+var audio1 = document.getElementById("sw1");
+var pig1 = document.getElementById("pig1");
 
 sjs.debug = true;
 
@@ -161,6 +169,9 @@ function getAnimation(move_x, move_y) {
         } else {
             current_player_anim = player_attack_right;
         }
+        if(current_player_anim.tick == 1) {
+            audio1.play();
+        }
         current_player_anim.next(scene.ticker.lastTicksElapsed);
         return current_player_anim;
     }
@@ -211,9 +222,9 @@ function startDialog(dialog, branch) {
     game_mode = 'dialog';
     var div = document.createElement("div");
     div.className = "dialog";
-    div.style.top = '100px';
-    div.style.left = '100px';
-    div.style.width = (scene.w - 240) + 'px';
+    div.style.top = '0';
+    div.style.left = '50px';
+    div.style.width = (scene.w - 140) + 'px';
     if(dialog.answer) {
         div.innerHTML = '<p>'+dialog.title + ' : ' + dialog.answer+'</p>';
     } else if(dialog.start) {
@@ -335,6 +346,7 @@ function paint(ticker) {
             }
 
             if(obj.class == "entity" && input.keyboard.space) {
+                pig1.play();
                 sjs.map.activeObjects.splice(i, 1);
                 continue;
             }
