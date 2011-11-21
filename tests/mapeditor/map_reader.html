@@ -90,6 +90,7 @@ var load = document.getElementById('load');
 
 
 scene.main = main;
+
 var local = true;
 switch(window.location.protocol) {
    case 'http:':
@@ -101,16 +102,14 @@ switch(window.location.protocol) {
      break;
 }
 
+if(local)
+    sjs.map.loadMap('http://127.0.0.1:8000/map.json', scene);
+else
+    sjs.map.loadMap('map.json', scene);
 
 function loadCallback() {
     // possibility to setup or reset stuff after the map is loaded
-
 }
-
-if(local)
-    sjs.map.loadMap('http://127.0.0.1:8000/map.json', scene, loadCallback);
-else
-    sjs.map.loadMap('map.json', scene, loadCallback);
 
 var input = scene.Input();
 var front = scene.Layer("front", {useCanvas:false});
@@ -148,9 +147,10 @@ function main() {
     if(surface)
         surface.remove();
 
-    surface = sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, x, y) {
-        sjs.map.paintOn(layer, x, y);
+    surface = sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, _x, _y) {
+        sjs.map.paintOn(layer, _x, _y);
     });
+
     surface.position(sjs.map.playerStart.x - surface.w / 2, sjs.map.playerStart.y - surface.h / 2);
     surface.update();
 
@@ -336,7 +336,9 @@ function paint(ticker) {
             if(obj.class == "teleport") {
                 target = null;
                 ticker.pause();
-                sjs.map.loadMap(obj.map, scene, loadCallback);
+                sjs.map.loadMap(obj.map, scene, function() {
+                    scene.main();
+                });
                 return;
             }
             if(obj.class == "dialog" && input.keyboard.space) {

@@ -44,8 +44,6 @@ nb_sprite = 0,
 nb_scene = 0,
 // number of cycle
 nb_cycle = 0,
-// a global cache to load each sprite only one time.
-spriteList = {},
 browser_specific_runned = false,
 // global z-index
 zindex = 1;
@@ -278,11 +276,12 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
 
     var toLoad = 0, total, div, img, src, error, scene, i;
     for (i = 0; i < images.length; i++) {
-        if (!spriteList[images[i]]) {
+        if (!sjs.spriteCache[images[i]]) {
             toLoad += 1;
-            spriteList[images[i]] = {src: images[i], loaded: false, loading: false};
+            sjs.spriteCache[images[i]] = {src: images[i], loaded: false, loading: false};
         }
     }
+
     if (toLoad === 0) {
         return callback();
     }
@@ -298,11 +297,11 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
     error = false;
 
     function _loadImg(src) {
-        spriteList[src].loading = true;
+        sjs.spriteCache[src].loading = true;
         img = doc.createElement('img');
-        spriteList[src].img = img;
+        sjs.spriteCache[src].img = img;
         img.addEventListener('load', function () {
-            spriteList[src].loaded = true;
+            sjs.spriteCache[src].loaded = true;
             toLoad -= 1;
             if (error === false) {
                 if (toLoad === 0) {
@@ -322,9 +321,9 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
         img.src = src;
     }
 
-    for (src in spriteList) {
-        if (spriteList.hasOwnProperty(src)) {
-            if (!spriteList[src].loading) {
+    for (src in sjs.spriteCache) {
+        if (sjs.spriteCache.hasOwnProperty(src)) {
+            if (!sjs.spriteCache[src].loading) {
                 _loadImg(src);
             }
         }
@@ -864,21 +863,21 @@ Sprite.prototype.loadImg = function (src, resetSize) {
     var _loaded, there = this, img;
     this.src = src;
     // check if the image is already in the cache
-    if (!spriteList[src]) {
+    if (!sjs.spriteCache[src]) {
         // if not we create the image in the cache
         this.img = doc.createElement('img');
-        spriteList[src] = {src: src, img: this.img, loaded: false, loading: true};
+        sjs.spriteCache[src] = {src: src, img: this.img, loaded: false, loading: true};
         _loaded = false;
     } else {
         // if it's already there, we set img object and check if it's loaded
-        this.img = spriteList[src].img;
-        _loaded = spriteList[src].loaded;
+        this.img = sjs.spriteCache[src].img;
+        _loaded = sjs.spriteCache[src].loaded;
     }
 
     // actions to perform when the image is loaded
     function imageReady(e) {
         img = there.img;
-        spriteList[src].loaded = true;
+        sjs.spriteCache[src].loaded = true;
         there.imgLoaded = true;
         if (there.layer && !there.layer.useCanvas)
             there.dom.style.backgroundImage = 'url(' + src + ')';
@@ -1615,6 +1614,8 @@ List.prototype.iterate = function iterate() {
 };
 
 var sjs = {
+    // a global cache to load each sprite only one time.
+    spriteCache: {},
     debug: false,
     Cycle: Cycle,
     Input: Input,

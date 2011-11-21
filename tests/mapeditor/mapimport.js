@@ -28,9 +28,7 @@
         sjs.map.positions = [];
         
         load(src, function(text) {
-            mapCallback(JSON.parse(text));
-            if(callback)
-                callback();
+            jsonCallback(JSON.parse(text), callback);
         });
         _scene = scene;
     }
@@ -44,7 +42,7 @@
         return this.data[index];
     }
 
-    function mapCallback(_map) {
+    function jsonCallback(_map, callback) {
         map = _map;
         
         for(index in map.layers) {
@@ -65,8 +63,8 @@
         for(var i=0; i<map.tilesets.length; i++) {
             to_load.push(map.tilesets[i].image);
         }
-
-        _scene.loadImages(to_load);
+        
+        _scene.loadImages(to_load, callback);
        
     }
 
