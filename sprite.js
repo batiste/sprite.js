@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011 Batiste Bieler and contributors, 
+Copyright (c) 2011 Batiste Bieler and contributors,
 https://github.com/batiste/sprite.js
 
 Permission is hereby granted, free of charge, to any person obtaining
@@ -103,6 +103,7 @@ function initBrowserSpecific() {
     sjs.animationFrame = has(global, ['mozRequestAnimationFrame',
         'webkitRequestAnimationFrame', 'oRequestAnimationFrame',
         'msRequestAnimationFrame']);
+    sjs.createEventProperty = has(doc, ['createEvent', 'createEventObject']);
     browser_specific_runned = true;
 }
 
@@ -237,37 +238,6 @@ Scene.prototype.Ticker = function Ticker(paint, options) {
     return this.ticker;
 };
 
-Scene.prototype.dialogEvent = function dialogEvent(div, el, event, callback) {
-    var that = this, ev;
-    ev = function () {
-        el.removeEventListener("click", event, false);
-        that.dom.removeChild(div);
-        callback();
-    };
-    el.addEventListener("click", ev, false);
-};
-
-Scene.prototype.dialog = function dialog(options) {
-    var div = doc.createElement("div"), html, buttons, b, button, callback, i, dummy;
-    div.className = "dialog " + optionValue(options, "class", "");
-    optionValue(options, "html");
-    div.innerHTML = html;
-    dummy = function () {};
-    buttons = optionValue(options, "buttons", []);
-    for (i = 0; i < buttons.length; i++) {
-        b = buttons[i];
-        button = doc.createElement("button");
-        button.innerHTML = optionValue(b, "text", "Ok");
-        div.appendChild(button);
-        callback = optionValue(b, "callback", dummy);
-        this.dialogEvent(div, button, "click", callback);
-    }
-    div.style.position = "absolute";
-    zindex += 1;
-    div.style.zIndex = String(zindex);
-    this.dom.appendChild(div);
-};
-
 Scene.prototype.loadImages = function loadImages(images, callback) {
     // function used to preload the sprite images
     if (!callback) {
@@ -296,7 +266,7 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
     scene = this;
     error = false;
 
-    function _loadImg(src) {
+    var _loadImg = function(src) {
         sjs.spriteCache[src].loading = true;
         img = doc.createElement('img');
         sjs.spriteCache[src].img = img;
@@ -1223,10 +1193,17 @@ _Input = function _Input(scene) {
     this.touchable = 'ontouchstart' in global;
 
     this.next = function () {
+        if(that.disableFor)
+            that.disableFor = that.disableFor - 1;
         that.keyboardChange = {};
         that.mousepressed = false;
         that.mouse.click = undefined;
         that.mousereleased = false;
+    }
+
+    this.disableFor = 0;
+    this.disable = function (ticks) {
+        that.disableFor = ticks;
     }
 
     this.keyPressed = function (name) {
@@ -1237,7 +1214,21 @@ _Input = function _Input(scene) {
         return that.keyboardChange[name] !== undefined && !that.keyboardChange[name];
     };
 
+    function fireEvent(name, value) {
+        if(doc.createEvent) {
+            var evObj = doc.createEvent('Events');
+            evObj.initEvent(name, true, true);
+            evObj.value = value;
+            that.dom.dispatchEvent(evObj);
+        } else if(doc.createEventObject) {
+            var evObj = doc.createEventObject();
+            evObj.value = value;
+            that.dom.fireEvent('on' + name, evObj);
+        }
+    }
+
     function updateKeyChange(name, val) {
+        fireEvent(name, val);
         if (that.keyboard[name] !== val) {
             that.keyboard[name] = val;
             that.keyboardChange[name] = val;
@@ -1277,10 +1268,9 @@ _Input = function _Input(scene) {
         }
     }
 
-    var addEvent = function (name, fct) {
+    var listen = function (name, fct) {
         global.addEventListener(name, fct, false);
     }
-
 
     // Mouse like events
     function clickEvent(event) {
@@ -1323,7 +1313,7 @@ _Input = function _Input(scene) {
     }
 
     if (this.touchable) {
-        addEvent("touchstart", function (e) {
+        listen("touchstart", function (e) {
             e = reduceTapEvent(e);
             updateKeyChange('space', true); // tap imitates space
             // simulate the click
@@ -1333,13 +1323,13 @@ _Input = function _Input(scene) {
 
         });
 
-    addEvent("touchend", function (e) {
+    listen("touchend", function (e) {
             mouseUpEvent(e);
             that.keyboard = {}
             that.touchStart = null;
     });
 
-    addEvent("touchmove", function (e) {
+    listen("touchmove", function (e) {
             e.preventDefault(); // avoid scrolling the page
             e = reduceTapEvent(e);
             updateKeyChange('space', false); // if it moves: it is not a tap
@@ -1369,31 +1359,31 @@ _Input = function _Input(scene) {
             }
         });
 
-        addEvent("touchmove", function (e) {
+        listen("touchmove", function (e) {
             e = reduceTapEvent(e);
             mouseMoveEvent(e);
         });
     };
 
-    addEvent("mousedown", mouseDownEvent);
-    addEvent("mouseup", mouseUpEvent);
-    addEvent("click", clickEvent);
-    addEvent("mousemove", mouseMoveEvent);
+    listen("mousedown", mouseDownEvent);
+    listen("mouseup", mouseUpEvent);
+    listen("click", clickEvent);
+    listen("mousemove", mouseMoveEvent);
 
-    addEvent("keydown", function (e) {
+    listen("keydown", function (e) {
         that.keydown = true;
         updateKeyboard(e, true);
     });
 
-    addEvent("keyup", function (e) {
+    listen("keyup", function (e) {
         that.keydown = false;
         updateKeyboard(e, false);
     });
 
     // can be used to avoid key jamming
-    addEvent("keypress", function (e) {});
+    listen("keypress", function (e) {});
     if (!sjs.debug)
-        addEvent("contextmenu", function (e) {e.preventDefault()});
+        listen("contextmenu", function (e) {e.preventDefault()});
 };
 
 _Input.prototype.arrows = function arrows() {
@@ -1625,6 +1615,7 @@ var sjs = {
     Sprite: Sprite,
     overlay: overlay,
     scenes: [],
+    createEvent: null,
     math: {hypo: hypo, mod: mod, normalVector: normalVector, lineSide: lineSide}
 };
 
