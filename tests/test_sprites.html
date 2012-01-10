@@ -3,14 +3,14 @@
 <title>Test 32 sprites in a cycle animation</title>
 <meta name = "viewport" content = "user-scalable=no, width=device-width">
 
-    <script type="text/javascript" src="../lib/glMatrix.js"></script>
-    <script type="text/javascript" src="../lib/webgl-utils.js"></script>
+    <script type="text/javascript" src="../vendors/glMatrix.js"></script>
+    <script type="text/javascript" src="../vendors/webgl-utils.js"></script>
     <script type="text/javascript" src="../lib/webgl.js"></script>
     <script src="../sprite.js"></script>
 
     <style>.sjs{border:2px #999 solid;}</style>
 
-    <script id="shader-vs" type="x-shader/x-vertex"> 
+    <script id="shader-vs" type="x-shader/x-vertex">
         attribute vec3 aVertexPosition;
         attribute vec2 aTextureCoord;
 
@@ -23,9 +23,9 @@
         gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
             vTextureCoord = aTextureCoord;
         }
-    </script> 
+    </script>
 
-    <script id="shader-fs" type="x-shader/x-fragment"> 
+    <script id="shader-fs" type="x-shader/x-fragment">
         #ifdef GL_ES
             precision highp float;
         #endif
@@ -37,14 +37,14 @@
         void main(void) {
             gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
         }
-    </script> 
+    </script>
 
 </head>
 <body>
 
 <p>Sprite.js, 32 animated sprites, rotation and scaling. <a href="https://github.com/batiste/sprite.js">Get the source</a>. <br>
 system load <span id="load"></span>%  (<span id="fps"></span>FPS)
-<br><a href="?canvas=1" id="canvas-mode">Use canvas engine.</a> 
+<br><a href="?canvas=1" id="canvas-mode">Use canvas engine.</a>
 <a href="?html=1" id="html-mode">Use HTML engine</a>
 <a href="?webgl=1" id="webgl-mode">Use WebGL engine (experimental)</a>
 </p>
@@ -118,7 +118,7 @@ window.onload = function() {
         logo.scale(xv)
             .rotate(0.02)
             .update();
-        
+
         if(ticker.currentTick % 30 == 0) {
             load.innerHTML = ticker.load;
             fps.innerHTML = ticker.fps;
