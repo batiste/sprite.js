@@ -48,14 +48,6 @@ browser_specific_runned = false,
 // global z-index
 zindex = 1;
 
-function error(msg) {
-    console.log("Sprite.js error: " + msg);
-}
-
-function warning(msg) {
-    console.log("Sprite.js warning: " + msg);
-}
-
 // math functions
 function mod(n, base) {
     // strictly positive modulo
@@ -1165,7 +1157,7 @@ Ticker_.prototype.resume = function () {
 
 
 var inputSingleton = false;
-function Input(scene){
+function Input(scene) {
     if (!inputSingleton)
         inputSingleton = new _Input(scene);
     return inputSingleton
@@ -1217,13 +1209,13 @@ _Input = function _Input(scene) {
     function fireEvent(name, value) {
         if(doc.createEvent) {
             var evObj = doc.createEvent('Events');
-            evObj.initEvent(name, true, true);
+            evObj.initEvent('sjs' + name, true, true);
             evObj.value = value;
             that.dom.dispatchEvent(evObj);
         } else if(doc.createEventObject) {
             var evObj = doc.createEventObject();
             evObj.value = value;
-            that.dom.fireEvent('on' + name, evObj);
+            that.dom.fireEvent('onsjs' + name, evObj);
         }
     }
 
@@ -1458,8 +1450,9 @@ Layer = function Layer(scene, name, options) {
     if (this.scene.layers[name] === undefined) {
         this.scene.layers[name] = this;
     } else {
-        if (sjs.debug)
-            warning("A layer named " + name + " already exist.");
+        if (sjs.debug) {
+            sjs.warning("A layer named " + name + " already exist.");
+        }
         // if the user try to create a Layer that already exists,
         // we send back the same.
         return this.scene.layers[name];
@@ -1473,7 +1466,7 @@ Layer = function Layer(scene, name, options) {
 
     if (this.useCanvas) {
         if (domElement && domElement.nodeName.toLowerCase() !== "canvas") {
-            error("Cannot use HTMLElement " + domElement.nodeName + " with canvas renderer.");
+            sjs.error("Cannot use HTMLElement " + domElement.nodeName + " with canvas renderer.");
         }
         if (needToCreate) {
             domElement = doc.createElement('canvas');
@@ -1603,6 +1596,29 @@ List.prototype.iterate = function iterate() {
     return this.list[this.index];
 };
 
+var log_output = null;
+
+function output(value) {
+    if(!log_output) {
+        log_output = doc.createElement('textarea');
+        log_output.style.height = "200px";
+        log_output.style.width = (window.innerWidth - 100) + 'px';
+        doc.body.appendChild(log_output);
+    }
+    log_output.value = log_output.value + value;
+    log_output.scrollTop = log_output.scrollHeight;
+}
+
+function _log() {
+    if(!sjs.debug)
+        return;
+    var result = "";
+    for (var i = 0; i < arguments.length; i++) {
+        result += arguments[i] + ' ';
+    }
+    output(result + "\r\n");
+}
+
 var sjs = {
     // a global cache to load each sprite only one time.
     spriteCache: {},
@@ -1615,6 +1631,9 @@ var sjs = {
     Sprite: Sprite,
     overlay: overlay,
     scenes: [],
+    error: function error(msg) {_log("Error: " + msg);},
+    warning:function warning(msg) {_log("Warning: " + msg);},
+    log:_log,
     createEvent: null,
     math: {hypo: hypo, mod: mod, normalVector: normalVector, lineSide: lineSide}
 };
