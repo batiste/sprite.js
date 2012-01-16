@@ -34,7 +34,7 @@ html, body{margin:0px;padding:0;font-size:12px;font-family:sans-serif;}
     font-family:sans-serif;
 }
 
-.dialog button:hover, .dialog button:focus, .dialog button.selected {
+.dialog button.selected {
     background:url(hand.png) left center no-repeat;
 }
 
@@ -273,7 +273,7 @@ function startDialog(dialog, branch) {
             updateSelected(current_choice);
         }
     }
-    input.dom.addEventListener("up", up, false);
+    input.dom.addEventListener("sjsup", up, false);
     function down(e) {
         if(e.value) {
           current_choice = Math.min(current_choice + 1, validDialogs.length - 1);
@@ -281,15 +281,15 @@ function startDialog(dialog, branch) {
           updateSelected(current_choice);
         }
     }
-    input.dom.addEventListener("down", down, false);
+    input.dom.addEventListener("sjsdown", down, false);
     function select(e) {
         if(!e.value) {
             var choice = choices['b'+current_choice];
             scene.dom.removeChild(div);
             e.stopPropagation();
             e.preventDefault();
-            input.dom.removeEventListener("up", up, false);
-            input.dom.removeEventListener("down", down, false);
+            input.dom.removeEventListener("sjsup", up, false);
+            input.dom.removeEventListener("sjsdown", down, false);
 
 
             if(choice && choice.answer) {
@@ -299,11 +299,11 @@ function startDialog(dialog, branch) {
 
             dialog.answer = false;
             game_mode = 'exit_dialog';
-            input.dom.removeEventListener("space", select, false);
+            input.dom.removeEventListener("sjsspace", select, false);
             scene.ticker.resume();
         }
     }
-    input.dom.addEventListener("space", select, false);
+    input.dom.addEventListener("sjsspace", select, false);
 
     scene.dom.appendChild(div);
     updateSelected(current_choice);
@@ -416,7 +416,6 @@ function paint(ticker) {
             obj.sprite.position(_x | 0, _y | 0);
             obj.sprite.canvasUpdate(surface.front);
         }
-
 
     }
 
