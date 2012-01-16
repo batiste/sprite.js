@@ -3,12 +3,14 @@
 <title>Test</title>
 </head>
 <body>
-<p>Test the isPointInImage method. This test needs to be runned on the server (python tests/server.py).</p>
+<p>Test the isPointInImage method. This test needs to be runned on a web server (python tests/server.py).</p>
 </body>
 <script src="../sprite.js"></script>
 <script src="../lib/collision.js"></script>
 <script>
 window.onload = function() {
+
+    sjs.debug = true;
 
     var game_height = 400;
     var game_width = 400;
@@ -22,7 +24,13 @@ window.onload = function() {
         var input = scene.Input();
 
         scene.dom.onclick = function(e) {
-            if(sjs.collision.isPointInImage(e.clientX - s.x - scene.dom.offsetLeft, e.clientY - s.y - scene.dom.offsetTop, s.img)) {
+            if(sjs.collision.isPointInImage(
+                  e.clientX - s.x - scene.dom.offsetLeft,
+                  e.clientY - s.y - scene.dom.offsetTop,
+                  s.w,
+                  s.h,
+                  s.img)
+            ) {
                 s.position(Math.random() * 300, Math.random() * 300);
                 s.update();
             }
