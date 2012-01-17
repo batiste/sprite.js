@@ -174,6 +174,8 @@ Scene.prototype.constructor = Scene;
 
 Scene.prototype.Sprite = function SceneSprite(src, layer) {
     // A shortcut for sjs.Sprite
+    if(layer===undefined)
+        sjs.error("When you create Sprite from the scene the layer should be specified or false.");
     return new Sprite(this, src, layer);
 };
 
@@ -1221,6 +1223,9 @@ _Input = function _Input(scene) {
 
     function updateKeyChange(name, val) {
         fireEvent(name, val);
+        if(name == "space" || name == "enter") {
+            updateKeyChange("action", val)
+        }
         if (that.keyboard[name] !== val) {
             that.keyboard[name] = val;
             that.keyboardChange[name] = val;

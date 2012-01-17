@@ -299,11 +299,11 @@ function startDialog(dialog, branch) {
 
             dialog.answer = false;
             game_mode = 'exit_dialog';
-            input.dom.removeEventListener("sjsspace", select, false);
+            input.dom.removeEventListener("sjsaction", select, false);
             scene.ticker.resume();
         }
     }
-    input.dom.addEventListener("sjsspace", select, false);
+    input.dom.addEventListener("sjsaction", select, false);
 
     scene.dom.appendChild(div);
     updateSelected(current_choice);
@@ -316,7 +316,7 @@ function paint(ticker) {
         return;
 
     if (game_mode == 'exit_dialog') {
-        if(input.keyReleased('space')) {
+        if(input.keyReleased('action')) {
             game_mode = 'play';
         }
         return;
@@ -372,12 +372,12 @@ function paint(ticker) {
                 });
                 return;
             }
-            if(obj.class == "dialog" && input.keyReleased('space')) {
+            if(obj.class == "dialog" && input.keyReleased('action')) {
                 ticker.pause();
                 startDialog(obj.dialog);
                 return;
             }
-            if(obj.class == "entity" && input.keyboard.space) {
+            if(obj.class == "entity" && input.keyboard.action) {
                 SoundJS.play("pig");
                 sjs.map.activeObjects.splice(i, 1);
                 continue;
