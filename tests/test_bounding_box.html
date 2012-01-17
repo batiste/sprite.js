@@ -1,0 +1,50 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test redefined bounding box</title>
+</head>
+<body>
+<p>Test that it's possible to redefine the bounding box of a sprite. In grey the colliding rectangle. In black the redefined bounding box.</p>
+</body>
+<script src="../sprite.js"></script>
+<script src="../lib/collision.js"></script>
+<script>
+window.onload = function() {
+
+    sjs.debug = true;
+
+    var game_height = 400;
+    var game_width = 400;
+    var scene = sjs.Scene({w:game_width, h:game_height});
+    var layer = scene.Layer("name", {useCanvas:false});
+
+    var s2 = layer.Sprite(false, {color:"#999", x:100, y:100, w:128, h:128});
+    s2.shape = {x:16, y:16, w:96, h:64};
+    s2.update();
+
+    var s3 = layer.Sprite(false, {color:"#222", x:116, y:116, w:96, h:64});
+    s3.update();
+
+    var s1 = layer.Sprite('img/crate.png');
+
+    var input = scene.Input();
+
+    var ticker = scene.Ticker(function() {
+
+        var pos = input.mouse.position;
+        if(pos) {
+            s1.position(pos.x - 16, pos.y - 16);
+        }
+        s1.update();
+        s2.update();
+        if(s1.collidesWith(s2)) {
+            s2.setColor("#f11");
+        } else {
+            s2.setColor("#999");
+        }
+        s2.update();
+    });
+    ticker.run();
+
+};
+</script>
+</html>
