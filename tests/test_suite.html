@@ -294,23 +294,24 @@ window.onload = function() {
     assertEqual(math.normalVector(2, 2), {x:(2/math.hypo(2, 2)), y:(2/math.hypo(2, 2))}, "Test normal vector 1")
     assertEqual(math.normalVector(2, 2, math.hypo(2, 2)), {x:2, y:2}, "Test normal vector 2")
 
-    var ticker = scene.Ticker(20, function() {});
+    var ticker = scene.Ticker(10, function() {});
     ticker.run();
     var ct = undefined;
 
     setTimeout(function() {
+        ticker.pause();
         ct = ticker.currentTick;
         ticker.resume();
     }, 20);
 
     setTimeout(function() {
-        assertGreater(ticker.currentTick, ct, "Test that the currentTick value of the ticker still increase after a pause");
         ticker.pause();
-    }, 50);
+        assertGreater(ticker.currentTick, ct, "Test that the currentTick value of the ticker still increase after a pause");
+    }, 100);
 
     var obj = {}
     obj[sp1] = 3;
-    
+
     assertEqual(obj[sp1], 3, "Test object hash access with a Sprite 1");
     sp1.move(10, 5);
     assertEqual(obj[sp1], 3, "Test object hash access with a Sprite 2");
