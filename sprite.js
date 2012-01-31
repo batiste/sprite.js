@@ -1183,6 +1183,7 @@ _Input = function _Input(scene) {
     that.mousepressed = false;
     this.mousereleased = false;
     this.keydown = false;
+    this.touchMoveSensibility = 3;
 
     this.touchable = 'ontouchstart' in global;
 
@@ -1321,40 +1322,42 @@ _Input = function _Input(scene) {
         });
 
     listen("touchend", function (e) {
-            mouseUpEvent(e);
-            that.keyboard = {}
-            that.touchStart = null;
+        mouseUpEvent(e);
+        that.keyboard = {}
+        that.touchStart = null;
     });
 
     listen("touchmove", function (e) {
-            e.preventDefault(); // avoid scrolling the page
-            e = reduceTapEvent(e);
-            updateKeyChange('space', false); // if it moves: it is not a tap
-            mouseMoveEvent(e);
-            if (that.touchStart) {
-                var deltaX = e.clientX - that.touchStart.x;
-                var deltaY = e.clientY - that.touchStart.y;
-                // limit of 3 pixels
-                if (deltaY < 0) {
-                    updateKeyChange('up', true);
-                    updateKeyChange('down', false);
-                } else {
-                    updateKeyChange('down', true);
-                    updateKeyChange('up', false);
-                };
-                if (deltaX < 0) {
-                    updateKeyChange('left', true);
-                    updateKeyChange('right', false);
-                } else {
-                    updateKeyChange('right', true);
-                    updateKeyChange('left', false);
-                };
-                // increase the control of the swipe in
-                // the long run.
-                that.touchStart.x += (deltaX / 10);
-                that.touchStart.y += (deltaY / 10);
+        e.preventDefault(); // avoid scrolling the page
+        e = reduceTapEvent(e);
+        updateKeyChange('space', false); // if it moves: it is not a tap
+        mouseMoveEvent(e);
+        if (that.touchStart) {
+            var deltaX = e.clientX - that.touchStart.x;
+            var deltaY = e.clientY - that.touchStart.y;
+
+            if (deltaY < -that.touchMoveSensibility) {
+                updateKeyChange('up', true);
+                updateKeyChange('down', false);
             }
-        });
+            if (deltaY > that.touchMoveSensibility) {
+                updateKeyChange('down', true);
+                updateKeyChange('up', false);
+            };
+            if (deltaX < -that.touchMoveSensibility) {
+                updateKeyChange('left', true);
+                updateKeyChange('right', false);
+            }
+            if(deltaX > that.touchMoveSensibility) {
+                updateKeyChange('right', true);
+                updateKeyChange('left', false);
+            };
+            // increase the control of the swipe in
+            // the long run.
+            that.touchStart.x += (deltaX / 10);
+            that.touchStart.y += (deltaY / 10);
+        }
+    });
 
         listen("touchmove", function (e) {
             e = reduceTapEvent(e);

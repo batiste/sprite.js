@@ -65,6 +65,21 @@
                  "width":22,
                  "x":170,
                  "y":24
+                }, 
+                {
+                 "height":77,
+                 "name":"",
+                 "properties":
+                    {
+                     "1)I want a fresh beer please":"This place is hardware shop!",
+                     "2)Why everybody here is wearing a beard?":"It's fashionable, you should grow one! Also it's warm in winter time.",
+                     "start":"Hello, can I help you?",
+                     "title":"The shop owner's twin brother"
+                    },
+                 "type":"dialog",
+                 "width":66,
+                 "x":275,
+                 "y":91
                 }],
          "opacity":1,
          "type":"objectgroup",

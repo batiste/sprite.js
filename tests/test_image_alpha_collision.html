@@ -18,7 +18,7 @@ window.onload = function() {
     var layer = scene.Layer("name", {useCanvas:false});
 
     scene.loadImages(['img/star.png'], function() {
-        var s = scene.Sprite('img/star.png');
+        var s = layer.Sprite('img/star.png');
         s.move(0, 0);
         s.update();
         var input = scene.Input();
