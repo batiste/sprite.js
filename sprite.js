@@ -24,7 +24,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 /*jslint bitwise: true, undef: true, white: true, maxerr: 50, indent: 4 */
 
-/* Sprite.js v1.2.0
+/* Sprite.js v1.2.1
  *
  * coding guideline
  *
