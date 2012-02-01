@@ -1,0 +1,98 @@
+<!DOCTYPE html><html>
+<head>
+<title>A visual guide to sprite.js primitives</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+
+<style>
+body {
+    margin:0 auto;
+}
+.sjs {
+    background:#f1f4fe;
+    border:1px #333 solid;
+}
+h2 {
+    font-size:14px;
+}
+
+</style>
+</head>
+<body>
+
+<p>Sprite.js visual guide to the basic sprite's transformation. <a href="https://github.com/batiste/sprite.js">Github project page</a></p>
+<ol id="exec_list" style="position:absolute;left:400px;"></ol>
+
+</body>
+<script src="../sprite.js"></script>
+<script src="../lib/collision.js"></script>
+<script>
+
+window.onload = function() {
+
+    var game_height = 400;
+    var game_width = 400;
+    var scene = sjs.Scene({w:game_width, h:game_height});
+    var exec_list = document.getElementById('exec_list');
+    var bird = scene.Sprite('img/bird.png');
+
+    scene.loadImages(['img/bird.png'], function() {
+
+        var function_array = [
+            {'name': 'Initialization',
+                'execute':function () {
+bird = scene.Sprite('img/bird.png');
+bird.update();
+            }},
+            {'name': 'Set position',
+                'execute':function () {
+bird.position(200, 200);
+bird.update();
+            }},
+            {'name': 'Move',
+                'execute':function () {
+bird.move(-10, -10);
+bird.update();
+            }},
+            {'name': 'Rotate',
+                'execute':function () {
+bird.rotate(Math.PI / 3.0);
+bird.update();
+            }},
+            {'name': 'Scale',
+                'execute':function () {
+bird.scale(bird.xscale + 0.5, bird.yscale + 0.5);
+bird.update();
+            }},
+            {'name': 'Set opacity',
+                'execute':function () {
+bird.setOpacity(bird.opacity - 0.2);
+bird.update();
+            }},
+        ]
+
+        var list_str = "";
+        for(var i=0; i<function_array.length; i++) {
+            var el = function_array[i];
+            var code = String(el['execute']).split('{')[1].split('}')[0].replace(/^\s+|\s+$/g, '');
+
+            list_str = list_str + '<li><h2>'+ el.name
+              +'</h2><pre>'+
+              code
+              +'</pre><button id="exec_'+
+
+              i+'">Execute</button></li>';
+
+        }
+
+        exec_list.innerHTML = list_str;
+        exec_list.onclick = function(e) {
+            var index = parseInt(e.target.id.split('_')[1]);
+            if(function_array[index])
+                function_array[index].execute();
+        }
+
+    });
+
+};
+</script>
+</html>

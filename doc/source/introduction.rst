@@ -3,7 +3,7 @@ How to use sprite.js?
 =======================
 
 
-Example of basic usage:
+Example of basic sprite transformations:
 
 .. code-block:: javascript
 
@@ -36,6 +36,8 @@ Example of basic usage:
 
         sp.update();
     });
+
+If you want a more interactive demonstration of basic sprite manipulation, there is a good example in the tests: http://batiste.dosimple.ch/sprite.js/tests/visual_guide.html
 
 
 Performance and different ways to draw
