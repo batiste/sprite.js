@@ -804,3 +804,8 @@ A node object should implement those 4 methods:
 
     Returns true if the current node cannot be used to find the path.
 
+
+The Entity/Component Model
+------------------------------------------
+
+If you wish to use a entity component model with Sprite.js I would recommend the use of this external library https://github.com/batiste/component-entity
