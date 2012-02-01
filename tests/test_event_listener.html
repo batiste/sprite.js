@@ -18,6 +18,7 @@ window.onload = function() {
     var layer = scene.Layer("name", {useCanvas:false});
 
     var input = scene.Input();
+    input.enableCustomEvents = true;
 
     var listener = function(event) {
         sjs.log(event.type, event.value);

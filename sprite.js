@@ -1184,6 +1184,7 @@ _Input = function _Input(scene) {
     this.mousereleased = false;
     this.keydown = false;
     this.touchMoveSensibility = 3;
+    this.enableCustomEvents = false;
 
     this.touchable = 'ontouchstart' in global;
 
@@ -1210,6 +1211,8 @@ _Input = function _Input(scene) {
     };
 
     function fireEvent(name, value) {
+        if(!that.enableCustomEvents)
+            return;
         if(doc.createEvent) {
             var evObj = doc.createEvent('Events');
             evObj.initEvent('sjs' + name, true, true);

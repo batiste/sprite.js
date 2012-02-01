@@ -119,6 +119,7 @@ else
     sjs.map.loadMap('map.json', scene);
 
 var input = scene.Input();
+input.enableCustomEvents = true;
 
 var front = scene.Layer("front", {useCanvas:false});
 var player = front.Sprite("character.png", {w:48, h:46, layer:front});
