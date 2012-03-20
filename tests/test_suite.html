@@ -324,6 +324,24 @@ window.onload = function() {
     assertEqual(sp1.layer, null, "Test that it's possible to create a layer less Sprite object 1.");
     assertEqual(sp1.dom, null, "Test that a layer less Sprite doesn't have dom.");
 
+    // testing the shape redefinition
+    var sp1 = scene.Sprite();
+    sp1.size(10, 10);
+    sp1.move(10, 10);
+
+    sp1.shape = {x:0, y:0, w:10, h:10, type:"rectangle"};
+    assertTrue(sp1.collidesWith(sp1), "Shape redefinition 1: a sprite should collides with itself");
+    sp1.shape = {x:1, y:1, w:8, h:8, type:"rectangle"};
+    assertTrue(sp1.collidesWith(sp1), "Shape redefinition 2: a sprite should collides with itself");
+
+    var sp2 = scene.Sprite();
+    sp2.size(10, 10);
+    sp2.move(10, 10);
+    sp1.shape = {x:0, y:0, w:10, h:10, type:"rectangle"};
+    assertTrue(sp1.collidesWith(sp2), "Shape redefinition 3: sprite collides with another");
+    sp1.shape = {x:1, y:1, w:8, h:8, type:"rectangle"};
+    assertTrue(sp1.collidesWith(sp2), "Shape redefinition 4: sprite collides with another");
+    assertTrue(sp2.collidesWith(sp1), "Shape redefinition 5: sprite collides with another");
 
 };
 </script>
