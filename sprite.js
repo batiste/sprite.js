@@ -1617,6 +1617,17 @@ List.prototype.iterate = function iterate() {
     return this.list[this.index];
 };
 
+List.prototype.pop = function pop() {
+    this.length -= 1;
+    return this.list.pop();
+};
+
+List.prototype.shift = function shift() {
+    this.index -= 1;
+    this.length -= 1;
+    return this.list.shift();
+};
+
 List.prototype.isIn = function isInList(el) {
     for(var i=0; i<this.list.length; i++) {
         if(this.list[i] == el) {
