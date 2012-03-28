@@ -1,0 +1,440 @@
+<!DOCTYPE html><html>
+<head>
+<title>Read map</title>
+<meta name="viewport" content="width=device-width, user-scalable=no" />
+<style>
+html, body{margin:0px;padding:0;font-size:12px;font-family:sans-serif;}
+
+.sjs{
+    border:0px #999 solid;
+}
+
+.dialog {
+    padding:1em;
+    background:#333;
+    border:3px #ddd solid;
+    border-top:0;
+    border-radius:0 0 5px 5px;
+    color:#fff;
+    font-weight:bold;
+    font-size:14px;
+    font-family:sans-serif;
+}
+
+.dialog button {
+    clear:both;
+    font-weight:bold;
+    display:block;
+    border:0;
+    padding:10px 10px 10px 60px;
+    background:#333;
+    color:#fff;
+    margin:0.5em;
+    font-size:14px;
+    font-family:sans-serif;
+}
+
+.dialog button.selected {
+    background:url(hand.png) left center no-repeat;
+}
+
+#infos {
+    position:absolute;
+    z-index:500;
+    color:#fff;
+    background:#333;
+    opacity:0.5;
+}
+
+#infos a {
+    color:#fff;
+}
+
+</style>
+</head>
+<body>
+<div id="infos">
+<p>(<span id="fps"></span>FPS,
+load <span id="load"></span>%,
+<span id="dropped"></span> dropped frames)
+Maps created with <a href="http://www.mapeditor.org/">Map Editor 0.8</a>.
+Sound loop by <a href="http://opengameart.org/users/elerya">elerya</a>.
+</p>
+
+</div>
+
+<script src="../../sprite.js"></script>
+<script src="../../lib/scrolling.js"></script>
+<script src="../../lib/collision.js"></script>
+<script src="../../vendors/touch.js"></script>
+<script src="../../lib/path.js"></script>
+<script src="../../vendors/SoundJS.js"></script>
+<script src="mapimport.js"></script>
+<script>
+
+var sound_list = [
+    {name:"swish", src:["swish-1.ogg"], instances:3},
+    {name:"click", src:["click.ogg"], instances:4},
+    {name:"pig", src:["pig.ogg"], instances:3},
+    {name:"music", src:["abeth.ogg"], instances:1, volume:0.2},
+];
+
+/*
+SoundJS.addBatch(sound_list);
+SoundJS.onLoadQueueComplete = function() {
+  SoundJS.play("music", null, 0.1, true);
+  SoundJS.setVolume(0.2, "pig");
+}
+*/
+
+
+sjs.debug = true;
+
+var w = Math.min(window.innerWidth, 1024);
+var h = Math.min(window.innerHeight, 800);
+
+var scene = sjs.Scene({w:w, h:h, autoPause:false});
+
+var dropped = document.getElementById('dropped');
+var fps = document.getElementById('fps');
+var load = document.getElementById('load');
+
+
+scene.loadImages(['ground.png', 'tiles.png'], function() {
+
+scene.main = main;
+
+var local = true;
+switch(window.location.protocol) {
+   case 'http:':
+   case 'https:':
+     local = false;
+     break;
+   case 'file:':
+     local = true;
+     break;
+}
+
+if(local)
+    sjs.map.loadMap('http://127.0.0.1:8000/map.json', scene);
+else
+    sjs.map.loadMap('map.json', scene);
+
+var input = scene.Input();
+input.enableCustomEvents = true;
+input.touchMoveSensibility = 10;
+
+var front = scene.Layer("front", {useCanvas:false});
+var player = front.Sprite("character.png", {w:48, h:46, layer:front});
+var player_walk_down = sjs.Cycle([[0,0,10],[48, 0, 10], [96, 0, 10], [144, 0, 10]]);
+var player_walk_up = sjs.Cycle([[0,96,10],[48, 96, 10], [96, 96, 10], [144, 96, 10]]);
+var player_walk_left = sjs.Cycle([[0,144,10],[48, 144, 10], [96, 144, 10], [144, 144, 10]]);
+var player_walk_right = sjs.Cycle([[0,48,10],[48, 48, 10], [96, 48, 10], [144, 48, 10]]);
+
+var player_attack_right = sjs.Cycle([[0,192, 2],[48, 192, 4], [0, 240, 3], [48, 240, 3], [0, 288, 4], [48, 288, 5]]);
+var player_attack_left = sjs.Cycle([[144, 192, 2],[96, 192, 4], [144, 240, 3], [96, 240, 3], [144, 288, 4], [96, 288, 5]]);
+
+player_walk_down.addSprite(player);
+player_walk_left.addSprite(player);
+player_walk_right.addSprite(player);
+player_walk_up.addSprite(player);
+player_attack_right.addSprite(player);
+player_attack_left.addSprite(player);
+var current_player_anim = player_walk_down;
+var surface, target;
+
+function reduceTo(v, max) {
+    if(v > max)
+        return max;
+    if(v < -max)
+        return -max;
+    return v;
+}
+
+function main() {
+
+    var offsetx = 0;
+    var offsety = 0;
+
+    if(surface)
+        surface.remove();
+
+    surface = sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, _x, _y) {
+        sjs.map.paintOn(layer, _x, _y);
+    });
+
+    surface.position(sjs.map.playerStart.x - surface.w / 2, sjs.map.playerStart.y - surface.h / 2);
+    surface.update();
+
+    player.position(surface.w / 2 - player.w/2, surface.h / 2 - player.h);
+
+    scene.Ticker(paint, {useAnimationRequest:true}).run();
+
+}
+
+function getAnimation(move_x, move_y) {
+
+    if(input.keyboard.enter || input.keyboard.space) {
+
+        if(move_x < 0) {
+            current_player_anim = player_attack_left;
+        } else {
+            current_player_anim = player_attack_right;
+        }
+        if(current_player_anim.tick == 1) {
+            //SoundJS.play("swish");
+        }
+        current_player_anim.next(scene.ticker.lastTicksElapsed);
+        return current_player_anim;
+    }
+
+    if(move_y < 0)
+        current_player_anim = player_walk_up;
+    if(move_x > 0)
+        current_player_anim = player_walk_right;
+    if(move_x < 0)
+        current_player_anim = player_walk_left;
+    if(move_y > 0)
+        current_player_anim = player_walk_down;
+
+    if(move_y == 0 && move_x == 0) {
+        current_player_anim = player_walk_down;
+        current_player_anim.go(0);
+        return;
+    }
+    current_player_anim.next(scene.ticker.lastTicksElapsed);
+}
+
+var game_mode = 'play';
+
+function startDialog(dialog, branch) {
+    // dialog format in the tile editor
+    // 1) I am hungry : I have no food
+    // 2) I want a drink : What do you want?
+    // 2.1) Just water : there you go.
+    // 2.2) Wine : there you go.
+
+    // filter the dialog branches
+    validDialogs = [];
+    if(branch) {
+        for (var index in dialog) {
+            var prefix = index.split(')')[0];
+            // eg: if branch is "1.1", we want "1.1.12 and "1.1.2"
+            if(prefix.indexOf(branch) == 0 && prefix.length == (branch.length + 2)) {
+                var after = index.split(')')[1];
+                validDialogs.push({question:after, answer:dialog[index], branch:prefix});
+            }
+        }
+    } else {
+        for (var index in dialog) {
+            var prefix = index.split(')')[0];
+            if(prefix.length == 1) {
+                var after = index.split(')')[1];
+                validDialogs.push({question:after, answer:dialog[index], branch:prefix});
+            }
+        }
+    }
+    validDialogs.push({question:"Bye!", answer:false, branch:false});
+
+    game_mode = 'dialog';
+    var div = document.createElement("div");
+    div.className = "dialog";
+    div.style.top = '0';
+    div.style.left = '50px';
+    div.style.width = (scene.w - 140) + 'px';
+    if(dialog.answer) {
+        div.innerHTML = '<p>'+dialog.title + ' : ' + dialog.answer+'</p>';
+    } else if(dialog.start) {
+        div.innerHTML = '<p>'+dialog.title + ' : ' + dialog.start+'</p>';
+    }
+    var choices = {};
+    var current_choice = 0;
+    for (var i = 0; i<validDialogs.length; i++) {
+        var button = document.createElement("button");
+        button.innerHTML = validDialogs[i].question;
+        button.id = 'b'+i;
+        div.appendChild(button);
+        choices[button.id] = {
+            dom:button,
+            branch:validDialogs[i].branch,
+            answer:validDialogs[i].answer
+        };
+    }
+
+    div.style.position = "absolute";
+    div.style.zIndex = String(1000);
+
+    function updateSelected(n) {
+        for (var i = 0; i<validDialogs.length; i++) {
+            choices['b'+i].dom.className = '';
+        }
+        choices['b'+n].dom.className = 'selected';
+    }
+
+    function up(e) {
+        if(e.value) {
+            current_choice = Math.max(0, current_choice - 1);
+            //SoundJS.play("click");
+            updateSelected(current_choice);
+        }
+    }
+    input.dom.addEventListener("sjsup", up, false);
+    function down(e) {
+        if(e.value) {
+          current_choice = Math.min(current_choice + 1, validDialogs.length - 1);
+          //SoundJS.play("click");
+          updateSelected(current_choice);
+        }
+    }
+    input.dom.addEventListener("sjsdown", down, false);
+    function select(e) {
+        if(!e.value) {
+            var choice = choices['b'+current_choice];
+            scene.dom.removeChild(div);
+            e.stopPropagation();
+            e.preventDefault();
+            input.dom.removeEventListener("sjsup", up, false);
+            input.dom.removeEventListener("sjsdown", down, false);
+
+
+            if(choice && choice.answer) {
+                dialog.answer = choice.answer;
+                return startDialog(dialog, choice.branch);
+            }
+
+            dialog.answer = false;
+            game_mode = 'exit_dialog';
+            input.dom.removeEventListener("sjsaction", select, false);
+            scene.ticker.resume();
+        }
+    }
+    input.dom.addEventListener("sjsaction", select, false);
+
+    scene.dom.appendChild(div);
+    updateSelected(current_choice);
+}
+
+function paint(ticker) {
+
+    // safe guard to avoid any excess cycle
+    if (game_mode == 'dialog')
+        return;
+
+    if (game_mode == 'exit_dialog') {
+        if(input.keyReleased('action')) {
+            game_mode = 'play';
+        }
+        return;
+    }
+
+    var mx = 0;
+    var my = 0;
+    var pixels = 4 * ticker.lastTicksElapsed;
+    if(input.keyboard.enter || input.keyboard.space) {
+        var pixels = 2 * ticker.lastTicksElapsed;
+    }
+
+    if(input.keyboard.up)
+        my = -pixels;
+    if(input.keyboard.down)
+        my = pixels;
+    if(input.keyboard.left)
+        mx = -pixels;
+    if(input.keyboard.right)
+        mx = pixels;
+
+    var x = (surface.x + surface.w / 2);
+    var y = (surface.y + surface.h / 2);
+
+    if(input.arrows()) {
+        target = null;
+        var collisionx = sjs.map.collides(x + mx, y);
+        var collisiony = sjs.map.collides(x, y + my);
+        if(!collisionx || !collisiony) {
+            if(!collisionx)
+                surface.move(mx, 0);
+            if(!collisiony)
+                surface.move(0, my);
+        }
+    }
+
+    surface.update();
+
+    var move_trigger = scene.ticker.currentTick % 300;
+
+    // Deal with active objects
+    for(var i=0; i<sjs.map.activeObjects.length; i++) {
+
+        var obj = sjs.map.activeObjects[i];
+
+        // collision
+        if(sjs.collision.isPointInRectangle(x, y, obj)) {
+            if(obj.class == "teleport") {
+                target = null;
+                ticker.pause();
+                sjs.map.loadMap(obj.map, scene, function() {
+                    scene.main();
+                });
+                return;
+            }
+            if(obj.class == "dialog" && input.keyReleased('action')) {
+                ticker.pause();
+                startDialog(obj.dialog);
+                return;
+            }
+            if(obj.class == "entity" && input.keyboard.action) {
+                //SoundJS.play("pig");
+                sjs.map.activeObjects.splice(i, 1);
+                continue;
+            }
+
+        }
+
+        // display
+        if(obj.class == "dialog") {
+            var _x = obj.x - surface.x + obj.w / 2 - obj.sprite.w / 2;
+            obj.sprite.position(_x, obj.y - surface.y - obj.sprite.h + (5 * Math.cos(scene.ticker.currentTick / 8.0)));
+            obj.sprite.canvasUpdate(surface.front);
+        }
+
+
+        if(obj.class == "entity") {
+
+            if(sjs.map.collides(obj.x + 24, obj.y + 24)) {
+                obj.xv = -obj.xv;
+                obj.yv = -obj.yv;
+            }
+
+            if(move_trigger < 10) {
+                obj.xv = 1.5 * (Math.random() - 0.5);
+                obj.yv = 1.5 * (Math.random() - 0.5);
+            }
+
+            if(move_trigger > 200) {
+                obj.x = obj.x + obj.xv;
+                obj.y = obj.y + obj.yv;
+            }
+
+            var _x = obj.x - surface.x;
+            var _y = obj.y - surface.y;
+
+            obj.sprite.position(_x | 0, _y | 0);
+            obj.sprite.canvasUpdate(surface.front);
+        }
+
+    }
+
+    getAnimation(mx, my);
+    player.update();
+
+
+    if(scene.ticker.currentTick % 20 == 0) {
+        fps.innerHTML = ticker.fps;
+        load.innerHTML = ticker.load;
+        dropped.innerHTML = ticker.droppedFrames;
+    }
+
+}
+
+});
+</script>

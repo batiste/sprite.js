@@ -1349,19 +1349,23 @@ _Input = function _Input(scene) {
             if (deltaY < -that.touchMoveSensibility) {
                 updateKeyChange('up', true);
                 updateKeyChange('down', false);
-            }
-            if (deltaY > that.touchMoveSensibility) {
+            } else if (deltaY > that.touchMoveSensibility) {
                 updateKeyChange('down', true);
                 updateKeyChange('up', false);
-            };
+            } else {
+                updateKeyChange('up', false);
+                updateKeyChange('down', false);
+            }
             if (deltaX < -that.touchMoveSensibility) {
                 updateKeyChange('left', true);
                 updateKeyChange('right', false);
-            }
-            if(deltaX > that.touchMoveSensibility) {
+            } else if(deltaX > that.touchMoveSensibility) {
                 updateKeyChange('right', true);
                 updateKeyChange('left', false);
-            };
+            } else {
+                updateKeyChange('left', false);
+                updateKeyChange('right', false);
+            }
             // increase the control of the swipe in
             // the long run.
             that.touchStart.x += (deltaX / 10);
