@@ -882,6 +882,7 @@ Sprite.prototype.center = function center() {
 Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
     if (!layer)
         layer = this.layer;
+    var props = {layer:layer, color:this.color};
     if (v === undefined) {
         if (horizontal)
             v = this.h / 2;
@@ -889,8 +890,8 @@ Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
             v = this.w / 2;
     }
     v = v | 0;
-    var s1 = layer.scene.Sprite(this.src, layer);
-    var s2 = layer.scene.Sprite(this.src, layer);
+    var s1 = layer.scene.Sprite(this.src, props);
+    var s2 = layer.scene.Sprite(this.src, props);
     if (horizontal) {
         s1.size(this.w, v);
         s1.position(this.x, this.y);
@@ -916,11 +917,12 @@ Sprite.prototype.explode4 = function explode(x, y, layer) {
     y = y | 0;
     if (!layer)
         layer = this.layer;
+    var props = {layer:layer, color:this.color};
     // top left sprite, going counterclockwise
-    var s1 = layer.scene.Sprite(this.src, layer),
-        s2 = layer.scene.Sprite(this.src, layer),
-        s3 = layer.scene.Sprite(this.src, layer),
-        s4 = layer.scene.Sprite(this.src, layer);
+    var s1 = layer.scene.Sprite(this.src, props),
+        s2 = layer.scene.Sprite(this.src, props),
+        s3 = layer.scene.Sprite(this.src, props),
+        s4 = layer.scene.Sprite(this.src, props);
 
         s1.size(x, y);
     s1.position(this.x, this.y);
@@ -1189,12 +1191,12 @@ _Input = function _Input(scene) {
     this.touchable = 'ontouchstart' in global;
 
     this.next = function () {
-        if(that.disableFor)
-            that.disableFor = that.disableFor - 1;
-        that.keyboardChange = {};
-        that.mousepressed = false;
-        that.mouse.click = undefined;
-        that.mousereleased = false;
+        if(this.disableFor)
+            this.disableFor = that.disableFor - 1;
+        this.keyboardChange = {};
+        this.mousepressed = false;
+        this.mouse.click = undefined;
+        this.mousereleased = false;
     }
 
     this.disableFor = 0;
@@ -1208,6 +1210,11 @@ _Input = function _Input(scene) {
 
     this.keyReleased = function (name) {
         return that.keyboardChange[name] !== undefined && !that.keyboardChange[name];
+    };
+
+    this.arrows = function arrows() {
+        /* Return true if any arrow key is pressed */
+        return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
     };
 
     function fireEvent(name, value) {
@@ -1389,10 +1396,6 @@ _Input = function _Input(scene) {
         listen("contextmenu", function (e) {e.preventDefault()});
 };
 
-_Input.prototype.arrows = function arrows() {
-    /* Return true if any arrow key is pressed */
-    return this.keyboard.right || this.keyboard.left || this.keyboard.up || this.keyboard.down;
-};
 
 // Add an automatic pause to all the scenes when the user
 // quit the current window.
@@ -1572,7 +1575,8 @@ Layer.prototype.onTop = function onTop(color) {
 List = function List(list) {
     if (this.constructor !== List)
         return new List(list);
-    this.list = list || [];
+    // ensure that a List can be initialized with a list.
+    this.list = (list && (list.list || list)) || [];
     this.length = this.list.length;
     this.index = -1;
 };
@@ -1585,17 +1589,23 @@ List.prototype.add = function add(sprite) {
     this.length = this.list.length;
 };
 
+// alias
+List.prototype.append = List.prototype.add;
+
 List.prototype.remove = function remove(toRemove) {
+    var removed = false
     for (var i = 0, el; el = this.list[i]; i++) {
         if (el == toRemove) {
             this.list.splice(i, 1);
             // delete during the iteration is possible
             if (this.index > -1)
                 this.index = this.index - 1;
-            this.length = this.list.length;
-            return true;
+            i--;
+            removed = true;
         }
     }
+    this.length = this.list.length;
+    return removed;
 };
 
 List.prototype.iterate = function iterate() {
@@ -1606,6 +1616,31 @@ List.prototype.iterate = function iterate() {
     }
     return this.list[this.index];
 };
+
+List.prototype.isIn = function isInList(el) {
+    for(var i=0; i<this.list.length; i++) {
+        if(this.list[i] == el) {
+            return true;
+        }
+    }
+    return false;
+}
+
+List.prototype.filter = function filterList(name, value) {
+    var newList = new List();
+    for(var i=0; i<this.list.length; i++) {
+        if(this.list[i][name] == value) {
+            newList.add(this.list[i]);
+        }
+    }
+    return newList;
+}
+
+List.prototype.empty = function () {
+    this.list = [];
+    this.length = 0;
+    this.index = -1;
+}
 
 var log_output = null;
 
