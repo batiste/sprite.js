@@ -1185,7 +1185,7 @@ _Input = function _Input(scene) {
     that.mousepressed = false;
     this.mousereleased = false;
     this.keydown = false;
-    this.touchMoveSensibility = 3;
+    this.touchMoveSensibility = 20;
     this.enableCustomEvents = false;
 
     this.touchable = 'ontouchstart' in global;
@@ -1366,10 +1366,6 @@ _Input = function _Input(scene) {
                 updateKeyChange('left', false);
                 updateKeyChange('right', false);
             }
-            // increase the control of the swipe in
-            // the long run.
-            that.touchStart.x += (deltaX / 10);
-            that.touchStart.y += (deltaY / 10);
         }
     });
 
