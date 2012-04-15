@@ -758,8 +758,20 @@ Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
         ctx = layer.ctx;
     else
         ctx = this.layer.ctx;
-    ctx.save();
 
+    var fast_track = (
+        this.angle == 0
+        && this.opacity == 1
+        && this.imgNaturalWidth == this.w
+        && this.imgNaturalHeight == this.h
+        && this.xTransformOrigin === null
+    )
+    if(fast_track) {
+        ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h, this.x, this.y, this.w, this.h);
+        return this;
+    }
+
+    ctx.save();
     if (this.xTransformOrigin === null) {
         // 50% 505 in CSS
         transx = this.w / 2 | 0;

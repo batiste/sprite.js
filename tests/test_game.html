@@ -28,17 +28,19 @@ window.onload = function() {
     var game_height = 478;
     var game_width = 318;
     var scene = sjs.Scene({w:game_width, h:game_height});
+    var layer = scene.Layer('front', {useCanvas:false});
+    sjs.debug = true;
 
     var plateforms = [];
     var mplateforms = [];
 
-    var bottom = scene.Sprite('img/ground.png');
+    var bottom = layer.Sprite('img/ground.png');
     bottom.move(0, game_height - 20);
     bottom.setW(game_width);
 
     plateforms.push(bottom);
 
-    var p = scene.Sprite('img/ground.png');
+    var p = layer.Sprite('img/ground.png');
     p.move(150, 400);
     p.setW(60);
     p.rotate(-0.2);
@@ -48,7 +50,7 @@ window.onload = function() {
     mplateforms.push(p);
 
 
-    var p = scene.Sprite('img/ground.png');
+    var p = layer.Sprite('img/ground.png');
     p.move(150, 320);
     p.setW(50);
     p.rotate(0.2);
@@ -57,7 +59,7 @@ window.onload = function() {
     plateforms.push(p);
     mplateforms.push(p);
 
-    var p = scene.Sprite('img/ground.png');
+    var p = layer.Sprite('img/ground.png');
     p.move(15, 250);
     p.setW(50);
     p.xv = 0.5;
@@ -65,7 +67,7 @@ window.onload = function() {
     plateforms.push(p);
     mplateforms.push(p);
 
-    var p = scene.Sprite('img/ground.png');
+    var p = layer.Sprite('img/ground.png');
     p.move(180, 180)
     p.setW(30);
     p.xv = 2;
@@ -74,7 +76,7 @@ window.onload = function() {
     mplateforms.push(p);
 
 
-    var p = scene.Sprite('img/ground.png');
+    var p = layer.Sprite('img/ground.png');
     p.move(180, 100);
     p.setW(30);
     p.xv = 1.3;
@@ -83,7 +85,7 @@ window.onload = function() {
     mplateforms.push(p);
 
 
-    var player = scene.Sprite('img/character.png');
+    var player = layer.Sprite('img/character.png');
     player.move(20, 390);
     player.size(23, 51);
     player.setYOffset(3);
