@@ -90,10 +90,17 @@ function has(el, propList) {
 }
 
 function initBrowserSpecific() {
-    sjs.tproperty = has(doc.body.style, ['transform',
-        'WebkitTransform', 'MozTransform', 'OTransform', 'msTransform']);
-    sjs.animationFrame = has(global, ['mozRequestAnimationFrame',
-        'webkitRequestAnimationFrame', 'oRequestAnimationFrame',
+    sjs.tproperty = has(doc.body.style, [
+        'transform',
+        'webkitTransform',
+        'MozTransform',
+        'OTransform',
+        'msTransform']);
+    sjs.animationFrame = has(global, [
+        'requestAnimationFrame',
+        'mozRequestAnimationFrame',
+        'webkitRequestAnimationFrame',
+        'oRequestAnimationFrame',
         'msRequestAnimationFrame']);
     sjs.createEventProperty = has(doc, ['createEvent', 'createEventObject']);
     browser_specific_runned = true;

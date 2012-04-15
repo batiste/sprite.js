@@ -42,8 +42,7 @@
 </head>
 <body style="overflow:hidden">
 
-<p>This demo is gonna produce particles and stop when 2000 particules
-are on the screen or 50% percent javascript load is reached . <a href="https://github.com/batiste/sprite.js">Get the source</a>.<br>
+<p>This demo produce as many particles as possible til the FPS drop under 60. <a href="https://github.com/batiste/sprite.js">Get the source</a>.<br>
 <label><input type="checkbox" checked id="useImage" />Use image for particle</label>
 <label><input type="checkbox" id="useRequestAnimation" />Use request animation frame
 <a href="https://developer.mozilla.org/en/DOM/window.mozRequestAnimationFrame">ref</a></label>
@@ -67,7 +66,7 @@ window.onload = function() {
     var nb = document.getElementById('nb');
     var fps = document.getElementById('fps');
     var dropped = document.getElementById('dropped');
-    var scene = sjs.Scene({w:window.innerWidth-20, h:window.innerHeight-120});
+    var scene = sjs.Scene({w:800, h:600});
 
     var use = document.getElementById('useImage');
     var useImage = true;
@@ -116,7 +115,7 @@ window.onload = function() {
 
     function paint() {
 
-        if(ticker.load < 50 && particles.length < 2000) {
+        if(ticker.load < 70 && ticker.fps > 58) {
             createParticle();
             createParticle();
             createParticle();
