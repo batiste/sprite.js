@@ -774,7 +774,8 @@ Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
         && this.xTransformOrigin === null
     )
     if(fast_track) {
-        ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h, this.x, this.y, this.w, this.h);
+        ctx.drawImage(this.img, this.xoffset, this.yoffset, this.w, this.h,
+            this._x_rounded, this._y_rounded, this.w, this.h);
         return this;
     }
 
@@ -789,7 +790,7 @@ Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
     }
 
     // rounding the coordinates yield a big performance improvement
-    ctx.translate(this.x + transx, this.y + transy);
+    ctx.translate(this._x_rounded + transx, this._y_rounded + transy);
     ctx.rotate(this.angle);
     if (this.xscale !== 1 || this.yscale !== 1)
         ctx.scale(this.xscale, this.yscale);
