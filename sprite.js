@@ -694,8 +694,11 @@ Sprite.prototype.webGLUpdate = function webGLUpdate () {
 };
 
 Sprite.prototype.update = function updateDomProperties () {
-    // This is the CPU heavy function.
 
+    if(this.layer.scene.disableUpdate)
+        return this;
+
+    // This is the CPU heavy function.
     if (this.layer.useWebGL) {
         return this.webGLUpdate();
     }
@@ -1099,6 +1102,7 @@ Ticker_ = function Ticker_(scene, paint, options) {
         return new Ticker_(tickDuration, paint);
 
     this.tickDuration = optionValue(options, 'tickDuration', 16);
+    this.expectedFps = 1000 / this.tickDuration;
     this.useAnimationFrame = optionValue(options, 'useAnimationFrame', false);
     if (!sjs.animationFrame)
         this.useAnimationFrame = false;
@@ -1111,6 +1115,8 @@ Ticker_ = function Ticker_(scene, paint, options) {
     this.currentTick = 0;
     this.ticksSinceLastStart = 0;
     this.droppedFrames = 0;
+    // will divide the framerate by 2 if true
+    this.lowFrameRate = false;
 };
 
 Ticker_.prototype.next = function () {
@@ -1127,8 +1133,24 @@ Ticker_.prototype.next = function () {
 };
 
 Ticker_.prototype.run = function () {
-    if (this.paused)
+    if (this.paused) {
         return;
+    }
+    if(this.lowFrameRate || this.load > 20 && this.fps < (this.expectedFps / 2)) {
+        this.lowFrameRate = true;
+        if(this.skippedFrames == 1) {
+            this.skippedFrames = 0;
+            this.skipPaint = true;
+            this.scene.disableUpdate = true;
+        } else {
+            this.skippedFrames = 1;
+            this.skipPaint = false;
+            this.scene.disableUpdate = false;
+        }
+    } else {
+        this.skipPaint = false;
+    }
+
     var t = this;
     var ticksElapsed = this.next();
     // no update needed, this happen on the first run
@@ -1138,10 +1160,12 @@ Ticker_.prototype.run = function () {
         return;
     }
 
-    for (var name in this.scene.layers) {
-        var layer = this.scene.layers[name];
-        if (layer.useCanvas && layer.autoClear) {
-            layer.clear();
+    if(!this.skipPaint) {
+        for (var name in this.scene.layers) {
+            var layer = this.scene.layers[name];
+            if (layer.useCanvas && layer.autoClear) {
+                layer.clear();
+            }
         }
     }
 
@@ -1153,8 +1177,8 @@ Ticker_.prototype.run = function () {
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
     this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) / 2 | 0;
-
     this.fps = Math.round(1000 / (this.now - (this.lastPaintAt || 0)));
+
     this.lastPaintAt = this.now;
     if (this.useAnimationFrame) {
         this.tickDuration = 16;

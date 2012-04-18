@@ -62,11 +62,14 @@ window.onload = function() {
 //netscape.security.PrivilegeManager.enablePrivilege("UniversalBrowserRead");
 
 
+    var w = Math.min(window.innerWidth, 800);
+    var h = Math.min(window.innerHeight, 600);
+
     var l = document.getElementById('load');
     var nb = document.getElementById('nb');
     var fps = document.getElementById('fps');
     var dropped = document.getElementById('dropped');
-    var scene = sjs.Scene({w:800, h:600});
+    var scene = sjs.Scene({w:w, h:h});
 
     var use = document.getElementById('useImage');
     var useImage = true;
@@ -126,7 +129,7 @@ window.onload = function() {
         var particle;
         while(particle = particles.iterate()) {
             particle.yv += 0.003;
-            particle.move(particle.xv, particle.yv);
+            particle.move(particle.xv * ticker.lastTicksElapsed, particle.yv * ticker.lastTicksElapsed);
             if(particle.y > window.innerHeight) {
                 particles.remove(particle)
                 particle.remove();
