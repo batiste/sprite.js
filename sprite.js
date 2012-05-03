@@ -566,6 +566,18 @@ Sprite.prototype.size = function (w, h) {
     return this;
 };
 
+Sprite.prototype.toFront = function(){
+	if(this.dom && this.layer){
+		this.layer.dom.appendChild(this.dom);
+	}
+};
+
+Sprite.prototype.toBack = function(){
+	if(this.dom && this.layer){
+		this.layer.dom.insertBefore(this.dom, this.layer.dom.firstChild);
+	}
+};
+
 // Physic
 
 Sprite.prototype.setForce = function setForce(xf, yf) {
