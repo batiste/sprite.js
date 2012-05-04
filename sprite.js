@@ -567,15 +567,22 @@ Sprite.prototype.size = function (w, h) {
 };
 
 Sprite.prototype.toFront = function(){
-	if(this.dom && this.layer){
-		this.layer.dom.appendChild(this.dom);
-	}
+    this.layer.lastZIndex++;
+    return this.setZIndex(this.layer.lastZIndex);
 };
 
 Sprite.prototype.toBack = function(){
-	if(this.dom && this.layer){
-		this.layer.dom.insertBefore(this.dom, this.layer.dom.firstChild);
-	}
+    this.layer.lastZIndex++;
+    return this.setZIndex(-this.layer.lastZIndex);
+};
+
+Sprite.prototype.setZIndex = function(z){
+    if(this.dom && this.layer) {
+        this._dirty.zindex = true;
+        this.changed = true;
+        this.zindex = z;
+    }
+    return this;
 };
 
 // Physic
@@ -747,7 +754,9 @@ Sprite.prototype.update = function updateDomProperties () {
 
     if (this._dirty.color)
         style.backgroundColor = this.color;
-
+	
+	if (this._dirty.zindex)
+        style.zIndex = this.zindex;
 
     if(this._dirty.transform) {
         style[sjs.tproperty + 'Origin'] = this.xTransformOrigin + " " + this.yTransformOrigin;
@@ -1527,7 +1536,9 @@ Layer = function Layer(scene, name, options) {
         // we send back the same.
         return this.scene.layers[name];
     }
-
+	
+	this.lastZIndex = 0;
+	
     domElement = doc.getElementById(name);
     if (!domElement)
         needToCreate = true;
