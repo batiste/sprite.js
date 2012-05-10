@@ -48,6 +48,33 @@ browser_specific_runned = false,
 // global z-index
 zindex = 1;
 
+
+//IE 8 fix help functions
+function _addEventListener(element, type,listener,useCapture){
+    if(element.addEventListener){
+        element.addEventListener(type, listener, useCapture);
+    }else if(element.attachEvent){
+        element.attachEvent("on" + type, listener);
+    }
+}
+
+function _removeEventListener(element, type,listener,useCapture){
+    if(element.removeEventListener){
+        element.removeEventListener(type, listener, useCapture);
+    }else if (element.detachEvent){
+        element.detachEvent(type, listener);
+    }
+}
+
+function _preventEvent(e){
+    if (e.preventDefault) {
+        e.preventDefault();
+        e.stopPropagation();
+    }else{
+        e.returnValue = false;
+    }
+}
+
 // math functions
 function mod(n, base) {
     // strictly positive modulo
@@ -271,7 +298,7 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
         sjs.spriteCache[src].loading = true;
         img = doc.createElement('img');
         sjs.spriteCache[src].img = img;
-        img.addEventListener('load', function () {
+        _addEventListener(img, 'load', function () {
             sjs.spriteCache[src].loaded = true;
             toLoad -= 1;
             if (error === false) {
@@ -284,7 +311,7 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
             }
         }, false);
 
-        img.addEventListener('error', function () {
+        _addEventListener(img, 'error', function () {
             error = true;
             div.innerHTML = 'Error loading image ' + src;
         }, false);
@@ -900,7 +927,7 @@ Sprite.prototype.loadImg = function (src, resetSize) {
     if (_loaded)
         imageReady();
     else {
-        this.img.addEventListener('load', imageReady, false);
+        _addEventListener(this.img, 'load', imageReady, false);
         this.img.src = src;
     }
     return this;
@@ -1342,7 +1369,7 @@ _Input = function _Input(scene) {
     }
 
     var listen = function (name, fct) {
-        global.addEventListener(name, fct, false);
+        _addEventListener(global, name, fct, false);
     }
 
     // Mouse like events
@@ -1358,7 +1385,7 @@ _Input = function _Input(scene) {
         that.mouse.down = true;
         that.mousepressed = true;
         // prevent unwanted browser drag and drop behavior
-        event.preventDefault();
+        _preventEvent(event);
     }
 
     function mouseUpEvent(event) {
@@ -1403,7 +1430,7 @@ _Input = function _Input(scene) {
     });
 
     listen("touchmove", function (e) {
-        e.preventDefault(); // avoid scrolling the page
+        _preventEvent(e); // avoid scrolling the page
         e = reduceTapEvent(e);
         updateKeyChange('space', false); // if it moves: it is not a tap
         mouseMoveEvent(e);
@@ -1458,13 +1485,13 @@ _Input = function _Input(scene) {
     // can be used to avoid key jamming
     listen("keypress", function (e) {});
     if (!sjs.debug)
-        listen("contextmenu", function (e) {e.preventDefault()});
+        listen("contextmenu", function (e) {_preventEvent(e);});
 };
 
 
 // Add an automatic pause to all the scenes when the user
 // quit the current window.
-global.addEventListener("blur", function (e) {
+_addEventListener(global, "blur", function (e) {
     for (var i = 0; i < sjs.scenes.length; i++) {
         var scene = sjs.scenes[i];
         if (!scene.autoPause)
@@ -1481,15 +1508,14 @@ global.addEventListener("blur", function (e) {
                 div.style.textAlign = 'center';
                 div.style.paddingTop = ((scene.h / 2) - 32) + 'px';
                 var listener = function (e) {
-                    e.stopPropagation();
-                    e.preventDefault();
+                    _preventEvent(e);
                     scene.dom.removeChild(div);
-                    doc.removeEventListener('click', listener, false);
-                    doc.removeEventListener('keyup', listener, false);
+                    _removeEventListener(doc, 'click', listener, false);
+                    _removeEventListener(doc, 'keyup', listener, false);
                     scene.ticker.resume();
                 }
-                doc.addEventListener('click', listener, false);
-                doc.addEventListener('keyup', listener, false);
+                _addEventListener(doc, 'click', listener, false);
+                _addEventListener(doc, 'keyup', listener, false);
                 scene.dom.appendChild(div);
             }
         }
