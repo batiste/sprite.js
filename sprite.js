@@ -123,12 +123,23 @@ function initBrowserSpecific() {
         'MozTransform',
         'OTransform',
         'msTransform']);
+		
     sjs.animationFrame = has(global, [
         'requestAnimationFrame',
         'mozRequestAnimationFrame',
         'webkitRequestAnimationFrame',
         'oRequestAnimationFrame',
         'msRequestAnimationFrame']);
+		
+	sjs.cancelAnimationFrame = has(global, [
+		'cancelAnimationFrame',
+		'cancelRequestAnimationFrame',
+        'mozCancelRequestAnimationFrame',
+        'webkitCancelRequestAnimationFrame',
+        'oCancelRequestAnimationFrame',
+        'msCancelRequestAnimationFrame',
+		'clearInterval']);
+	
     sjs.createEventProperty = has(doc, ['createEvent', 'createEventObject']);
     browser_specific_runned = true;
 }
