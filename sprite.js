@@ -1146,14 +1146,16 @@ Ticker_ = function Ticker_(scene, paint, options) {
 
     this.scene = scene;
 
-    if (this.constructor !== Ticker_)
+    if (this.constructor !== Ticker_){
         return new Ticker_(tickDuration, paint);
-
+	}
+	
     this.tickDuration = optionValue(options, 'tickDuration', 16);
     this.expectedFps = 1000 / this.tickDuration;
     this.useAnimationFrame = optionValue(options, 'useAnimationFrame', false);
-    if (!sjs.animationFrame)
-        this.useAnimationFrame = false;
+    if (!sjs.animationFrame) {
+		this.useAnimationFrame = false;
+	}
     this.paint = paint;
 
     this.start = new Date().getTime();
@@ -1201,13 +1203,14 @@ Ticker_.prototype.run = function () {
 
     var t = this;
     var ticksElapsed = this.next();
+
     // no update needed, this happen on the first run
     if (ticksElapsed == 0) {
         // this is not a cheap operation
         setTimeout(function () {t.run()}, this.tickDuration);
         return;
     }
-
+	
     if(!this.skipPaint) {
         for (var name in this.scene.layers) {
             var layer = this.scene.layers[name];
@@ -1219,9 +1222,10 @@ Ticker_.prototype.run = function () {
 
     this.paint(this);
     // reset the keyboard change
-    if (this.scene.input)
-        this.scene.input.next();
-
+    if (this.scene.input) {
+		this.scene.input.next();
+	}
+	
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
     this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) / 2 | 0;
@@ -1229,8 +1233,8 @@ Ticker_.prototype.run = function () {
 
     this.lastPaintAt = this.now;
     if (this.useAnimationFrame) {
-        this.tickDuration = 16;
-        global[sjs.animationFrame](function () {t.run()});
+        this.tickDuration 	= 16;
+        this.timeout 		= global[sjs.animationFrame](function () {t.run()});
     } else {
         var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 6);
         this.timeout = setTimeout(function () {t.run()}, _nextPaint);
@@ -1238,8 +1242,7 @@ Ticker_.prototype.run = function () {
 };
 
 Ticker_.prototype.pause = function () {
-    global.clearTimeout(this.timeout);
-    global[sjs.animationFrame] = undefined;
+    global[sjs.cancelAnimationFrame](this.timeout);
     this.paused = true;
 };
 
