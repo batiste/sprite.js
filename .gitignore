@@ -1,2 +1,4 @@
 build
 *.pyc
+
+lib/.DS_Store
