@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="24" height="20" tilewidth="40" tileheight="40">
+ <properties>
+  <property name="height" value="480"/>
+  <property name="width" value="640"/>
+ </properties>
+ <tileset firstgid="1" name="village_damaged" tilewidth="40" tileheight="40">
+  <image source="village_damaged.png" width="560" height="400"/>
+ </tileset>
+ <tileset firstgid="141" name="village_floor" tilewidth="40" tileheight="40">
+  <image source="village_floor.png" width="440" height="40"/>
+ </tileset>
+ <tileset firstgid="152" name="village" tilewidth="40" tileheight="40">
+  <image source="village.png" width="560" height="400"/>
+ </tileset>
+ <tileset firstgid="292" name="table" tilewidth="40" tileheight="40">
+  <image source="table.png" width="360" height="280"/>
+  <tile id="44">
+   <properties>
+    <property name="collision" value="true"/>
+   </properties>
+  </tile>
+ </tileset>
+ <tileset firstgid="355" name="seats_misc" tilewidth="40" tileheight="40">
+  <image source="seats_misc.png" width="400" height="160"/>
+ </tileset>
+ <tileset firstgid="395" name="kitchen" tilewidth="40" tileheight="40">
+  <image source="kitchen.png" width="240" height="120"/>
+ </tileset>
+ <layer name="Floor" width="24" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzrZWBg6B3Fo3gUj+JRPIpHMV0xALpvCHA=
+  </data>
+ </layer>
+ <layer name="Top Wall" width="24" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzt0D0KwkAQQOFVxFYRW0Ow9gKWHsSTBYkYLUJQNBZBFH/6qG0OkgP4ipUMqcaUsg++YmCYYoypaqGNDhZYIcIaG3QRIMTS/F4PfQyQYI8DUhwxRIwtdg3uj+DBxwlX3HDHA2NkOOPS4P4UEzHneOKFd213prwZWPLfmgrlXmzJf2uaK/cyS/5bU6nck33/7XK5XP/QByCtIuc=
+  </data>
+ </layer>
+ <layer name="Fireplace" width="24" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFpIJ0RvzymQTkKQXFJJjfC1TbB8T9WPQkA8VSgDiVAvdOBuqdAsRTsZiRCxTLA+J8CsyfCdQ7C4hn0zhMCQFCcT4KRsEoGAWkAgAWZwlo
+  </data>
+ </layer>
+ <layer name="Bottom Wall" width="24" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYICALwykA0sS1JJjfiiR6iqAuJIM8y8QoUaakYGhDUi3k2E+KeFDDnhDY/OJCR9igSsQu0HZsPgiNn5hwBmIXXDIBQNxCBC3MCDii5jwkWSE4CYgOxCIg/CojQXiGUA8E4hnA/EiIsyfC8TzgXgBEBcCcRFUHOYXWLjAwmQZEC8H4pVAvIEI81cD8VogXgfE9UDcwAAJA5hfYOECC5MtQLwViLcD8T4izN8JxLuBeA8Q+zEiMHLcxSLJgdLMYaj4GSLMHwWjYCQDANTBJ+g=
+  </data>
+ </layer>
+ <layer name="Tile Layer 5" width="24" height="20">
+  <data encoding="base64" compression="zlib">
+   eJzt1bkKwkAQBuDNE2hroY/k8yli44nYeBJs4tXGoxSP3qP1AfwDGVwmQxzMYuXAh7BD/uxAdjXm+5rAFHxLAPO4/8yQHdUK1mwthI2j/E/1z/9N/hkubC3nGZP33OTf4QEF760IJUf5LWhDXeCiRjCGPjNwlL+AJcyYIO5L8zWgKfRo3a4t7IT3hvGvNF8021Do0XrW+eie4j37/pK+S6mk+eie4j37/pK+S06qI5wU+6MzVE4hvfOKZ2+K/dEZSsuX7K09HqACVZM8OzUFTX4HuiZ5fnoKmnz6H+Tnx1d4ATmYfFU=
+  </data>
+ </layer>
+ <layer name="Tile Layer 6" width="24" height="20">
+  <data encoding="base64" compression="zlib">
+   eJxjYBjcYAIjgl3NiFsduWAaDczEBbqBdvXQ0L6JQLMn0dE/tALZQD/k0NAfpUCzy3CYP4HG4UfP9DZYAS3y8VAEo2ltFAAAHicIdQ==
+  </data>
+ </layer>
+ <objectgroup name="Objects" width="24" height="20">
+  <object name="P1" type="teleport_from" x="259" y="708" width="40" height="40">
+   <properties>
+    <property name="id" value="indoors1"/>
+   </properties>
+  </object>
+  <object name="T1" type="teleport_to" x="240" y="780" width="80" height="20">
+   <properties>
+    <property name="id" value="town1"/>
+    <property name="map" value="town.json"/>
+   </properties>
+  </object>
+  <object name="T2" type="teleport_to" x="941" y="442" width="20" height="116">
+   <properties>
+    <property name="id" value="town2"/>
+    <property name="map" value="town.json"/>
+   </properties>
+  </object>
+  <object name="P2" type="teleport_from" x="872" y="500" width="40" height="40">
+   <properties>
+    <property name="id" value="indoors2"/>
+   </properties>
+  </object>
+  <object name="Start" type="player_start" x="268" y="304" width="60" height="60"/>
+ </objectgroup>
+ <objectgroup name="Collision" width="24" height="20">
+  <properties>
+   <property name="type" value="collision"/>
+  </properties>
+  <object x="2" y="2">
+   <polygon points="0,0 321,-2 322,116 159,114 159,275 -3,275"/>
+  </object>
+  <object x="240" y="642">
+   <polygon points="0,0 -240,1 -240,158 -1,159"/>
+  </object>
+  <object x="2" y="324">
+   <polygon points="0,0 157,-1 157,74 276,75 275,235 74,236 75,154 -1,154"/>
+  </object>
+  <object x="401" y="3">
+   <polygon points="0,0 -1,114 160,114 160,276 39,275 39,394 -40,393 -41,558 118,559 121,435 236,436 237,-1"/>
+  </object>
+  <object x="847" y="44">
+   <polygon points="0,0 0,-44 -208,-44 -208,0"/>
+  </object>
+  <object x="960" y="3">
+   <polygon points="0,0 0,438 -242,437 -239,279 -41,278 -41,-2"/>
+  </object>
+  <object x="320" y="642">
+   <polygon points="0,0 320,-1 319,-82 640,-82 641,157 0,157"/>
+  </object>
+  <object x="774" y="124">
+   <polygon points="0,0 54,0 54,57 36,57 36,68 19,68 19,58 -1,57"/>
+  </object>
+  <object x="844" y="245">
+   <polygon points="0,0 73,-1 73,34 0,33"/>
+  </object>
+  <object x="284" y="204">
+   <polygon points="0,0 115,0 116,54 0,56"/>
+  </object>
+  <object x="402" y="324">
+   <polygon points="0,0 0,33 36,32 35,-1"/>
+  </object>
+  <object x="163" y="323">
+   <polygon points="0,0 36,0 36,70 -2,71"/>
+  </object>
+  <object x="201" y="124">
+   <polygon points="0,0 1,33 36,33 36,-1"/>
+  </object>
+  <object x="523" y="179">
+   <polygon points="0,0 32,0 33,-59 1,-59"/>
+  </object>
+  <object x="602" y="562">
+   <polygon points="0,0 35,0 36,76 0,77"/>
+  </object>
+  <object name="boxe" x="841" y="444">
+   <polygon points="0,0 38,0 38,33 0,33"/>
+  </object>
+  <object name="stertchoo" x="643" y="117">
+   <polygon points="0,0 36,0 36,-74 -1,-73"/>
+  </object>
+  <object x="761" y="43">
+   <polygon points="0,0 -1,33 38,33 38,0"/>
+  </object>
+ </objectgroup>
+</map>

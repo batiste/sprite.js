@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="18" height="14" tilewidth="40" tileheight="40">
+ <tileset firstgid="1" name="pavement" tilewidth="40" tileheight="40">
+  <image source="pavement.png" width="360" height="280"/>
+ </tileset>
+ <tileset firstgid="64" name="town_whatev" tilewidth="40" tileheight="40">
+  <image source="town_whatev.png" width="360" height="360"/>
+ </tileset>
+ <tileset firstgid="145" name="town_roof" tilewidth="40" tileheight="40">
+  <image source="town_roof.png" width="480" height="240"/>
+ </tileset>
+ <tileset firstgid="217" name="town_building" tilewidth="40" tileheight="40">
+  <image source="town_building.png" width="480" height="480"/>
+ </tileset>
+ <tileset firstgid="361" name="town_building_tall" tilewidth="40" tileheight="40">
+  <image source="town_building_tall.png" width="480" height="240"/>
+ </tileset>
+ <tileset firstgid="433" name="town_door" tilewidth="40" tileheight="40">
+  <image source="town_door.png" width="280" height="240"/>
+ </tileset>
+ <tileset firstgid="475" name="fence" tilewidth="40" tileheight="40">
+  <image source="fence.png" width="360" height="360"/>
+ </tileset>
+ <tileset firstgid="556" name="baddies" tilewidth="40" tileheight="40">
+  <image source="baddies.png" width="40" height="40"/>
+ </tileset>
+ <layer name="Tile Layer 1" width="18" height="14">
+  <data encoding="base64" compression="zlib">
+   eJxTZ2BgUCcDM+Ngk4sZqWAGpZgdjx8HApNjPyuW8GRHkyM2PliR9DNjMY9a4Uwo7lnR1KCHC7H+Y8WhH5u5uljkhYFYEs08mB5JBuxusAZiVSDWhOoXhaqF6UP3F7awBYmLA7E51DxtHH7B5n/0sAUAixQhIQ==
+  </data>
+ </layer>
+ <layer name="Tile Layer 2" width="18" height="14">
+  <data encoding="base64" compression="zlib">
+   eJzV0blKA1EUBuDxTV0qTVBMIooxUTAmxC1BcQFFcQFFcam00iYuhYJiKrW19R380l5m4Lb+8BXD/Pdw4HSSJHngiWf6GWCQIW76kuSWcQoUKRHmjXc+6DLMCDny3HlzT4Uqs8ylzOkE+xQoUmKi98+bR5osssRyxD5lZqhQ5cWbVzbYZIttvoNZ4T41FqjT6M3X73LAIUcc8xPMCfdZYZUWbT71v7jgkiuu+Q3m5HznGWUs4i5ZmdSdYppyxF2yMq9bo04j4i5Zaem2WWM95S6x2dHdZY/9lLvE5kT3lDPOU+7yX/MHhltSzA==
+  </data>
+ </layer>
+ <layer name="Tile Layer 3" width="18" height="14">
+  <data encoding="base64" compression="zlib">
+   eJxjYBiZYCMjA8MmRsrN2QE0YycVzMEFvlHJ7P80dOMoGDoAAEsCBNA=
+  </data>
+ </layer>
+ <layer name="Tile Layer 6" width="18" height="14">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFIwH8YqSOOcxM1DFnFAwMAAAKowEB
+  </data>
+ </layer>
+ <layer name="Tile Layer 5" width="18" height="14">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFo4B48I2ROub8p5I5o4A0AAAsWwH4
+  </data>
+ </layer>
+ <layer name="Tile Layer 4" width="18" height="14">
+  <data encoding="base64" compression="zlib">
+   eJxjYBiZYDMjA8MWRuxywkwMDHcZITQhsAuobjcOc2SA+p8xQmhKgCpQ/3tGCD1YgA6JbhFEC1NRIC1Ghn+kkMKUEYjlgFieDHOUkcKUC4jVgVhjEIUvrQAAJTYKrQ==
+  </data>
+ </layer>
+ <objectgroup name="Collision" width="18" height="14">
+  <properties>
+   <property name="type" value="collision"/>
+  </properties>
+  <object x="405" y="437">
+   <polygon points="0,0 -1,-88 164,-89 163,-289 316,-290 316,-203 195,-200 197,-1"/>
+  </object>
+  <object x="1" y="3">
+   <polygon points="0,0 0,437 259,439 261,342 313,342 314,123 394,124 395,204 501,205 503,106 553,93 553,65 527,64 526,-2"/>
+  </object>
+  <object x="639" y="281" width="41" height="39"/>
+ </objectgroup>
+ <objectgroup name="Objects" width="18" height="14">
+  <object name="P1" type="teleport_from" x="341" y="183" width="40" height="40">
+   <properties>
+    <property name="id" value="town1"/>
+   </properties>
+  </object>
+  <object name="T1" type="teleport_to" x="332" y="134" width="59" height="20">
+   <properties>
+    <property name="id" value="indoors1"/>
+    <property name="map" value="indoors.json"/>
+   </properties>
+  </object>
+  <object name="T2" type="teleport_to" x="533" y="2" width="20" height="60">
+   <properties>
+    <property name="id" value="indoors2"/>
+    <property name="map" value="indoors.json"/>
+   </properties>
+  </object>
+  <object name="P2" type="teleport_from" x="577" y="12" width="40" height="40">
+   <properties>
+    <property name="id" value="town2"/>
+   </properties>
+  </object>
+  <object name="Start" type="player_start" x="382" y="479" width="60" height="60"/>
+  <object name="Sheep1" type="dialog" x="625" y="266" width="69" height="74">
+   <properties>
+    <property name="1) I am hungry." value="Go inside and make a sammich."/>
+    <property name="2) Are you on drugs?" value="Drugs are bad mmmmkay."/>
+    <property name="start" value="Piggers!"/>
+    <property name="title" value="Psychadelic Sheep"/>
+   </properties>
+  </object>
+ </objectgroup>
+</map>
