@@ -1,0 +1,75 @@
+<!DOCTYPE html><html>
+<head>
+<title>Test 32 sprites in a cycle animation</title>
+<meta name = "viewport" content = "user-scalable=no, width=device-width">
+    <script src="../../sprite.js"></script>
+
+    <style>.sjs{border:2px #999 solid;}</style>
+</head>
+<body>
+
+<p>Sprite.js, loading sprite and animation from TexturePacker export <a href="https://github.com/batiste/sprite.js">Get the source</a>. <br>
+</p>
+
+</body>
+
+<script>
+function loadFile(filename, fileLoaded) {
+    var request = new XMLHttpRequest();
+    request.open("GET", filename);
+    request.onreadystatechange = function () {
+        if (request.readyState == 4) {
+            fileLoaded(request.responseText);
+        }
+    }
+    request.send();
+}
+
+function createSpriteFromSheet(scene, spritesheet, spritesheet_img, name) {
+    var frame = spritesheet.frames[name].frame;
+    var sprite = scene.Sprite(spritesheet_img);
+    sprite.size(frame.w, frame.h);
+    sprite.setXOffset(frame.x);
+    sprite.setYOffset(frame.y);
+    return sprite;
+}
+    
+function createCycleFromSheet(scene, spritesheet, names, dt) {
+    var frameList = [];
+    for (var i = 0; i < names.length; ++i) {
+        var frame = spritesheet.frames[names[i]].frame;
+        frameList.push([frame.x, frame.y, dt]);
+    }
+    return sjs.Cycle(frameList);
+}
+    
+var myspritesheet;
+
+function initScene() {
+    var scene = sjs.Scene({w:100, h:100, autoPause: false});
+    scene.loadImages(['spritesheet1.png'], function() {
+        var shout1 = createSpriteFromSheet(scene, myspritesheet, 'spritesheet1.png', 'shout-1.png');
+        var cycle = createCycleFromSheet(scene, myspritesheet, Object.keys(myspritesheet.frames), 2);
+        cycle.addSprite(shout1);
+        shout1.move(10, 10);
+        function paint() {
+            var start = new Date().getTime(),
+                xv = Math.sin(ticker.currentTick / 15) * 2,
+                xscale = xv < 0 ? 1 : -1;
+            cycle.next(ticker.lastTicksElapsed);
+            shout1.update();
+        };
+        var ticker = scene.Ticker(30, paint);
+        ticker.run();
+    });
+}
+    
+window.onload = function() {
+    // load srite sheet
+    loadFile("spritesheet1.json", function (data) {
+        myspritesheet = JSON.parse(data);
+        initScene();
+    });
+};
+</script>
+</html>
