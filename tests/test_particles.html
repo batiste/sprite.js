@@ -83,7 +83,7 @@ window.onload = function() {
         useReq = req.checked;
         ticker.useAnimationFrame = useReq;
     }
-    if(!sjs.animationFrame)
+    if(!sjs.requestAnimationFrame || !sjs.cancelAnimationFrame)
         req.disabled = "disabled";
 
     var canvas = window.location.href.indexOf('canvas') != -1;
