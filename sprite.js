@@ -123,12 +123,24 @@ function initBrowserSpecific() {
         'MozTransform',
         'OTransform',
         'msTransform']);
-    sjs.animationFrame = has(global, [
+    sjs.requestAnimationFrame = has(global, [
         'requestAnimationFrame',
         'mozRequestAnimationFrame',
         'webkitRequestAnimationFrame',
         'oRequestAnimationFrame',
         'msRequestAnimationFrame']);
+    sjs.cancelAnimationFrame = has(global, [
+        'cancelAnimationFrame',
+        'cancelRequestAnimationFrame',
+        'mozCancelAnimationFrame',
+        'mozCancelRequestAnimationFrame',
+        'webkitCancelAnimationFrame',
+        'webkitCancelRequestAnimationFrame',
+        'oCancelAnimationFrame',
+        'oCancelRequestAnimationFrame',
+        'msCancelAnimationFrame',
+        'msCancelRequestAnimationFrame']);
+
     sjs.createEventProperty = has(doc, ['createEvent', 'createEventObject']);
     browser_specific_runned = true;
 }
@@ -1152,7 +1164,7 @@ Ticker_ = function Ticker_(scene, paint, options) {
     this.tickDuration = optionValue(options, 'tickDuration', 16);
     this.expectedFps = 1000 / this.tickDuration;
     this.useAnimationFrame = optionValue(options, 'useAnimationFrame', false);
-    if (!sjs.animationFrame)
+    if (!sjs.requestAnimationFrame || !sjs.cancelAnimationFrame)
         this.useAnimationFrame = false;
     this.paint = paint;
 
@@ -1230,7 +1242,7 @@ Ticker_.prototype.run = function () {
     this.lastPaintAt = this.now;
     if (this.useAnimationFrame) {
         this.tickDuration = 16;
-        global[sjs.animationFrame](function () {t.run()});
+        this.animationId = global[sjs.requestAnimationFrame](function () {t.run()});
     } else {
         var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 6);
         this.timeout = setTimeout(function () {t.run()}, _nextPaint);
@@ -1238,8 +1250,11 @@ Ticker_.prototype.run = function () {
 };
 
 Ticker_.prototype.pause = function () {
-    global.clearTimeout(this.timeout);
-    global[sjs.animationFrame] = undefined;
+    if (this.useAnimationFrame) {
+        global[sjs.cancelAnimationFrame](this.animationId);
+    } else {
+        global.clearTimeout(this.timeout);
+    }
     this.paused = true;
 };
 
