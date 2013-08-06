@@ -790,6 +790,7 @@ Sprite.prototype.update = function updateDomProperties () {
 
     if (this._dirty.opacity)
         style.opacity = this.opacity;
+        style.filter = "alpha(opacity="+ this.opacity*100 + ")";
 
     if (this._dirty.color)
         style.backgroundColor = this.color;
