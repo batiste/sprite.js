@@ -295,7 +295,7 @@ Game = (function (SpriteJS) {
             if (boundsCheckX.length > 0) {
                 i = 0;
                 while (!collideX && i < collisionObjects.length) {
-                    collideX = SpriteJS.Collision.inPolygon(boundsCheckX, collisionObjects[i], true);
+                    collideX = SpriteJS.collision.inPolygon(boundsCheckX, collisionObjects[i], true);
     
                     i += 1;
                 }
@@ -303,7 +303,7 @@ Game = (function (SpriteJS) {
             if (boundsCheckY.length > 0) {
                 i = 0;
                 while (!collideY && i < collisionObjects.length) {
-                    collideY = SpriteJS.Collision.inPolygon(boundsCheckY, collisionObjects[i], true);
+                    collideY = SpriteJS.collision.inPolygon(boundsCheckY, collisionObjects[i], true);
                     i += 1;
                 }
             }
@@ -353,7 +353,7 @@ Game = (function (SpriteJS) {
         while (!objectCollides && i < activeObjects.length) {
             // don't attempt to calculate collision unless the object is a polygon that can be run into
             if (activeObjects[i].hasOwnProperty('polygon')) {
-                objectCollides = SpriteJS.Collision.inPolygon(playerBounds, activeObjects[i].polygon);
+                objectCollides = SpriteJS.collision.inPolygon(playerBounds, activeObjects[i].polygon);
                 if (objectCollides) {
                     hitObject = activeObjects[i];
                 }
@@ -443,7 +443,7 @@ Game = (function (SpriteJS) {
             MapSurface.remove();
         }
 
-        MapSurface = new Surface(Scene, Scene.w, Scene.h, function (layer, x, y) {
+        MapSurface = new sjs.ScrollingSurface(Scene, Scene.w, Scene.h, function (layer, x, y) {
             Map.paint(layer, x, y);
         });
         mapDimensions = Map.dimensions();

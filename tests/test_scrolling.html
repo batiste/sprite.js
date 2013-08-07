@@ -37,7 +37,7 @@ scene.loadImages(['img/tiles.png'], function() {
         tile_list.push(tile);
     }
 
-    var surface= sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, x, y) {
+    var surface = sjs.ScrollingSurface(scene, scene.w, scene.h, function(layer, x, y) {
         for(var x = 0; x < (layer.w / 48); x++) {
             for(var y = 0; y < (layer.h / 48); y++) {
                 var tile = random_from_list(tile_list);
