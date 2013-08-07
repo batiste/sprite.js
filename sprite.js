@@ -1187,7 +1187,7 @@ Ticker_ = function Ticker_(scene, paint, options) {
     this.lowFrameRate = false;
 };
 
-Ticker_.prototype.next = function () {
+Ticker_.prototype.next = function (timestamp) {
     var now = new Date().getTime();
     this.diff = now - this.now;
     this.now = now;
@@ -1204,7 +1204,7 @@ Ticker_.prototype.run = function(timestamp) {
     if (this.paused) {
         return;
     }
-    if(this.lowFrameRate || this.load > 20 && this.fps < (this.expectedFps / 2)) {
+    /*if(this.lowFrameRate || this.load > 20 && this.fps < (this.expectedFps / 2)) {
         this.lowFrameRate = true;
         if(this.skippedFrames == 1) {
             this.skippedFrames = 0;
@@ -1217,26 +1217,26 @@ Ticker_.prototype.run = function(timestamp) {
         }
     } else {
         this.skipPaint = false;
-    }
+    }*/
 
     var t = this;
-    var ticksElapsed = this.next();
+    var ticksElapsed = this.next(timestamp);
 
     // no update needed, this happen on the first run
-    if (ticksElapsed == 0) {
+    /*if (ticksElapsed == 0) {
         // this is not a cheap operation
         setTimeout(this.bindedRun, this.tickDuration);
         return;
-    }
+    }*/
 	
-    if(!this.skipPaint) {
-        for (var name in this.scene.layers) {
-            var layer = this.scene.layers[name];
-            if (layer.useCanvas && layer.autoClear) {
-                layer.clear();
-            }
+    //if(!this.skipPaint) {
+    for (var name in this.scene.layers) {
+        var layer = this.scene.layers[name];
+        if (layer.useCanvas && layer.autoClear) {
+            layer.clear();
         }
     }
+    //}
 
     this.paint(this);
     // reset the keyboard change
