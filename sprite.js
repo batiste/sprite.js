@@ -789,8 +789,11 @@ Sprite.prototype.update = function updateDomProperties () {
         style.backgroundPosition=-(this.xoffset | 0) + 'px ' + -(this.yoffset | 0) + 'px';
 
     if (this._dirty.opacity)
-        style.opacity = this.opacity;
-        style.filter = "alpha(opacity="+ this.opacity*100 + ")";
+    	if ('opacity' in document.body.style) {
+    		style.opacity = this.opacity;	 
+    	} else {
+    		style.filter = "alpha(opacity="+ this.opacity*100 + ")";
+    	}
 
     if (this._dirty.color)
         style.backgroundColor = this.color;
