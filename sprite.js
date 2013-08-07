@@ -1173,6 +1173,9 @@ Ticker_ = function Ticker_(scene, paint, options) {
 
     this.paint = paint;
 
+    var that = this;
+    this.bindedRun = function bindedRun(t) {that.run(t);}
+
     this.start = new Date().getTime();
     this.now = this.start;
     this.ticksElapsed = 0;
@@ -1197,7 +1200,7 @@ Ticker_.prototype.next = function () {
     return this.lastTicksElapsed;
 };
 
-Ticker_.prototype.run = function () {
+Ticker_.prototype.run = function(timestamp) {
     if (this.paused) {
         return;
     }
@@ -1222,7 +1225,7 @@ Ticker_.prototype.run = function () {
     // no update needed, this happen on the first run
     if (ticksElapsed == 0) {
         // this is not a cheap operation
-        setTimeout(function () {t.run()}, this.tickDuration);
+        setTimeout(this.bindedRun, this.tickDuration);
         return;
     }
 	
@@ -1238,8 +1241,8 @@ Ticker_.prototype.run = function () {
     this.paint(this);
     // reset the keyboard change
     if (this.scene.input) {
-		this.scene.input.next();
-	}
+		  this.scene.input.next();
+	  }
 	
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
@@ -1249,10 +1252,10 @@ Ticker_.prototype.run = function () {
     this.lastPaintAt = this.now;
     if (this.useAnimationFrame) {
         this.tickDuration = 16;
-        this.animationId = global[sjs.requestAnimationFrame](function () {t.run()});
+        this.animationId = global[sjs.requestAnimationFrame](this.bindedRun);
     } else {
         var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 6);
-        this.timeout = setTimeout(function () {t.run()}, _nextPaint);
+        this.timeout = setTimeout(this.bindedRun, _nextPaint);
     }
 };
 
