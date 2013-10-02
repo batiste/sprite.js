@@ -847,8 +847,8 @@ Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
     ctx.save();
     if (this.xTransformOrigin === null) {
         // 50% 505 in CSS
-        transx = this.w / 2 | 0;
-        transy = this.h / 2 | 0;
+        transx = this.w >> 1;
+        transy = this.h >> 1;
     } else {
         transx = this.xTransformOrigin;
         transy = this.yTransformOrigin;
@@ -970,11 +970,10 @@ Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
     var props = {layer:layer, color:this.color};
     if (v === undefined) {
         if (horizontal)
-            v = this.h / 2;
+            v = this.h >> 1;
         else
-            v = this.w / 2;
+            v = this.w >> 1;
     }
-    v = v | 0;
     var s1 = layer.scene.Sprite(this.src, props);
     var s2 = layer.scene.Sprite(this.src, props);
     if (horizontal) {
@@ -995,11 +994,9 @@ Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
 
 Sprite.prototype.explode4 = function explode(x, y, layer) {
     if (x === undefined)
-        x = this.w / 2;
+        x = this.w >> 1;
     if (y === undefined)
-        y = this.h / 2;
-    x = x | 0;
-    y = y | 0;
+        y = this.h >> 1;
     if (!layer)
         layer = this.layer;
     var props = {layer:layer, color:this.color};
@@ -1162,8 +1159,8 @@ Ticker_ = function Ticker_(scene, paint, options) {
 
     if (this.constructor !== Ticker_){
         return new Ticker_(tickDuration, paint);
-  	}
-	
+    }
+
     this.tickDuration = optionValue(options, 'tickDuration', 16);
     this.expectedFps = 1000 / this.tickDuration;
     this.useAnimationFrame = optionValue(options, 'useAnimationFrame', false);
@@ -1241,12 +1238,11 @@ Ticker_.prototype.run = function(timestamp) {
     this.paint(this);
     // reset the keyboard change
     if (this.scene.input) {
-		  this.scene.input.next();
-	  }
-	
+        this.scene.input.next();
+    }
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
-    this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) / 2 | 0;
+    this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) >> 1;
     this.fps = Math.round(1000 / (this.now - (this.lastPaintAt || 0)));
 
     this.lastPaintAt = this.now;
