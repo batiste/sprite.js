@@ -791,16 +791,16 @@ Sprite.prototype.update = function updateDomProperties () {
         style.backgroundPosition=-(this.xoffset | 0) + 'px ' + -(this.yoffset | 0) + 'px';
 
     if (this._dirty.opacity)
-    	if ('opacity' in document.body.style) {
-    		style.opacity = this.opacity;	 
-    	} else {
-    		style.filter = "alpha(opacity="+ this.opacity*100 + ")";
-    	}
+        if ('opacity' in document.body.style) {
+            style.opacity = this.opacity;     
+        } else {
+            style.filter = "alpha(opacity="+ this.opacity*100 + ")";
+        }
 
     if (this._dirty.color)
         style.backgroundColor = this.color;
-	
-	if (this._dirty.zindex)
+    
+    if (this._dirty.zindex)
         style.zIndex = this.zindex;
 
     if(this._dirty.transform) {
@@ -1229,7 +1229,7 @@ Ticker_.prototype.run = function(timestamp) {
         setTimeout(this.bindedRun, this.tickDuration);
         return;
     }*/
-	
+    
     //if(!this.skipPaint) {
     for (var name in this.scene.layers) {
         var layer = this.scene.layers[name];
@@ -1587,9 +1587,9 @@ Layer = function Layer(scene, name, options) {
         // we send back the same.
         return this.scene.layers[name];
     }
-	
-	this.lastZIndex = 0;
-	
+    
+    this.lastZIndex = 0;
+    
     domElement = doc.getElementById(name);
     if (!domElement)
         needToCreate = true;
