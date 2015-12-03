@@ -48,33 +48,6 @@ browser_specific_runned = false,
 // global z-index
 zindex = 1;
 
-
-//IE 8 fix help functions
-function _addEventListener(element, type,listener,useCapture){
-    if(element.addEventListener){
-        element.addEventListener(type, listener, useCapture);
-    }else if(element.attachEvent){
-        element.attachEvent("on" + type, listener);
-    }
-}
-
-function _removeEventListener(element, type,listener,useCapture){
-    if(element.removeEventListener){
-        element.removeEventListener(type, listener, useCapture);
-    }else if (element.detachEvent){
-        element.detachEvent(type, listener);
-    }
-}
-
-function _preventEvent(e){
-    if (e.preventDefault) {
-        e.preventDefault();
-        e.stopPropagation();
-    }else{
-        e.returnValue = false;
-    }
-}
-
 // math functions
 function mod(n, base) {
     // strictly positive modulo
@@ -123,26 +96,12 @@ function initBrowserSpecific() {
         'MozTransform',
         'OTransform',
         'msTransform']);
-
-    sjs.requestAnimationFrame = has(global, [
+    sjs.animationFrame = has(global, [
         'requestAnimationFrame',
         'mozRequestAnimationFrame',
         'webkitRequestAnimationFrame',
         'oRequestAnimationFrame',
         'msRequestAnimationFrame']);
-
-    sjs.cancelAnimationFrame = has(global, [
-        'cancelAnimationFrame',
-        'cancelRequestAnimationFrame',
-        'mozCancelAnimationFrame',
-        'mozCancelRequestAnimationFrame',
-        'webkitCancelAnimationFrame',
-        'webkitCancelRequestAnimationFrame',
-        'oCancelAnimationFrame',
-        'oCancelRequestAnimationFrame',
-        'msCancelAnimationFrame',
-        'msCancelRequestAnimationFrame']);
-
     sjs.createEventProperty = has(doc, ['createEvent', 'createEventObject']);
     browser_specific_runned = true;
 }
@@ -312,7 +271,7 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
         sjs.spriteCache[src].loading = true;
         img = doc.createElement('img');
         sjs.spriteCache[src].img = img;
-        _addEventListener(img, 'load', function () {
+        img.addEventListener('load', function () {
             sjs.spriteCache[src].loaded = true;
             toLoad -= 1;
             if (error === false) {
@@ -325,7 +284,7 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
             }
         }, false);
 
-        _addEventListener(img, 'error', function () {
+        img.addEventListener('error', function () {
             error = true;
             div.innerHTML = 'Error loading image ' + src;
         }, false);
@@ -607,25 +566,6 @@ Sprite.prototype.size = function (w, h) {
     return this;
 };
 
-Sprite.prototype.toFront = function(){
-    this.layer.lastZIndex++;
-    return this.setZIndex(this.layer.lastZIndex);
-};
-
-Sprite.prototype.toBack = function(){
-    this.layer.lastZIndex++;
-    return this.setZIndex(-this.layer.lastZIndex);
-};
-
-Sprite.prototype.setZIndex = function(z){
-    if(this.dom && this.layer) {
-        this._dirty.zindex = true;
-        this.changed = true;
-        this.zindex = z;
-    }
-    return this;
-};
-
 // Physic
 
 Sprite.prototype.setForce = function setForce(xf, yf) {
@@ -791,17 +731,11 @@ Sprite.prototype.update = function updateDomProperties () {
         style.backgroundPosition=-(this.xoffset | 0) + 'px ' + -(this.yoffset | 0) + 'px';
 
     if (this._dirty.opacity)
-        if ('opacity' in document.body.style) {
-            style.opacity = this.opacity;     
-        } else {
-            style.filter = "alpha(opacity="+ this.opacity*100 + ")";
-        }
+        style.opacity = this.opacity;
 
     if (this._dirty.color)
         style.backgroundColor = this.color;
-    
-    if (this._dirty.zindex)
-        style.zIndex = this.zindex;
+
 
     if(this._dirty.transform) {
         style[sjs.tproperty + 'Origin'] = this.xTransformOrigin + " " + this.yTransformOrigin;
@@ -851,8 +785,8 @@ Sprite.prototype.canvasUpdate = function canvasUpdate(layer) {
     ctx.save();
     if (this.xTransformOrigin === null) {
         // 50% 505 in CSS
-        transx = this.w >> 1;
-        transy = this.h >> 1;
+        transx = this.w / 2 | 0;
+        transy = this.h / 2 | 0;
     } else {
         transx = this.xTransformOrigin;
         transy = this.yTransformOrigin;
@@ -945,7 +879,7 @@ Sprite.prototype.loadImg = function (src, resetSize) {
     if (_loaded)
         imageReady();
     else {
-        _addEventListener(this.img, 'load', imageReady, false);
+        this.img.addEventListener('load', imageReady, false);
         this.img.src = src;
     }
     return this;
@@ -974,10 +908,11 @@ Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
     var props = {layer:layer, color:this.color};
     if (v === undefined) {
         if (horizontal)
-            v = this.h >> 1;
+            v = this.h / 2;
         else
-            v = this.w >> 1;
+            v = this.w / 2;
     }
+    v = v | 0;
     var s1 = layer.scene.Sprite(this.src, props);
     var s2 = layer.scene.Sprite(this.src, props);
     if (horizontal) {
@@ -998,9 +933,11 @@ Sprite.prototype.explode2 = function explode(v, horizontal, layer) {
 
 Sprite.prototype.explode4 = function explode(x, y, layer) {
     if (x === undefined)
-        x = this.w >> 1;
+        x = this.w / 2;
     if (y === undefined)
-        y = this.h >> 1;
+        y = this.h / 2;
+    x = x | 0;
+    y = y | 0;
     if (!layer)
         layer = this.layer;
     var props = {layer:layer, color:this.color};
@@ -1161,21 +1098,15 @@ Ticker_ = function Ticker_(scene, paint, options) {
 
     this.scene = scene;
 
-    if (this.constructor !== Ticker_){
+    if (this.constructor !== Ticker_)
         return new Ticker_(tickDuration, paint);
-    }
 
     this.tickDuration = optionValue(options, 'tickDuration', 16);
     this.expectedFps = 1000 / this.tickDuration;
     this.useAnimationFrame = optionValue(options, 'useAnimationFrame', false);
-    if (!sjs.requestAnimationFrame || !sjs.cancelAnimationFrame) {
+    if (!sjs.animationFrame)
         this.useAnimationFrame = false;
-    }
-
     this.paint = paint;
-
-    var that = this;
-    this.bindedRun = function bindedRun(t) {that.run(t);}
 
     this.start = new Date().getTime();
     this.now = this.start;
@@ -1188,7 +1119,7 @@ Ticker_ = function Ticker_(scene, paint, options) {
     this.lowFrameRate = false;
 };
 
-Ticker_.prototype.next = function (timestamp) {
+Ticker_.prototype.next = function () {
     var now = new Date().getTime();
     this.diff = now - this.now;
     this.now = now;
@@ -1201,11 +1132,11 @@ Ticker_.prototype.next = function (timestamp) {
     return this.lastTicksElapsed;
 };
 
-Ticker_.prototype.run = function(timestamp) {
+Ticker_.prototype.run = function () {
     if (this.paused) {
         return;
     }
-    /*if(this.lowFrameRate || this.load > 20 && this.fps < (this.expectedFps / 2)) {
+    if(this.lowFrameRate || this.load > 20 && this.fps < (this.expectedFps / 2)) {
         this.lowFrameRate = true;
         if(this.skippedFrames == 1) {
             this.skippedFrames = 0;
@@ -1218,53 +1149,49 @@ Ticker_.prototype.run = function(timestamp) {
         }
     } else {
         this.skipPaint = false;
-    }*/
+    }
 
     var t = this;
-    var ticksElapsed = this.next(timestamp);
-
+    var ticksElapsed = this.next();
     // no update needed, this happen on the first run
-    /*if (ticksElapsed == 0) {
+    if (ticksElapsed == 0) {
         // this is not a cheap operation
-        setTimeout(this.bindedRun, this.tickDuration);
+        setTimeout(function () {t.run()}, this.tickDuration);
         return;
-    }*/
-    
-    //if(!this.skipPaint) {
-    for (var name in this.scene.layers) {
-        var layer = this.scene.layers[name];
-        if (layer.useCanvas && layer.autoClear) {
-            layer.clear();
+    }
+
+    if(!this.skipPaint) {
+        for (var name in this.scene.layers) {
+            var layer = this.scene.layers[name];
+            if (layer.useCanvas && layer.autoClear) {
+                layer.clear();
+            }
         }
     }
-    //}
 
     this.paint(this);
     // reset the keyboard change
-    if (this.scene.input) {
+    if (this.scene.input)
         this.scene.input.next();
-    }
+
     this.timeToPaint = (new Date().getTime()) - this.now;
     // spread the load value on 2 frames so the value is more stable
-    this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) >> 1;
+    this.load = ((this.timeToPaint / this.tickDuration * 100) + this.load) / 2 | 0;
     this.fps = Math.round(1000 / (this.now - (this.lastPaintAt || 0)));
 
     this.lastPaintAt = this.now;
     if (this.useAnimationFrame) {
         this.tickDuration = 16;
-        this.animationId = global[sjs.requestAnimationFrame](this.bindedRun);
+        global[sjs.animationFrame](function () {t.run()});
     } else {
         var _nextPaint = Math.max(this.tickDuration - this.timeToPaint, 6);
-        this.timeout = setTimeout(this.bindedRun, _nextPaint);
+        this.timeout = setTimeout(function () {t.run()}, _nextPaint);
     }
 };
 
 Ticker_.prototype.pause = function () {
-    if (this.useAnimationFrame) {
-        global[sjs.cancelAnimationFrame](this.animationId);
-    } else {
-        global.clearTimeout(this.timeout);
-    }
+    global.clearTimeout(this.timeout);
+    global[sjs.animationFrame] = undefined;
     this.paused = true;
 };
 
@@ -1394,7 +1321,7 @@ _Input = function _Input(scene) {
     }
 
     var listen = function (name, fct) {
-        _addEventListener(global, name, fct, false);
+        global.addEventListener(name, fct, false);
     }
 
     // Mouse like events
@@ -1410,7 +1337,7 @@ _Input = function _Input(scene) {
         that.mouse.down = true;
         that.mousepressed = true;
         // prevent unwanted browser drag and drop behavior
-        _preventEvent(event);
+        event.preventDefault();
     }
 
     function mouseUpEvent(event) {
@@ -1455,7 +1382,7 @@ _Input = function _Input(scene) {
     });
 
     listen("touchmove", function (e) {
-        _preventEvent(e); // avoid scrolling the page
+        e.preventDefault(); // avoid scrolling the page
         e = reduceTapEvent(e);
         updateKeyChange('space', false); // if it moves: it is not a tap
         mouseMoveEvent(e);
@@ -1510,13 +1437,13 @@ _Input = function _Input(scene) {
     // can be used to avoid key jamming
     listen("keypress", function (e) {});
     if (!sjs.debug)
-        listen("contextmenu", function (e) {_preventEvent(e);});
+        listen("contextmenu", function (e) {e.preventDefault()});
 };
 
 
 // Add an automatic pause to all the scenes when the user
 // quit the current window.
-_addEventListener(global, "blur", function (e) {
+global.addEventListener("blur", function (e) {
     for (var i = 0; i < sjs.scenes.length; i++) {
         var scene = sjs.scenes[i];
         if (!scene.autoPause)
@@ -1533,14 +1460,15 @@ _addEventListener(global, "blur", function (e) {
                 div.style.textAlign = 'center';
                 div.style.paddingTop = ((scene.h / 2) - 32) + 'px';
                 var listener = function (e) {
-                    _preventEvent(e);
+                    e.stopPropagation();
+                    e.preventDefault();
                     scene.dom.removeChild(div);
-                    _removeEventListener(doc, 'click', listener, false);
-                    _removeEventListener(doc, 'keyup', listener, false);
+                    doc.removeEventListener('click', listener, false);
+                    doc.removeEventListener('keyup', listener, false);
                     scene.ticker.resume();
                 }
-                _addEventListener(doc, 'click', listener, false);
-                _addEventListener(doc, 'keyup', listener, false);
+                doc.addEventListener('click', listener, false);
+                doc.addEventListener('keyup', listener, false);
                 scene.dom.appendChild(div);
             }
         }
@@ -1587,9 +1515,7 @@ Layer = function Layer(scene, name, options) {
         // we send back the same.
         return this.scene.layers[name];
     }
-    
-    this.lastZIndex = 0;
-    
+
     domElement = doc.getElementById(name);
     if (!domElement)
         needToCreate = true;

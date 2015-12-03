@@ -41,9 +41,6 @@ class Allow(SimpleHTTPServer.SimpleHTTPRequestHandler):
             self.send_response(200)
             self.send_header("Content-type", ctype)
             self.send_header("Access-Control-Allow-Origin", "*")
-            if path.endswith("png") or path.endswith("gif") or path.endswith("jpg"):
-                # 2 minutes cache
-                self.send_header("Cache-Control", "max-age=120");
             self.end_headers()
             return f
 

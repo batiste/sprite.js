@@ -683,7 +683,7 @@ To use some of these feature, you must include an extra javascript files in your
 
 ScrollingSurface object
 -------------------------
-Scro
+
 This object is not included in sprite.js core and needs to be loaded independantly::
 
     <script src="lib/scrolling.js"></script>
@@ -694,7 +694,7 @@ already been drawn and only redraw the necessary parts instead of the whole scen
 
 .. code-block:: javascript
 
-    var surface = sjs.ScrollingSurface(scene, w, h, redrawCallback);
+    var surface = sjs.SrollingSurface(scene, w, h, redrawCallback);
 
     function redrawCallback(layer, x, y) {
         // draw the necessary sprites on the layer
@@ -707,7 +707,7 @@ already been drawn and only redraw the necessary parts instead of the whole scen
 The redrawCallback is called whenever a part of the surface needs to be updated. The absolute position on the surface
 is provided for you as an argument to redrawCallback so you may determine what to draw on this layer. The layer object has a width and height (layer.w, layer.h).
 
-.. js:class:: sjs.ScrollingSurface(scene, w, h, redrawCallback)
+.. js:class:: sjs.SrollingSurface(scene, w, h, redrawCallback)
 
     :param Scene scene: The scene that will hold the surface.
     :param number w: The width of the surface.
@@ -720,15 +720,15 @@ is provided for you as an argument to redrawCallback so you may determine what t
     :param number x: The x position of the layer within the scrolling surface.
     :param number y: The y position of the layer within the scrolling surface.
 
-.. js:function:: ScrollingSurface.move(x, y)
+.. js:function:: SrollingSurface.move(x, y)
 
     Moves the surface offset in direction (x, y).
 
-.. js:function:: ScrollingSurface.position(x, y)
+.. js:function:: SrollingSurface.position(x, y)
 
     Sets the surface offset position to (x, y)
 
-.. js:function:: ScrollingSurface.update()
+.. js:function:: SrollingSurface.update()
 
     Updates the latest changes to the surface and call the redrawCallback if necessary.
 

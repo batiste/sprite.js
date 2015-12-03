@@ -156,7 +156,7 @@ function main() {
     if(surface)
         surface.remove();
 
-    surface = sjs.ScrollingSurface(scene, scene.w, scene.h, function(layer, _x, _y) {
+    surface = sjs.SrollingSurface(scene, scene.w, scene.h, function(layer, _x, _y) {
         sjs.map.paintOn(layer, _x, _y);
     });
 
