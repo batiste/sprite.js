@@ -1044,11 +1044,10 @@ Cycle = function Cycle(triplets) {
     // this array knows on which ticks in the animation
     // an image change is needed
     this.changingTicks = [0];
-    for (i = 0; triplets[i]; i++) {
-        triplet = triplets[i];
+    triplets.map(function(triplet) {
         this.cycleDuration = this.cycleDuration + triplet[2];
         this.changingTicks.push(this.cycleDuration);
-    }
+    }.bind(this));
     this.currentTripletIndex = undefined;
     // suppose to be private
     this.sprites = [];
@@ -1122,12 +1121,13 @@ Cycle.prototype.next = function (ticks, update) {
         }
     }
     if (currentTripletIndex !== undefined && currentTripletIndex !== this.currentTripletIndex) {
-        for (j = 0; sprite = this.sprites[j]; j++) {
+        this.sprites.map(function(sprite) {
             sprite.setXOffset(this.triplets[currentTripletIndex][0]);
             sprite.setYOffset(this.triplets[currentTripletIndex][1]);
-            if (update)
+            if (update) {
                 sprite.update();
-        }
+            }
+        }.bind(this));
         this.currentTripletIndex = currentTripletIndex;
     }
 
