@@ -343,6 +343,55 @@ window.onload = function() {
     assertTrue(sp1.collidesWith(sp2), "Shape redefinition 4: sprite collides with another");
     assertTrue(sp2.collidesWith(sp1), "Shape redefinition 5: sprite collides with another");
 
+    var cycle = scene.Cycle(
+    [[1, 1, 1],
+     [2, 2, 1],
+     [3, 3, 1]]
+    );
+
+    assertEqual(cycle.cycleDuration, 3);
+
+    assertEqual(cycle.currentTripletIndex, undefined, "Default cycle index is undefined");
+    cycle.next(1);
+    assertEqual(cycle.currentTripletIndex, 0, "Cycle index should be 0");
+    cycle.next(1);
+    assertEqual(cycle.currentTripletIndex, 1, "Cycle index should be 1");
+    cycle.next(1);
+    assertEqual(cycle.currentTripletIndex, 2, "Cycle index should be 2");
+    cycle.next(1);
+    assertEqual(cycle.currentTripletIndex, 0, "Cycle index should be 0");
+    cycle.next(1);
+    assertEqual(cycle.currentTripletIndex, 1, "Cycle index should be 1");
+    cycle.next(1);
+    assertEqual(cycle.currentTripletIndex, 2, "Cycle index should be 2");
+    cycle.next(1);
+    assertEqual(cycle.currentTripletIndex, 0, "Cycle index should be 0");
+
+    var cycle = scene.Cycle(
+    [[1, 1, 3],
+     [2, 2, 3],
+     [3, 3, 3]]
+    );
+
+    assertEqual(cycle.cycleDuration, 9);
+
+    assertEqual(cycle.currentTripletIndex, undefined, "Default cycle index is undefined");
+    cycle.next(3);
+    assertEqual(cycle.currentTripletIndex, 0, "Cycle index should be 0");
+    cycle.next(3);
+    assertEqual(cycle.currentTripletIndex, 1, "Cycle index should be 1");
+    cycle.next(3);
+    assertEqual(cycle.currentTripletIndex, 2, "Cycle index should be 2");
+    cycle.next(3);
+    assertEqual(cycle.currentTripletIndex, 0, "Cycle index should be 0");
+    cycle.next(3);
+    assertEqual(cycle.currentTripletIndex, 1, "Cycle index should be 1");
+    cycle.next(3);
+    assertEqual(cycle.currentTripletIndex, 2, "Cycle index should be 2");
+    cycle.next(3);
+    assertEqual(cycle.currentTripletIndex, 0, "Cycle index should be 0");
+
+
 };
 </script>
 </html>

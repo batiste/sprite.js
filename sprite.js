@@ -1044,7 +1044,8 @@ Cycle = function Cycle(triplets) {
     // this array knows on which ticks in the animation
     // an image change is needed
     this.changingTicks = [0];
-    for (i = 0; triplet=triplets[i]; i++) {
+    for (i = 0; triplets[i]; i++) {
+        triplet = triplets[i];
         this.cycleDuration = this.cycleDuration + triplet[2];
         this.changingTicks.push(this.cycleDuration);
     }
@@ -1105,22 +1106,29 @@ Cycle.prototype.next = function (ticks, update) {
             return this;
         }
     }
-    // search if we are in a new triplet
-    var newTripletIndex, i, j, sprite;
-    for (i = 0; i < this.changingTicks.length - 1; i++) {
-        if (this.tick >= this.changingTicks[i] && this.tick <= this.changingTicks[i+1]) {
-            newTripletIndex = i;
-            break;
+    // search the current triplet index
+    var currentTripletIndex, i, j, sprite, next;
+    for (i = 0; i < this.changingTicks.length; i++) {
+        next = this.changingTicks[i+1];
+        if (this.tick >= this.changingTicks[i]) {
+            if(next === undefined) {
+                currentTripletIndex = 0;
+                this.tick = 0;
+                break;
+            } else if(this.tick < next) {
+                currentTripletIndex = i;
+                break;
+            }
         }
     }
-    if (newTripletIndex !== undefined && newTripletIndex !== this.currentTickIndex) {
+    if (currentTripletIndex !== undefined && currentTripletIndex !== this.currentTripletIndex) {
         for (j = 0; sprite = this.sprites[j]; j++) {
-            sprite.setXOffset(this.triplets[i][0]);
-            sprite.setYOffset(this.triplets[i][1]);
+            sprite.setXOffset(this.triplets[currentTripletIndex][0]);
+            sprite.setYOffset(this.triplets[currentTripletIndex][1]);
             if (update)
                 sprite.update();
         }
-        this.currentTripletIndex = newTripletIndex;
+        this.currentTripletIndex = currentTripletIndex;
     }
 
     ticks = ticks || 1; // default tick: 1
@@ -1281,7 +1289,7 @@ var inputSingleton = false;
 function Input(scene) {
     if (!inputSingleton)
         inputSingleton = new _Input(scene);
-    return inputSingleton
+    return inputSingleton;
 };
 
 _Input = function _Input(scene) {
@@ -1522,6 +1530,7 @@ _addEventListener(global, "blur", function (e) {
         if (!scene.autoPause)
             continue;
         var anon = function (scene) {
+            Input();
             inputSingleton.keyboard = {};
             inputSingleton.keydown = false;
             inputSingleton.mousedown = false;
