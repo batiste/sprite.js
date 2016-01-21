@@ -1530,7 +1530,7 @@ _addEventListener(global, "blur", function (e) {
         if (!scene.autoPause)
             continue;
         var anon = function (scene) {
-            Input();
+            Input(scene);
             inputSingleton.keyboard = {};
             inputSingleton.keydown = false;
             inputSingleton.mousedown = false;
