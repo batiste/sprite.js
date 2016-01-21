@@ -342,6 +342,22 @@ Scene.prototype.loadImages = function loadImages(images, callback) {
     }
 };
 
+Scene.prototype.unloadImages = function unloadImages (callback){
+	sjs.spriteCache = null;
+	sjs.spriteCache = {};
+	if (callback) callback();
+};
+
+Scene.prototype.unloadFolderImages = function unloadFolderImages (folderName,callback){	
+	var folder = folderName + "/";
+	for (var name in sjs.spriteCache) {
+		if (!sjs.spriteCache.hasOwnProperty(name)) continue;
+		
+		if (name.indexOf(folder)==0) delete sjs.spriteCache[name];
+	}
+	if (callback) callback();
+};
+
 Sprite = function Sprite(scene, src, layer) {
 
     this.scene = scene;
