@@ -10,7 +10,7 @@ http://readthedocs.org/docs/spritejs/en/latest/
 
 For examples of what the framework offers:
 
-http://batiste.info/sprite.js/tests/
+http://batiste.info/sprite.js/tests/visual_guide.html
 
 
 Projects that uses sprite.js
