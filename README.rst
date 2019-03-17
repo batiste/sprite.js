@@ -12,7 +12,7 @@ For examples of what the framework offers:
 
  * http://batiste.info/sprite.js/tests/visual_guide.html
  * http://batiste.info/sprite.js/tests/test_scrolling.html
- * http://batiste.info/sprite.js/tests/test_physic.html
+ * http://batiste.info/sprite.js/tests/test_angle_collision.html
 
 
 Projects that uses sprite.js
