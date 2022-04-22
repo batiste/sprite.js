@@ -37,7 +37,7 @@ Example of basic sprite transformations:
         sp.update();
     });
 
-If you want a more interactive demonstration of basic sprite manipulation, there is a good example in the tests: http://batiste.info/sprite.js/tests/visual_guide.html
+If you want a more interactive demonstration of basic sprite manipulation, there is a good example in the tests: http://batiste.github.io/sprite.js/tests/visual_guide.html
 
 
 Performance and different ways to draw
