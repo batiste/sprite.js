@@ -21,7 +21,7 @@ or use the `direct link to the library <https://raw.github.com/batiste/sprite.js
 Examples
 =========================
 
-To see examples of what the framework has to offer `have a look at the test files <http://batiste.info/sprite.js/tests/>`_.
+To see examples of what the framework has to offer `have a look at the test files <http://batiste.github.io/sprite.js/tests/>`_.
 
 Table of content
 ======================================
@@ -39,6 +39,6 @@ Table of content
 Projects that Use Sprite.js
 ==============================
 
-* `Steam <http://batiste.info/games/steam9/>`_ is a platform game involving a physics puzzle.
+* `Steam <http://batiste.github.io/games/steam9/>`_ is a platform game involving a physics puzzle.
 * `Webattle.js <https://github.com/tadast/webattle.js>`_ is a multiplayer HTML5 game using node.js.
-* `"The invasion of the evil lords" <http://batiste.info/games/rpg/game.html>`_. is a demo RPG with different creatures and a boss.
+* `"The invasion of the evil lords" <http://batiste.github.io/games/rpg/game.html>`_. is a demo RPG with different creatures and a boss.
